@@ -5,3 +5,4 @@ requests
 # beautifulsoup4
 Flask-Login
 bcrypt
+Pillow>=9.0.0

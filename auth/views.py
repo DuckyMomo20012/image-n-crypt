@@ -6,15 +6,17 @@ from auth.model import User, LoginForm
 from auth.service import getUserById, getUserByUserName
 from flask_login import login_user, login_required, AnonymousUserMixin
 import bcrypt
+import json
 
 @login_manager.user_loader
 def load_user(user_id):
     userDoc = getUserById(user_id)
-    print("userDoc", userDoc)
     if (not userDoc):
         return AnonymousUserMixin()
 
-    user = User(username=userDoc.username, password=userDoc.password)
+    userObj = json.loads(userDoc.to_json())
+    # id field inherited from UserMixin class (from flask_login)
+    user = User(id=userObj['_id']['$oid'], username=userObj['username'], password=userObj['password'])
     return user
 
 @login_manager.unauthorized_handler
@@ -66,32 +68,23 @@ def register():
 def login():
     # pass request data to form
     form = LoginForm()
-    if request.method == 'POST':
-        # Don't have to pass request.form or check POST request, because
-        # validate_on_submit automatically do that
 
-        if form.validate_on_submit():
-            data = request.form
-            username = data['username']
-            password = data['password'].encode()
-
-            users = getUserByUserName(username)
-
-            if (not len(users)):
-                return redirect(url_for('login'))
-
-            # Get first user, although there is no duplicate username 🤔
-            user = users[0]
-
-            if bcrypt.checkpw(password, user.password.encode()):
-                login_user(user)
-                flash('Logged in')
-                return redirect(url_for('index'))
-            else:
-                return 'Invalid information'
-
+    # Don't have to pass request.form or check POST request, because
+    # validate_on_submit automatically do that
+    if form.validate_on_submit():
+        data = request.form
+        username = data['username']
+        password = data['password'].encode()
+        user = getUserByUserName(username).first()
+        if (not user):
+            return redirect(url_for('login'))
+        # print(user.to_json())
+        if bcrypt.checkpw(password, user.password.encode()):
+            login_user(user)
+            flash('Logged in')
+            return redirect(url_for('index'))
         else:
-            return form.errors
+            return 'Invalid information'
 
     return render_template('login.html', form=form)
 
