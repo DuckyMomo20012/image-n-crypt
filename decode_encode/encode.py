@@ -1,15 +1,12 @@
 from cv2 import PyRotationWarper
 from function_support import *
 import json
-binary_file = open("output.png", 'rb')
-ima = binary_file.read()
-binary_file.close()
+save_file = "Encry.png"
+pathImage = "1.png"
+quotient = "quotient.txt"
 if __name__ == "__main__":
-<<<<<<< Updated upstream
-    result = Encrypted(ima,"rsa_pub.txt") 
-    print(result)        
+    result = Encrypted(pathImage,"rsa_pub.txt",save_file,quotient) 
+    cv2.imshow('image',result)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()   
                           
-=======
-    result = Encrypted("rsa_pub.txt", ima, '../output.png')
-    print(result)
->>>>>>> Stashed changes
