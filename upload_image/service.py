@@ -1,4 +1,10 @@
 from upload_image.model import Image
+from mongoengine.queryset.visitor import Q
+
 
 def getImageById(id):
-	return Image.objects(userId=id)
+    return Image.objects(userId=id)
+
+
+def getImageByNameAndUserId(id, fileName):
+    return Image.objects(Q(userId=id) & Q(nameImg=fileName)).first()

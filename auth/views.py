@@ -1,12 +1,13 @@
-from flask import request, render_template, url_for, flash, session
+from flask import request, render_template, url_for, jsonify
 from flask_login.utils import logout_user
 from werkzeug.utils import redirect
-from app import app, login_manager
+from app import app, login_manager, csrf
 from auth.model import User, LoginForm
 from auth.service import getUserById, getUserByUserName
 from flask_login import login_user, login_required, AnonymousUserMixin
 import bcrypt
 import json
+from flask_wtf.csrf import generate_csrf
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -21,50 +22,46 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    # Flash all flash messages before
-    session.pop('_flashes', None)
-    flash('Please login to continue')
     # If unauthorize then redirect to login
-    return redirect(url_for('login'))
+    return jsonify({
+		"status": "error",
+		"message": "User is not authorized"
+	})
 
-# @csrf.exempt
-@app.route("/api/register", methods = ['GET', 'POST'])
+@app.route("/api/register", methods=["GET", "POST"])
 def register():
     # pass request data to form
     form = LoginForm()
-    if request.method == 'POST':
-        # Don't have to pass request.form or check POST request, because
-        # validate_on_submit automatically do that
+    # Don't have to pass request.form or check POST request, because
+    # validate_on_submit automatically do that
+    if form.validate_on_submit():
+        data = request.form
+        # NOTE: the field we access MUST persist with the field. Otherwise, we
+        # will get the 400 Bad request
+        username = data["username"]
+        password = data["password"].encode()
+        publicKey = data["publicKey"]
+        users = getUserByUserName(username)
+        if len(users) > 0:
+            return jsonify({"status": "error", "message": "Username already exists"})
+        salt = bcrypt.gensalt(rounds=16)
+        hashPassword = bcrypt.hashpw(password, salt)
+        user = User(username=username, password=hashPassword, publicKey=publicKey)
+        user.save()
+        login_user(user)
+        return jsonify(
+            {
+                "status": "success",
+                "data": {"username": username, "public_key": publicKey},
+            }
+        )
+    # else:
+    #     return jsonify({"status": "error", "message": form.errors})
 
-        if form.validate_on_submit():
-            data = request.form
-            username = data['username']
-            password = data['password'].encode()
-
-            users = getUserByUserName(username)
-
-            if len(users) > 0:
-                flash('Username already exists');
-                return redirect(url_for('register'))
-
-            salt = bcrypt.gensalt(rounds=16)
-
-            hashPassword = bcrypt.hashpw(password, salt)
-            user = User(username=username, password=hashPassword)
-            user.save()
-
-            login_user(user)
-
-            flash('Account register successfully')
-            return redirect(url_for('index'))
-        else:
-            flash(form.errors)
-            return redirect(url_for('register'))
-
-    return render_template('register.html', form=form)
+    return jsonify({"csrf_token": generate_csrf()})
 
 
-@app.route("/api/login", methods = ['GET', 'POST'])
+@app.route("/api/login", methods=["GET", "POST"])
 def login():
     # pass request data to form
     form = LoginForm()
@@ -76,23 +73,33 @@ def login():
         username = data['username']
         password = data['password'].encode()
         user = getUserByUserName(username).first()
-        if (not user):
-            return redirect(url_for('login'))
+        if not user:
+            return jsonify(
+                {"status": "error", "message": "Username or password is invalid"}
+            )
         # print(user.to_json())
         if bcrypt.checkpw(password, user.password.encode()):
             login_user(user)
-            flash('Logged in')
-            return redirect(url_for('index'))
+            return jsonify(
+                {
+                    "status": "success",
+                    "data": {"username": user.username, "public_key": user.publicKey},
+                }
+            )
         else:
-            return 'Invalid information'
+            return jsonify(
+                {"status": "error", "message": "Username or password is invalid"}
+            )
 
-    return render_template('login.html', form=form)
+    return jsonify({"csrf_token": generate_csrf()})
 
-@app.route('/api/logout')
+
+@app.route("/api/logout", methods=["POST"])
+@csrf.exempt
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return jsonify({"status": "success", "data": "User logged out"})
 
 
 # with app.test_client() as c:
