@@ -17,8 +17,11 @@ def image_list():
 	curUser = current_user.get_id()
 
 	images = getImageById(curUser)
-	imageList = [img.nameImg for img in images]
-	return jsonify({"status": "success", "data": imageList})
+	if images:
+		imageList = [img.nameImg for img in images]
+		return jsonify({"status": "success", "data": imageList})
+
+	return jsonify({"status": "success", "data": "No image"})
 
 
 @app.route("/api/image-list/download/<string:fileName>", methods=["GET"])
@@ -58,7 +61,6 @@ def uploadImage():
 
 		# Query to check duplicate file name
 		imageList = getImageByNameAndUserId(userId, filename)
-		print("imageList", imageList)
 
 		if imageList:
 			filename = getRandomFileName(filename)

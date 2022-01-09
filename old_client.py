@@ -23,14 +23,6 @@ import base64
 # Success: {"data":{"public_key":"34609 28407","username":"vinh"},"status":"success"}
 # Error: {"message":"Username already exists","status":"error"}
 
-# token_el = BeautifulSoup(r.json()['csrf_token'], 'html.parser')
-# token_val = token_el.input.attrs['value']
-# print("token_val", type(token_val))
-
-# custom_header = {
-# 	"X-CSRFToken": token_val
-# }
-
 # 2. LOGIN:
 
 # NOTE: Only login GET request have "Set-Cookie" header
@@ -62,6 +54,7 @@ list_img_g = requests.get(
 )
 print("list_img_g", list_img_g.text)
 # Success: {"data":["traffic-sign.png","bicycle.png"],"status":"success"}
+# Success: {"status": "success", "data": "No image"}
 
 # 4. LOGOUT:
 
