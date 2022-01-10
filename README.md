@@ -1,3 +1,8 @@
+<style>
+    table {
+        width: 100%;
+    }
+</style>
 # 1. Installation:
 
 ## 1.1. Install environment:
@@ -28,8 +33,9 @@ flask run
 
 ## 2.1. Login:
 
-> NOTE: Whenever User login or logout, cookie will be reset. After register,
-> user is logged in, so cookie is reset.
+> NOTE: Whenever User login or logout, that means user's session is over, so cookie will be reset.
+
+> After register, user is logged in, so cookie is reset.
 
 ```python
 login_g = requests.get("http://localhost:5000/api/login")
