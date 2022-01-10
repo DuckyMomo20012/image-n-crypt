@@ -50,17 +50,82 @@ print("login_p", login_p.text)
 cookie = login_p.headers["Set-cookie"]
 ```
 
-> Success: { "data":{"public_key":null,"username":"admin"},"status":"success"}
+<table>
+<td> URL </td>
+<td> http://localhost:5000/api/login </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"message":"Username or password is invalid","status":"error"}
+```json
+{
+  "csrf_token": "IjA5Z...",
+  "status": "success"
+}
+```
 
-> Error: {"message":"Password is required","status":"error"}
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Success </td>
+<td>
+
+```json
+{
+  "data": {
+    "public_key": "34609 28407",
+    "username": "vinh"
+  },
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Username or password is invalid"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Password is required"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.2. Logout:
 
 > NOTE: When logout, cookie will be reset
 
 > NOTE: I have turned off csrf protection for logout route, so we don't have to request a CSRF key.
+
+> NOTE: Unauthorized request will return "User is not authorized"
 
 ```python
 logout_p = requests.post(
@@ -71,11 +136,43 @@ print("logout", logout_p.text)
 cookie = logout_p.headers["Set-Cookie"]
 ```
 
-> Success: {"data":"User logged out","status":"success"}
+<table>
+<td> URL </td>
+<td> http://localhost:5000/api/logout </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Success </td>
+<td>
 
-> NOTE: Unauthorized request will return this error
+```json
+{
+  "data": "User logged out",
+  "status": "success"
+}
+```
 
-> Error: {"message":"User is not authorized","status":"error"}
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "User is not authorized"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.3. Register:
 
@@ -97,11 +194,74 @@ register_p = requests.post(
 print("register_p", register_p.text)
 ```
 
-> Success: {"data":{"public_key":"34609 28407","username":"vinh"},"status":"success"}
+<table>
+<td> URL </td>
+<td> http://localhost:5000/api/register </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"message":"Username already exists","status":"error"}
+```json
+{
+  "csrf_token": "IjA5Z...",
+  "status": "success"
+}
+```
 
-> Error: {"message":"Password is required, Public key is required","status":"error"}
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Success </td>
+<td>
+
+```json
+{
+  "data": {
+    "public_key": "34609 28407",
+    "username": "vinh"
+  },
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Username already exists"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Password is required, Public key is required"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.4. List images:
 
@@ -112,9 +272,43 @@ list_img_g = requests.get(
 print("list_img_g", list_img_g.text)
 ```
 
-> Success: {"data":["traffic-sign.png","bicycle.png"],"status":"success"}
+<table>
+<td> URL </td>
+<td> http://localhost:5000/api/image-list </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Success: {"status": "success", "data": "No image"}
+```json
+{
+  "status": "success",
+  "data": ["traffic-sign.png", "bicycle.png"]
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
+
+```json
+{
+  "status": "success",
+  "message": "No image on database"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.5. Upload image:
 
@@ -159,9 +353,59 @@ with open(fileName_encrypt, "rb") as f:
     print("upload_img_p", upload_img_p.text)
 ```
 
-> Success: {"data":{"img_name":"bicycle.png_20220109213826"},"status":"success"}
+<table>
+<td> URL </td>
+<td> http://localhost:5000/api/upload-image </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"message":"Image file is required","status":"error"}
+```json
+{
+  "csrf_token": "IjA5Z...",
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Success </td>
+<td>
+
+```json
+{
+  "data": {
+    "img_name": "bicycle.png_20220109213826"
+  },
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Image file is required"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.6. Download image:
 
@@ -187,11 +431,60 @@ function_support.Decrypted(
 )
 ```
 
-> Success: {"data":{"img_content":"\u00ff...","img_name":"bicycle.png"},"status":"success"}
+<table>
+<td> URL </td>
+<td> http://127.0.0.1:5000/api/download/{downloadFile} </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"message":"Image not found","status":"error"}
+```json
+{
+  "status": "success",
+  "data": {
+    "img_content": "\u00ff...",
+    "img_name": "bicycle.png"
+  }
+}
+```
 
-> Error: {"status": "error", "message": "User not found"}
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Image not found"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "User not found"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.7 Download ALL images:
 
@@ -217,12 +510,62 @@ for image in imgData:
     )
 ```
 
-> Success: {"status": "success", "data":
-> [{"img_content":"\u00ff...","img_name":"bicycle.png"}]}
+<table>
+<td> URL </td>
+<td> http://127.0.0.1:5000/api/download-all </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"message":"Image not found","status":"error"}
+```json
+{
+  "status": "success",
+  "data": [
+    {
+      "img_content": "\u00ff...",
+      "img_name": "bicycle.png"
+    }
+  ]
+}
+```
 
-> Error: {"status": "error", "message": "User not found"}
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "Image not found"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "User not found"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.8. Delete image:
 
@@ -245,12 +588,57 @@ delete_img_p_data = json.loads(delete_img_p.text)
 print("delete_img_p_data", delete_img_p_data)
 ```
 
-> Success: {'data': 'Image deleted', 'status': 'success'}
+<table>
+<td> URL </td>
+<td> http://127.0.0.1:5000/api/delete/{deleteFile} </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {'message': 'Image not found', 'status': 'error'}
+```json
+{
+  "csrf_token": "IjA5Z...",
+  "status": "success"
+}
+```
 
-> Error: {"status": "error", "message": "User not found"}
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Success </td>
+<td>
 
+```json
+{
+  "data": "Image deleted",
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "User not found"
+}
+```
+
+</td>
+</tr>
+</table>
 
 ## 2.9. Get public key:
 
@@ -265,6 +653,40 @@ public_key_g_data = json.loads(public_key_g.text)
 print("public_key_g_data", public_key_g_data)
 ```
 
-> Success: {'public_key': '118403 97093'}
+<table>
+<td> URL </td>
+<td> http://127.0.0.1:5000/api/public-key </td>
+</table>
+<table>
+<tr>
+<td> Method </td> <td> Status </td> <td> Response </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Success </td>
+<td>
 
-> Error: {"status": "error", "message": "User not found"}
+```json
+{
+  "public_key": "118403 97093",
+  "status": "success"
+}
+```
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> Error </td>
+<td>
+
+```json
+{
+  "status": "error",
+  "message": "User not found"
+}
+```
+
+</td>
+</tr>
+</table>

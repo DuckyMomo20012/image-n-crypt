@@ -101,7 +101,7 @@ def uploadImage():
         errorMessage = ", ".join(flatten(form.errors))
         return jsonify({"status": "error", "message": errorMessage})
 
-    return jsonify({"csrf_token": generate_csrf()})
+    return jsonify({"status": "success", "csrf_token": generate_csrf()})
 
 
 @app.route("/api/delete/<string:fileName>", methods=["GET", "POST"])
@@ -124,7 +124,7 @@ def deleteImage(fileName):
 		if not image:
 			return jsonify({"status": "error", "message": "Image not found"})
 
-		return jsonify({"csrf_token": generate_csrf()})
+		return jsonify({"status": "success", "csrf_token": generate_csrf()})
 
 @app.route("/api/public-key", methods=["GET"])
 @login_required
@@ -137,4 +137,4 @@ def getPublicKey():
 
     publicKey = user.publicKey
 
-    return jsonify({"public_key": publicKey})
+    return jsonify({"status": "success", "public_key": publicKey})

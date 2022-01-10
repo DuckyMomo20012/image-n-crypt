@@ -65,7 +65,7 @@ def register():
         errorMessage = ", ".join(flatten(form.errors))
         return jsonify({"status": "error", "message": errorMessage})
 
-    return jsonify({"csrf_token": generate_csrf()})
+    return jsonify({"status": "success", "csrf_token": generate_csrf()})
 
 
 @app.route("/api/login", methods=["GET", "POST"])
@@ -102,7 +102,7 @@ def login():
         errorMessage = ", ".join(flatten(form.errors))
         return jsonify({"status": "error", "message": errorMessage})
 
-    return jsonify({"csrf_token": generate_csrf()})
+    return jsonify({"status": "success", "csrf_token": generate_csrf()})
 
 
 @app.route("/api/logout", methods=["POST"])
