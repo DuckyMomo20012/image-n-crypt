@@ -86,10 +86,7 @@ print("upload_img_g", upload_img_g.text)
 
 # NOTE: "imageFile" is field from ImageForm class
 fileName = 'bicycle.png'
-fileName_encrypt = 'bicycle_e.png'
-imgData = Image.open(fileName)
-imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
-imgData.save(fileName_encrypt)
+fileName_encrypt = 'bicycle.png'
 function_support.create_write_key("", writeFile=True)
 function_support.Encrypted(fileName_encrypt, "rsa_pub.txt", fileName_encrypt)
 with open(fileName_encrypt, 'rb') as f:
@@ -107,7 +104,7 @@ with open(fileName_encrypt, 'rb') as f:
 
 # 6. DOWNLOAD IMAGE:
 
-downloadFile = 'bicycle_e.png'
+downloadFile = 'bicycle.png'
 downloadFile_d = 'bicycle_d.png'
 download_img_g = requests.get(
     f"http://127.0.0.1:5000/api/image-list/download/{downloadFile}",
@@ -118,10 +115,7 @@ imgData = data["data"]["img_content"]
 imgName = data["data"]["img_name"]
 with open(imgName, "wb") as f:
     f.write(imgData.encode("ISO-8859-1"))
-imgData = Image.open(imgName)
-imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
-imgData.save(downloadFile_d)
-function_support.Decrypted(downloadFile_d, "rsa.txt", downloadFile_d)
+function_support.Decrypted(downloadFile, "rsa.txt", downloadFile_d)
 # Success:
 # {"data":{"img_content":"\u00ff...","img_name":"bicycle.png"},"status":"success"}
 # Error: {"message":"Image not found","status":"error"}

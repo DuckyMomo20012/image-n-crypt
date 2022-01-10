@@ -124,9 +124,6 @@ print("upload_img_g", upload_img_g.text)
 # NOTE: "imageFile" is field from ImageForm class
 fileName = 'bicycle.png'
 fileName_encrypt = 'bicycle_e.png'
-imgData = Image.open(fileName)
-imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
-imgData.save(fileName_encrypt)
 function_support.create_write_key("", writeFile=True)
 function_support.Encrypted(fileName_encrypt, "rsa_pub.txt", fileName_encrypt)
 with open(fileName_encrypt, 'rb') as f:
@@ -158,9 +155,6 @@ imgData = data["data"]["img_content"]
 imgName = data["data"]["img_name"]
 with open(imgName, "wb") as f:
     f.write(imgData.encode("ISO-8859-1"))
-imgData = Image.open(imgName)
-imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
-imgData.save(downloadFile_d)
 function_support.Decrypted(downloadFile_d, "rsa.txt", downloadFile_d)
 ```
 

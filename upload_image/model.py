@@ -12,5 +12,5 @@ class ImageForm(FlaskForm):
 class Image(me.Document):
     userId = me.StringField()
     nameImg = me.StringField()
-    dataImg = me.ImageField(size=(1024, 1024, True))
+    dataImg = me.ImageField()
     meta = {"collection": "images"}
