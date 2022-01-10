@@ -2,7 +2,7 @@ from upload_image.model import Image
 from mongoengine.queryset.visitor import Q
 
 
-def getImageById(id):
+def getAllImageByUserId(id):
     return Image.objects(userId=id)
 
 

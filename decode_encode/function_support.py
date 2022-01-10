@@ -122,7 +122,7 @@ def publicKey_privateKey(p, q):
 def powermod(x, e, n):
     y = e
     res = 1
-    x = x % n
+    x = x % int(n)
     if x == 0:
         return x
     while y > 0:
@@ -156,16 +156,27 @@ def read_file(filename):
 # ma hoa vì mã màu tối đa là 255 nên file save_quotient sẽ chưa thương của phần tử sau khi được mã hóa RSA.
 def Encrypted(
     pathImage,
-    path_pbKey,
+    e=None,
+    n=None,
+    path_pbKey=None,
     save_imageEncrypted="encode_img.png",
     save_quotient="quotient.txt",
 ):
+    if not path_pbKey and not e and not n:
+        raise Exception("Public key is missing")
+    # e, n directly passed into function has more priority than text file
+    if path_pbKey and not e and not n:
+        public_key = read_file(path_pbKey)
+        n, e = map(int, public_key.split(" "))
+
+    if not e or not n and not path_pbKey:
+        raise Exception("Public key is missing.")
+
+    if not os.path.exists(pathImage):
+        raise Exception('Image path is not exist')
+
     img = cv2.imread(pathImage)
-    public_key = read_file(path_pbKey)
-    data = public_key.split(" ")
-    n = int(data[0])
-    e = int(data[1])
-    str1 = ""
+
     f = open(save_quotient, "w")
     for i in range(3):
         for j in range(img.shape[0]):
@@ -183,18 +194,30 @@ def Encrypted(
 
 def Decrypted(
     path_ImageDecode,
-    path_private_key,
+    d=None,
+    n=None,
+    path_private_key=None,
     save_imageDecrypted="decode_imge.png",
     path_file_quotient="quotient.txt",
 ):
+    if not path_private_key and not d and not n:
+        raise Exception("Private key is missing")
+    # d, n directly passed into function has more priority than text file
+    if path_private_key and not d and not n:
+        private_key = read_file(path_private_key)
+        d, n = map(int, private_key.split(" "))
+
+    if not os.path.exists(path_ImageDecode):
+        raise Exception('Image path is not exist')
+
+    if not os.path.exists(path_file_quotient):
+        raise Exception('Quotient path is not exist')
+
+
     img = cv2.imread(path_ImageDecode)
-    private_key = read_file(path_private_key)
     quotient = read_file(path_file_quotient)
     list_quotient = quotient.split(" ")
 
-    d_n = private_key.split(" ")
-    d = int(d_n[0])
-    n = int(d_n[1])
     index = 0
     for i in range(3):
         for j in range(img.shape[0]):
