@@ -6,9 +6,24 @@ from flask_login import UserMixin
 
 
 class LoginForm(FlaskForm):
-    username = wf.StringField(label="name")
-    password = wf.StringField(label="password")
-    publicKey = wf.StringField(label="public_key")
+    username = wf.StringField(
+        label="name", validators=[DataRequired("Username is required")]
+    )
+    password = wf.StringField(
+        label="password", validators=[DataRequired("Password is required")]
+    )
+
+
+class RegisterForm(FlaskForm):
+    username = wf.StringField(
+        label="name", validators=[DataRequired("Username is required")]
+    )
+    password = wf.StringField(
+        label="password", validators=[DataRequired("Password is required")]
+    )
+    publicKey = wf.StringField(
+        label="public_key", validators=[DataRequired("Public key is required")]
+    )
 
 
 class User(me.Document, UserMixin):

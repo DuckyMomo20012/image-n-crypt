@@ -7,6 +7,8 @@ from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 app.config.from_object("config.Config")
+app.config.from_object("config.DBConfig")
+# configure_uploads(app, photos)
 
 # Auth
 login_manager = LoginManager()

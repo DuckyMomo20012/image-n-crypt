@@ -2,36 +2,41 @@ from flask import request, render_template, url_for, jsonify
 from flask_login.utils import logout_user
 from werkzeug.utils import redirect
 from app import app, login_manager, csrf
-from auth.model import User, LoginForm
+from auth.model import User, LoginForm, RegisterForm
 from auth.service import getUserById, getUserByUserName
 from flask_login import login_user, login_required, AnonymousUserMixin
 import bcrypt
 import json
 from flask_wtf.csrf import generate_csrf
+from helpers.utils import flatten
+
 
 @login_manager.user_loader
 def load_user(user_id):
     userDoc = getUserById(user_id)
-    if (not userDoc):
+    if not userDoc:
         return AnonymousUserMixin()
 
     userObj = json.loads(userDoc.to_json())
     # id field inherited from UserMixin class (from flask_login)
-    user = User(id=userObj['_id']['$oid'], username=userObj['username'], password=userObj['password'])
+    user = User(
+        id=userObj["_id"]["$oid"],
+        username=userObj["username"],
+        password=userObj["password"],
+    )
     return user
+
 
 @login_manager.unauthorized_handler
 def unauthorized():
     # If unauthorize then redirect to login
-    return jsonify({
-		"status": "error",
-		"message": "User is not authorized"
-	})
+    return jsonify({"status": "error", "message": "User is not authorized"})
+
 
 @app.route("/api/register", methods=["GET", "POST"])
 def register():
     # pass request data to form
-    form = LoginForm()
+    form = RegisterForm()
     # Don't have to pass request.form or check POST request, because
     # validate_on_submit automatically do that
     if form.validate_on_submit():
@@ -55,8 +60,10 @@ def register():
                 "data": {"username": username, "public_key": publicKey},
             }
         )
-    # else:
-    #     return jsonify({"status": "error", "message": form.errors})
+
+    if form.errors:
+        errorMessage = ", ".join(flatten(form.errors))
+        return jsonify({"status": "error", "message": errorMessage})
 
     return jsonify({"csrf_token": generate_csrf()})
 
@@ -70,8 +77,8 @@ def login():
     # validate_on_submit automatically do that
     if form.validate_on_submit():
         data = request.form
-        username = data['username']
-        password = data['password'].encode()
+        username = data["username"]
+        password = data["password"].encode()
         user = getUserByUserName(username).first()
         if not user:
             return jsonify(
@@ -91,6 +98,10 @@ def login():
                 {"status": "error", "message": "Username or password is invalid"}
             )
 
+    if form.errors:
+        errorMessage = ", ".join(flatten(form.errors))
+        return jsonify({"status": "error", "message": errorMessage})
+
     return jsonify({"csrf_token": generate_csrf()})
 
 
@@ -100,17 +111,3 @@ def login():
 def logout():
     logout_user()
     return jsonify({"status": "success", "data": "User logged out"})
-
-
-# with app.test_client() as c:
-# 	rv = c.get('/api/register', data=dict(
-# 		username='vinh',
-# 		password='asdfasdf',
-# 	))
-# 	csrf_token = str(rv.data)
-# 	rv = c.get('/api/register', data=dict(
-# 		username='vinh',
-# 		password='asdfasdf',
-# 	))
-# 	print(rv.data)
-    # json_data = rv.get_json()

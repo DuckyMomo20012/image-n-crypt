@@ -3,7 +3,7 @@
 ```console
 python -m venv .venv
 ```
-# 1.2. Activate enviroment:
+# 1.2. Activate environment:
 ```console
 .venv\Scripts\activate
 ```
@@ -44,6 +44,8 @@ cookie = login_p.headers["Set-cookie"]
 > Success: { "data":{"public_key":null,"username":"admin"},"status":"success"}
 
 > Error: {"message":"Username or password is invalid","status":"error"}
+
+> Error: {"message":"Password is required","status":"error"}
 
 ## 2.2. Logout:
 > NOTE: Every POST request, cookie will be reset.
@@ -92,6 +94,8 @@ print("register_p", register_p.text)
 
 > Error: {"message":"Username already exists","status":"error"}
 
+> Error: {"message":"Password is required, Public key is required","status":"error"}
+
 ## 2.4. List images:
 ```python
 list_img_g = requests.get(
@@ -107,54 +111,59 @@ print("list_img_g", list_img_g.text)
 
 >  Success: {"status": "success", "data": "No image"}
 
-## 2.5. Download image:
-```python
-downloadFile = 'bicycle.jpg'
-download_img_g = requests.get(
-	f"http://127.0.0.1:5000/api/image-list/download/{downloadFile}",
-	headers={
-		"Cookie": cookie
-	},
-)
+## 2.5. Upload image:
+> NOTE: Temporarily accepting .PNG image extension only.
 
+```python
+upload_img_g = requests.get("http://localhost:5000/api/upload-image", headers={"Cookie": cookie})
+upload_img_data = json.loads(upload_img_g.text)
+csrfKey = upload_img_data["csrf_token"]
+
+print("upload_img_g", upload_img_g.text)
+
+# NOTE: "imageFile" is field from ImageForm class
+fileName = 'bicycle.png'
+fileName_encrypt = 'bicycle_e.png'
+imgData = Image.open(fileName)
+imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
+imgData.save(fileName_encrypt)
+function_support.create_write_key("", writeFile=True)
+function_support.Encrypted(fileName_encrypt, "rsa_pub.txt", fileName_encrypt)
+with open(fileName_encrypt, 'rb') as f:
+	upload_img_p = requests.post(
+		"http://localhost:5000/api/upload-image",
+		files={"imageFile": f},
+		headers={
+			"X-CSRFToken": csrfKey,
+			"Cookie": cookie,
+		},
+	)
+	print("upload_img_p", upload_img_p.text)
+```
+
+> Success: {"data":{"img_name":"bicycle.png_20220109213826"},"status":"success"}
+
+> Error: {"message":"Image file is required","status":"error"}
+
+## 2.6. Download image:
+```python
+downloadFile = 'bicycle_e.png'
+downloadFile_d = 'bicycle_d.png'
+download_img_g = requests.get(
+    f"http://127.0.0.1:5000/api/image-list/download/{downloadFile}",
+    headers={"Cookie": cookie},
+)
 data = json.loads(download_img_g.text)
 imgData = data["data"]["img_content"]
 imgName = data["data"]["img_name"]
 with open(imgName, "wb") as f:
-	f.write(imgData.encode("ISO-8859-1"))
+    f.write(imgData.encode("ISO-8859-1"))
+imgData = Image.open(imgName)
+imgData.thumbnail((1024, 1024), Image.ANTIALIAS)
+imgData.save(downloadFile_d)
+function_support.Decrypted(downloadFile_d, "rsa.txt", downloadFile_d)
 ```
 
 > Success: {"data":{"img_content":"\u00ff...","img_name":"bicycle.png"},"status":"success"}
 
 > Error: {"message":"Image not found","status":"error"}
-
-## 2.6. Upload image:
-```python
-upload_img_g = requests.get(
-	"http://localhost:5000/api/upload-image",
-	headers={
-		"Cookie": cookie
-	}
-)
-upload_img_data = json.loads(upload_img_g.text)
-csrfKey = upload_img_data["csrf_token"]
-print("upload_img_g", upload_img_g.text)
-
-# NOTE: "imageFile" is field from ImageForm class
-
-fileName = 'bicycle.jpg'
-with open(fileName, 'rb') as f:
-	upload_img_p = requests.post(
-		"http://localhost:5000/api/upload-image",
-		files={
-			"imageFile": f
-		},
-		headers={
-			"X-CSRFToken": csrfKey,
-			"Cookie": cookie,
-		},
- 	)
- print("upload_img_p", upload_img_p.text)
-```
-
-> Success: {"data":{"img_name":"bicycle.png_20220109213826"},"status":"success"}
