@@ -1,8 +1,3 @@
-<style>
-    table {
-        width: 100%;
-    }
-</style>
 # 1. Installation:
 
 ## 1.1. Install environment:
@@ -55,7 +50,6 @@ login_p = requests.post(
 print("login_p", login_p.text)
 cookie = login_p.headers["Set-cookie"]
 ```
-
 <table>
 <td> URL </td>
 <td> http://localhost:5000/api/login </td>
@@ -64,6 +58,8 @@ cookie = login_p.headers["Set-cookie"]
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -78,6 +74,7 @@ cookie = login_p.headers["Set-cookie"]
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Success </td>
@@ -95,6 +92,7 @@ cookie = login_p.headers["Set-cookie"]
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -109,6 +107,7 @@ cookie = login_p.headers["Set-cookie"]
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -150,6 +149,8 @@ cookie = logout_p.headers["Set-Cookie"]
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Success </td>
@@ -164,6 +165,7 @@ cookie = logout_p.headers["Set-Cookie"]
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -208,6 +210,8 @@ print("register_p", register_p.text)
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -222,6 +226,7 @@ print("register_p", register_p.text)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Success </td>
@@ -239,6 +244,7 @@ print("register_p", register_p.text)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -253,6 +259,7 @@ print("register_p", register_p.text)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -286,6 +293,8 @@ print("list_img_g", list_img_g.text)
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -300,6 +309,7 @@ print("list_img_g", list_img_g.text)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -367,6 +377,8 @@ with open(fileName_encrypt, "rb") as f:
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -381,6 +393,7 @@ with open(fileName_encrypt, "rb") as f:
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Success </td>
@@ -397,6 +410,7 @@ with open(fileName_encrypt, "rb") as f:
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -445,6 +459,8 @@ function_support.Decrypted(
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -462,6 +478,7 @@ function_support.Decrypted(
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Error </td>
@@ -476,6 +493,7 @@ function_support.Decrypted(
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -524,6 +542,8 @@ for image in imgData:
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -543,6 +563,7 @@ for image in imgData:
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Error </td>
@@ -557,6 +578,7 @@ for image in imgData:
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Error </td>
@@ -602,6 +624,8 @@ print("delete_img_p_data", delete_img_p_data)
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -616,6 +640,7 @@ print("delete_img_p_data", delete_img_p_data)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Success </td>
@@ -630,6 +655,7 @@ print("delete_img_p_data", delete_img_p_data)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> POST </td>
 <td> Error </td>
@@ -667,6 +693,8 @@ print("public_key_g_data", public_key_g_data)
 <tr>
 <td> Method </td> <td> Status </td> <td> Response </td>
 </tr>
+<tr></tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Success </td>
@@ -681,6 +709,7 @@ print("public_key_g_data", public_key_g_data)
 
 </td>
 </tr>
+<tr></tr>
 <tr>
 <td> GET </td>
 <td> Error </td>
