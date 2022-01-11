@@ -1,39 +1,70 @@
-from flask import request, render_template, url_for, jsonify
-from flask_login.utils import logout_user
-from werkzeug.utils import redirect
-from app import app, login_manager, csrf
+from flask import request, jsonify, make_response
+from werkzeug.security import generate_password_hash, check_password_hash
+from app import app, jwt
 from auth.model import User, LoginForm, RegisterForm
 from auth.service import getUserById, getUserByUserName
-from flask_login import login_user, login_required, AnonymousUserMixin
-import bcrypt
-import json
 from flask_wtf.csrf import generate_csrf
 from helpers.utils import flatten
+from flask_jwt_extended import create_access_token, jwt_required
+import json
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    userDoc = getUserById(user_id)
-    if not userDoc:
-        return AnonymousUserMixin()
+# @login_manager.user_loader
+# def load_user(user_id):
+#     userDoc = getUserById(user_id)
+#     if not userDoc:
+#         return AnonymousUserMixin()
 
-    userObj = json.loads(userDoc.to_json())
-    # id field inherited from UserMixin class (from flask_login)
-    user = User(
-        id=userObj["_id"]["$oid"],
-        username=userObj["username"],
-        password=userObj["password"],
-    )
-    return user
-
-
-@login_manager.unauthorized_handler
-def unauthorized():
-    # If unauthorize then redirect to login
-    return jsonify({"status": "error", "message": "User is not authorized"})
+#     userObj = json.loads(userDoc.to_json())
+#     # id field inherited from UserMixin class (from flask_login)
+#     user = User(
+#         id=userObj["_id"]["$oid"],
+#         username=userObj["username"],
+#         password=userObj["password"],
+#     )
+#     return user
 
 
-@app.route("/api/register", methods=["GET", "POST"])
+# @login_manager.unauthorized_handler
+# def unauthorized():
+#     # If unauthorize then redirect to login
+#     return jsonify(
+#         {
+#             "status": "Unauthorized",
+#             "code": 401,
+#             "message": "The request could not be authenticated",
+#         }
+#     )
+
+
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    # when JWT is created, "id" is passed in private claim: "sub", in payload section.
+    # Then when user_lookup_loader is called, in "jwt_data" we can access "id"
+    # via "sub".
+    curUser = json.loads(user.to_json())
+    return {"id": curUser["_id"]["$oid"]}
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    # {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
+    # '88d6273b-be35-446d-af03-8efc417937d2', 'type': 'access', 'sub': {'id':
+    # '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386, 'exp': 1641893286}
+
+    # Extract "id" claim from JWT token, then we can query "id" and return
+    # current user
+    # jwt_data["jti"] is kinda a jwt id?
+    userId = jwt_data["sub"]["id"]
+    user = getUserById(userId)
+    if user:
+        return user
+    # If user may be deleted from db, then return None to indicate that an error
+    # occurred loading the user
+    return None
+
+
+@app.route("/register", methods=["GET", "POST"])
 def register():
     # pass request data to form
     form = RegisterForm()
@@ -44,31 +75,38 @@ def register():
         # NOTE: the field we access MUST persist with the field. Otherwise, we
         # will get the 400 Bad request
         username = data["username"]
-        password = data["password"].encode()
+        password = data["password"]
         publicKey = data["publicKey"]
         users = getUserByUserName(username)
         if len(users) > 0:
-            return jsonify({"status": "error", "message": "Username already exists"})
-        salt = bcrypt.gensalt(rounds=16)
-        hashPassword = bcrypt.hashpw(password, salt)
-        user = User(username=username, password=hashPassword, publicKey=publicKey)
-        user.save()
-        login_user(user)
-        return jsonify(
-            {
-                "status": "success",
-                "data": {"username": username, "public_key": publicKey},
-            }
+            return make_response(
+                {
+                    "status": "error",
+                    "code": "409",
+                    "message": "Username already exists",
+                },
+                409,
+            )
+
+        user = User(
+            username=username,
+            password=generate_password_hash(password, "sha256"),
+            publicKey=publicKey,
         )
+        user.save()
+        return make_response("", 201)
 
     if form.errors:
         errorMessage = ", ".join(flatten(form.errors))
-        return jsonify({"status": "error", "message": errorMessage})
+        return make_response(
+            {"status": "error", "code": "422", "message": errorMessage}, 422
+        )
 
-    return jsonify({"status": "success", "csrf_token": generate_csrf()})
+    # Don't have to call jsonify since we return a dict
+    return make_response({"csrf_token": generate_csrf()}, 200)
 
 
-@app.route("/api/login", methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     # pass request data to form
     form = LoginForm()
@@ -78,36 +116,50 @@ def login():
     if form.validate_on_submit():
         data = request.form
         username = data["username"]
-        password = data["password"].encode()
+        password = data["password"]
         user = getUserByUserName(username).first()
         if not user:
-            return jsonify(
-                {"status": "error", "message": "Username or password is invalid"}
+            # Should return 404 instead
+            return make_response(
+                {
+                    "status": "error",
+                    "code": "422",
+                    "message": "Username or password is invalid",
+                },
+                422,
             )
         # print(user.to_json())
-        if bcrypt.checkpw(password, user.password.encode()):
-            login_user(user)
-            return jsonify(
-                {
-                    "status": "success",
-                    "data": {"username": user.username, "public_key": user.publicKey},
-                }
-            )
+        if check_password_hash(user.password, password):
+            # login_user(user)
+            # We passed in a User object, this user will be handled in
+            # user_identity_loader, in that function we only
+            # use id to create JWT token
+            access_token = create_access_token(identity=user)
+            return make_response({"access_token": access_token}, 200)
         else:
-            return jsonify(
-                {"status": "error", "message": "Username or password is invalid"}
+            return make_response(
+                {
+                    "status": "error",
+                    "code": "422",
+                    "message": "Username or password is invalid",
+                },
+                422,
             )
 
     if form.errors:
         errorMessage = ", ".join(flatten(form.errors))
-        return jsonify({"status": "error", "message": errorMessage})
+        return make_response(
+            {"status": "error", "code": "422", "message": errorMessage}, 422
+        )
 
-    return jsonify({"status": "success", "csrf_token": generate_csrf()})
+    return make_response({"csrf_token": generate_csrf()}, 200)
 
 
-@app.route("/api/logout", methods=["POST"])
-@csrf.exempt
-@login_required
-def logout():
-    logout_user()
-    return jsonify({"status": "success", "data": "User logged out"})
+# @app.route("/logout", methods=["POST"])
+# @csrf.exempt
+# # @login_required
+# @jwt_required()
+# def logout():
+#     # logout_user()
+
+#     return make_response({"status": "success", "data": "User logged out"})

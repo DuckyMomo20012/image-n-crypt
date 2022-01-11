@@ -1,61 +1,84 @@
 from app import app
-from flask import request, jsonify, render_template
+from flask import request, jsonify, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
-from flask_login import current_user, login_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_wtf.csrf import generate_csrf
 from auth.service import getUserById
 from upload_image.model import Image, ImageForm
 from upload_image.service import getAllImageByUserId, getImageByNameAndUserId
 from helpers.utils import getRandomFileName, flatten
 
+# from flask_login import current_user, login_required
 
-@app.route("/api/image-list", methods=["GET"])
-@login_required
-def listImage():
-    curUser = current_user.get_id()
 
-    images = getAllImageByUserId(curUser)
+@app.route("/api/v1/users/<int:userId>/images", methods=["GET"])
+# @login_required
+@jwt_required()
+def listImage(userId):
+    # current_user is User document returned from user_lookup_loader
+    curUserId = current_user.id
+
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        )
+
+    images = getAllImageByUserId(curUserId)
     if images:
         imageList = [img.nameImg for img in images]
-        return jsonify({"status": "success", "data": imageList})
+        return make_response(
+            {"status": "success", "code": "200", "data": imageList}, 200
+        )
 
-    return jsonify({"status": "success", "data": "No image on database"})
+    return make_response({"status": "success", "code": "200", "data": []}, 200)
 
 
-@app.route("/api/download/<string:fileName>", methods=["GET"])
-@login_required
-def downloadImage(fileName):
-    curUser = current_user.get_id()
-    if not curUser:
-        return jsonify({"status": "error", "message": "Image not found"})
+@app.route("/api/v1/users/<int:userId>/images/<string:fileName>", methods=["GET"])
+# @login_required
+@jwt_required()
+def downloadImage(userId, fileName):
+    curUserId = current_user.id
 
-    image = getImageByNameAndUserId(curUser, fileName)
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        )
+
+    image = getImageByNameAndUserId(curUserId, fileName)
 
     if image:
         data_byte = image.dataImg.read().decode("ISO-8859-1")
-        return jsonify(
+        return make_response(
             {
                 "status": "success",
+                "code": "200",
                 "data": {
                     "img_name": image.nameImg,
                     "img_content": data_byte,
-                    "quotient" : image.quotientImg
+                    "quotient": image.quotientImg,
                 },
-            }
+            },
+            200,
         )
 
-    return jsonify({"status": "error", "message": "Image not found"})
+    return make_response(
+        {"status": "error", "code": "404", "message": "Image not found"}, 404
+    )
 
 
-@app.route("/api/download-all", methods=["GET"])
-@login_required
-def downloadImageAll():
-    curUser = current_user.get_id()
-    if not curUser:
-        return jsonify({"status": "error", "message": "Image not found"})
+@app.route("/api/v1/users/<int:userId>/images/data", methods=["GET"])
+# @login_required
+@jwt_required()
+def downloadImageAll(userId):
+    curUserId = current_user.id
 
-    images = getAllImageByUserId(curUser)
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        )
+
+    images = getAllImageByUserId(curUserId)
 
     if images:
         data = []
@@ -64,77 +87,80 @@ def downloadImageAll():
             content = {
                 "img_name": image.nameImg,
                 "img_content": data_byte,
-                "quotient" : image.quotientImg
+                "quotient": image.quotientImg,
             }
             data.append(content)
 
-        return jsonify({"status": "success", "data": [*data]})
+        return make_response({"status": "success", "code": "200", "data": [*data]}, 200)
 
-    return jsonify({"status": "error", "message": "Image not found"})
+    # Because images can be None if there is no image on database, so instead of
+    # return an error, we return an empty array
+    return make_response({"status": "success", "code": "200", "data": []}, 200)
 
 
-@app.route("/api/upload-image", methods=["GET", "POST"])
-@login_required
-def uploadImage():
+@app.route("/api/v1/users/<int:userId>/images/upload", methods=["GET", "POST"])
+# @login_required
+@jwt_required()
+def uploadImage(userId):
+
+    curUserId = current_user.id
+
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        )
+
     # Because we pass file via files request, not from body
     form = ImageForm(CombinedMultiDict((request.files, request.form)))
 
     if form.validate_on_submit():
         data = request.form
-        quotient = data['quotient']
+        quotient = data["quotient"]
 
         file = form.imageFile.data
         filename = secure_filename(file.filename)
-        userId = current_user.get_id()
 
         # Query to check duplicate file name
-        imageList = getImageByNameAndUserId(userId, filename)
+        imageList = getImageByNameAndUserId(curUserId, filename)
 
         if imageList:
             filename = getRandomFileName(filename)
 
-        image = Image(userId=userId, nameImg=filename, dataImg=file, quotientImg=quotient)
+        image = Image(
+            userId=userId, nameImg=filename, dataImg=file, quotientImg=quotient
+        )
         image.save()
-        return jsonify({"status": "success", "data": {"img_name": image.nameImg}})
+        return make_response(
+            {"status": "success", "code": "200", "data": {"img_name": image.nameImg}},
+            200,
+        )
 
     if form.errors:
         errorMessage = ", ".join(flatten(form.errors))
-        return jsonify({"status": "error", "message": errorMessage})
+        return make_response(
+            {"status": "error", "code": "422", "message": errorMessage}, 422
+        )
 
-    return jsonify({"status": "success", "csrf_token": generate_csrf()})
+    return make_response({"csrf_token": generate_csrf()}, 200)
 
 
-@app.route("/api/delete/<string:fileName>", methods=["GET", "POST"])
-@login_required
-def deleteImage(fileName):
+@app.route("/api/v1/users/<int:userId>/images/<string:fileName>", methods=["DELETE"])
+# @login_required
+@jwt_required()
+def deleteImage(userId, fileName):
+    curUserId = current_user.id
 
-	if request.method == "POST":
-		curUser = current_user.get_id()
-		if not curUser:
-			return jsonify({"status": "error", "message": "User not found"})
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        )
 
-		image = getImageByNameAndUserId(curUser, fileName)
+    image = getImageByNameAndUserId(curUserId, fileName)
 
-		if image:
+    if image:
+        image.delete()
+        return make_response("", 204)
 
-			image.delete()
-
-			return jsonify({"status": "success", "data": "Image deleted"})
-
-		if not image:
-			return jsonify({"status": "error", "message": "Image not found"})
-
-		return jsonify({"status": "success", "csrf_token": generate_csrf()})
-
-@app.route("/api/public-key", methods=["GET"])
-@login_required
-def getPublicKey():
-    curUser = current_user.get_id()
-    if not curUser:
-        return jsonify({"status": "error", "message": "User not found"})
-
-    user = getUserById(curUser)
-
-    publicKey = user.publicKey
-
-    return jsonify({"status": "success", "public_key": publicKey})
+    return make_response(
+        {"status": "error", "code": "404", "message": "Image not found"}, 404
+    )

@@ -2,6 +2,7 @@
 class Config(object):
     SESSION_COOKIE_SECURE = False,
     SECRET_KEY = "my secret key",
+    JWT_SECRET_KEY = "my super secret key"
     # WTF_CSRF_ENABLED = False
 
 

@@ -6,12 +6,11 @@ from decode_encode import function_support
 
 # 1. REGISTER:
 
-# NOTE: After user register, user is logged in, cookie will be reset
-
-
+# NOTE: Each form has its own cookie, so when we send a GET request to request a
+# form to submit, we have to set cookie for POST request
 def register():
-    global cookie
-    register_g = requests.get("http://localhost:5000/api/register")
+    # global cookie
+    register_g = requests.get("http://localhost:5000/register")
     register_data = json.loads(register_g.text)
     csrfKey = register_data["csrf_token"]
     cookie = register_g.headers["Set-Cookie"]
@@ -21,7 +20,7 @@ def register():
     e, d, n = function_support.create_write_key("", writeFile=True)
 
     register_p = requests.post(
-        "http://localhost:5000/api/register",
+        "http://localhost:5000/register",
         data={"username": "admin", "password": "admin", "publicKey": f"{n} {e}"},
         headers={
             "X-CSRFToken": csrfKey,
@@ -31,17 +30,20 @@ def register():
     print("register_p", register_p.text)
 
 
-# Success: {"data":{"public_key":"34609 28407","username":"vinh"},"status":"success"}
-# Error: {"message":"Username already exists","status":"error"}
-# Error: {"message":"Password is required, Public key is required","status":"error"}
+# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# POST - Success: "", 201
+# POST - Error: {"status": "error","code": "409","message": "Username already
+# exists",},
+# POST - Error: {"status": "error", "code": "422", "message": "Password is required, Public key is required"}
 
 
 # 2. LOGIN:
 
 # NOTE: Only login GET request have "Set-Cookie" header
 def login():
-    global cookie
-    login_g = requests.get("http://localhost:5000/api/login")
+    # global cookie
+    global access_token
+    login_g = requests.get("http://localhost:5000/login")
     login_data = json.loads(login_g.text)
     csrfKey = login_data["csrf_token"]
     cookie = login_g.headers["Set-Cookie"]
@@ -50,34 +52,42 @@ def login():
 
     # NOTE: When login, cookie will be reset
     login_p = requests.post(
-        "http://localhost:5000/api/login",
-        data={"username": "admin", "password": "admin", "csrf_token": csrfKey},
+        "http://localhost:5000/login",
+        data={"username": "admin", "password": "admin"},
         headers={
             "X-CSRFToken": csrfKey,
             "Cookie": cookie,
         },
     )
     print("login_p", login_p.text)
-    cookie = login_p.headers["Set-cookie"]
+    data = json.loads(login_p.text)
+    access_token = data["access_token"]
+    print("access_token", access_token)
+    # cookie = login_p.headers["Set-cookie"]
 
 
-# Success: {"data":{"public_key":null,"username":"admin"},"status":"success"}
-# Error: {"message":"Username or password is invalid","status":"error"}
-# Error: {"message":"Password is required","status":"error"}
+# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# POST - Success: {"access_token": "eyJ0eXAi..."}
+# POST - Error: {"status": "error","code": "422","message": "Username or password is invalid",}
+# POST - Error: {"status": "error", "code": "422", "message": "Password is required"}
 
 # 3. LIST IMAGE:
 
 
 def listImage():
-    global cookie
+    # global cookie
+    global access_token
     list_img_g = requests.get(
-        "http://localhost:5000/api/image-list", headers={"Cookie": cookie}
+        "http://localhost:5000/api/v1/users/<int:userId>/images",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
     print("list_img_g", list_img_g.text)
 
 
-# Success: {"data":["traffic-sign.png","bicycle.png"],"status":"success"}
-# Success: {"status": "success", "data": "No image"}
+# GET - Success: {"status": "success", "code": "200", "data": ["traffic-sign.png","bicycle.png"]}
+# GET - Success: {"status": "success", "code": "200", "data": []}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
 
 # 4. LOGOUT:
 
@@ -102,16 +112,21 @@ def logout():
 
 
 def uploadImage():
-    global cookie
-    public_key_g = requests.get(
-        "http://localhost:5000/api/public-key", headers={"Cookie": cookie}
-    )
-    public_key_data = json.loads(public_key_g.text)
-    print("public_key_data", public_key_data)
-    n, e = map(int, public_key_data["public_key"].split(" "))
+    # global cookie
+    global access_token
+    global userId
+    # public_key_g = requests.get(
+    #     "http://localhost:5000/api/v1/users/<int:userId>/public-key",
+    #     headers={"Cookie": cookie},
+    # )
+    # public_key_data = json.loads(public_key_g.text)
+    # print("public_key_data", public_key_data)
+    n, e = map(int, "".split(" "))
 
     upload_img_g = requests.get(
-        "http://localhost:5000/api/upload-image", headers={"Cookie": cookie}
+        f"http://localhost:5000/api/v1/users/{userId}/images/upload",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
     upload_img_data = json.loads(upload_img_g.text)
     csrfKey = upload_img_data["csrf_token"]
@@ -133,30 +148,37 @@ def uploadImage():
     q.close()
     with open(fileName_encrypt, "rb") as f:
         upload_img_p = requests.post(
-            "http://localhost:5000/api/upload-image",
+            f"http://localhost:5000/api/v1/users/{userId}/images/upload",
             files={"imageFile": f},
             data={"quotient": quotient},
             headers={
                 "X-CSRFToken": csrfKey,
-                "Cookie": cookie,
+                # "Cookie": cookie,
+                "Authorization": f"Bearer {access_token}",
             },
         )
         print("upload_img_p", upload_img_p.text)
 
 
-# Success: {"data":{"img_name":"bicycle.png_20220109213826"},"status":"success"}
-# Error: {"message":"Image file is required","status":"error"}
+# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# POST - Success:
+# {"data":{"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
+# POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
 
 # 6. DOWNLOAD IMAGE:
 
 
 def downloadImage():
-    global cookie
+    # global cookie
+    global access_token
+    global userId
     downloadFile = "bicycle2_e.png"
     downloadFile_d = "bicycle_d.png"
     download_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/download/{downloadFile}",
-        headers={"Cookie": cookie},
+        f"http://127.0.0.1:5000//api/v1/users/{userId}/images/{downloadFile}",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
     data = json.loads(download_img_g.text)
     imgData = data["data"]["img_content"]
@@ -173,19 +195,23 @@ def downloadImage():
     )
 
 
-# Success:
-# {"data":{"img_content":"\u00ff...","img_name":"bicycle.png","quotient":""},"status":"success"}
-# Error: {"message":"Image not found","status":"error"}
-# Error: {"status": "error", "message": "User not found"}
+# GET - Success:
+# {"status": "success","code": "200","data": {"img_name":
+# "bicycle.png","img_content": "\u00ff...","quotient": "22 22...",},}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# GET - Error: {"status": "error", "code": "404", "message": "Image not found"}
 
 # 7. DOWNLOAD IMAGE ALL:
 
 
 def downloadImageAll():
-    global cookie
+    # global cookie
+    global access_token
+    global userId
     download_img_all_g = requests.get(
-        f"http://127.0.0.1:5000/api/download-all",
-        headers={"Cookie": cookie},
+        f"/api/v1/users/{userId}/images/data",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
     )
     data = json.loads(download_img_all_g.text)
     imgData = data["data"]
@@ -205,62 +231,78 @@ def downloadImageAll():
         )
 
 
-# Success: {"status": "success", "data":
-# [{"img_content":"\u00ff...","img_name":"bicycle.png"}]}
-# Error: {"message":"Image not found","status":"error"}
-# Error: {"status": "error", "message": "User not found"}
+# GET - Success:
+# {"status": "success","code": "200","data": [{"img_name":
+# "bicycle.png","img_content": "\u00ff...","quotient": "22 22...",}],}
+# GET - Success:
+# {"status": "success","code": "200","data": [],}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+
 
 # 8. DELETE IMAGE:
 
 
 def deleteImage():
-    global cookie
+    # global cookie
+    global access_token
+    global userId
     deleteFile = "bicycle2_e.png"
-    delete_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/delete/{deleteFile}", headers={"Cookie": cookie}
-    )
-    delete_img_g_data = json.loads(delete_img_g.text)
-    print("delete_img_g_data", delete_img_g_data)
-    csrfKey = delete_img_g_data["csrf_token"]
+    # delete_img_g = requests.delete(
+    #     f"/api/v1/users/{userId}/images/{deleteFile}",
+    #     # headers={"Cookie": cookie}
+    #     headers={"Authorization": f"Bearer {access_token}"},
+    # )
+    # delete_img_g_data = json.loads(delete_img_g.text)
+    # print("delete_img_g_data", delete_img_g_data)
+    # csrfKey = delete_img_g_data["csrf_token"]
 
-    delete_img_p = requests.post(
-        f"http://127.0.0.1:5000/api/delete/{deleteFile}",
+    delete_img_p = requests.delete(
+        f"/api/v1/users/{userId}/images/{deleteFile}",
         headers={
-            "X-CSRFToken": csrfKey,
-            "Cookie": cookie,
+            # "X-CSRFToken": csrfKey,
+            # "Cookie": cookie,
+            "Authorization": f"Bearer {access_token}",
         },
     )
     delete_img_p_data = json.loads(delete_img_p.text)
     print("delete_img_p_data", delete_img_p_data)
 
 
-# Success: {'data': 'Image deleted', 'status': 'success'}
-# Error: {'message': 'Image not found', 'status': 'error'}
-# Error: {"status": "error", "message": "User not found"}
+# DELETE - Success: "", 201
+# DELETE - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# DELETE - Error: {"status": "error", "code": "404", "message": "Image not found"}
 
-# 9. GET PUBLIC KEY:
+# 9. GET USER INFORMATION:
 
 
-def getPublicKey():
-    global cookie
-    public_key_g = requests.get(
-        "http://127.0.0.1:5000/api/public-key",
+def getUserInformation():
+    # global cookie
+    global access_token
+    global userId
+    user_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}",
         headers={
-            "Cookie": cookie,
+            # "Cookie": cookie,
+            "Authorization": f"Bearer {access_token}",
         },
     )
 
-    public_key_g_data = json.loads(public_key_g.text)
-    print("public_key_g_data", public_key_g_data)
+    user_info_g_data = json.loads(user_info_g.text)
+    print("public_key_g_data", user_info_g_data)
 
 
-# Success: {'public_key': '118403 97093'}
-# Error: {"status": "error", "message": "User not found"}
+# GET - Success: {"status": "success", "code": "200", "data": {"public_key": "118403 97093"}}
+# GET - Error: {"status": "error", "code": "404", "message": "User not found"}
 
 if __name__ == "__main__":
-    cookie = ""
+    # cookie = ""
+    access_token = ""
+    userId = ""
+    # register()
     login()
-    logout()
+    listImage()
+    # logout()
     # uploadImage()
     # downloadImage()
     # deleteImage()
