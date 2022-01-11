@@ -1,13 +1,18 @@
 from flask import request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import app, jwt
-from auth.model import User, LoginForm, RegisterForm
-from auth.service import getUserById, getUserByUserName
+from app import app, jwt, csrf
+from auth.model import User, LoginForm, RegisterForm, TokenBlocklist
+from auth.service import (
+    getUserById,
+    getUserByUserName,
+    getTokenBlocklistByJTI,
+    getFirstTokenBlockList,
+)
 from flask_wtf.csrf import generate_csrf
 from helpers.utils import flatten
-from flask_jwt_extended import create_access_token, jwt_required
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 import json
-
+from datetime import timezone, datetime
 
 # @login_manager.user_loader
 # def load_user(user_id):
@@ -62,6 +67,29 @@ def user_lookup_callback(_jwt_header, jwt_data):
     # If user may be deleted from db, then return None to indicate that an error
     # occurred loading the user
     return None
+
+
+# This function is called whenever a valid JWT is used to access a protected
+# route
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload):
+    jti = jwt_payload["jti"]
+
+    checkEmptyDB = getFirstTokenBlockList()
+
+    if not checkEmptyDB:
+        return False
+
+    token_in_db = getTokenBlocklistByJTI(jti)
+    print("token_in_redis", token_in_db)
+    return token_in_db is not None
+
+
+@jwt.revoked_token_loader
+def revoked_token_handler(jwt_header, jwt_payload):
+    return make_response(
+        {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+    )
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -128,7 +156,9 @@ def login():
                 },
                 422,
             )
+
         # print(user.to_json())
+
         if check_password_hash(user.password, password):
             # login_user(user)
             # We passed in a User object, this user will be handled in
@@ -155,11 +185,17 @@ def login():
     return make_response({"csrf_token": generate_csrf()}, 200)
 
 
-# @app.route("/logout", methods=["POST"])
-# @csrf.exempt
-# # @login_required
-# @jwt_required()
-# def logout():
-#     # logout_user()
+@app.route("/logout", methods=["POST"])
+@csrf.exempt
+# @login_required
+@jwt_required()
+def logout():
+    # logout_user()
+    jti = get_jwt()["jti"]
+    print("jti", type(jti))
+    now = datetime.now(timezone.utc)
 
-#     return make_response({"status": "success", "data": "User logged out"})
+    tokenBlock = TokenBlocklist(jti=jti, created_at=now)
+    tokenBlock.save()
+
+    return make_response({"status": "success", "code": "200", "data": "User logged out"}, 200)

@@ -7,17 +7,17 @@ from flask_wtf.csrf import generate_csrf
 from auth.service import getUserById
 from upload_image.model import Image, ImageForm
 from upload_image.service import getAllImageByUserId, getImageByNameAndUserId
-from helpers.utils import getRandomFileName, flatten
+from helpers.utils import getRandomFileName, flatten, getExtension
 
 # from flask_login import current_user, login_required
 
 
-@app.route("/api/v1/users/<int:userId>/images", methods=["GET"])
+@app.route("/api/v1/users/<string:userId>/images", methods=["GET"])
 # @login_required
 @jwt_required()
 def listImage(userId):
     # current_user is User document returned from user_lookup_loader
-    curUserId = current_user.id
+    curUserId = str(current_user.id)
 
     if userId != curUserId:
         return make_response(
@@ -34,18 +34,19 @@ def listImage(userId):
     return make_response({"status": "success", "code": "200", "data": []}, 200)
 
 
-@app.route("/api/v1/users/<int:userId>/images/<string:fileName>", methods=["GET"])
+@app.route("/api/v1/users/<string:userId>/images/<string:fileName>", methods=["GET"])
 # @login_required
 @jwt_required()
 def downloadImage(userId, fileName):
-    curUserId = current_user.id
+    curUserId = str(current_user.id)
 
     if userId != curUserId:
         return make_response(
             {"status": "error", "code": "401", "message": "User is not authorized"}, 401
         )
 
-    image = getImageByNameAndUserId(curUserId, fileName)
+    fileExt = getExtension(request)
+    image = getImageByNameAndUserId(curUserId, fileName + fileExt)
 
     if image:
         data_byte = image.dataImg.read().decode("ISO-8859-1")
@@ -67,11 +68,11 @@ def downloadImage(userId, fileName):
     )
 
 
-@app.route("/api/v1/users/<int:userId>/images/data", methods=["GET"])
+@app.route("/api/v1/users/<string:userId>/images/data", methods=["GET"])
 # @login_required
 @jwt_required()
 def downloadImageAll(userId):
-    curUserId = current_user.id
+    curUserId = str(current_user.id)
 
     if userId != curUserId:
         return make_response(
@@ -98,12 +99,11 @@ def downloadImageAll(userId):
     return make_response({"status": "success", "code": "200", "data": []}, 200)
 
 
-@app.route("/api/v1/users/<int:userId>/images/upload", methods=["GET", "POST"])
+@app.route("/api/v1/users/<string:userId>/images/upload", methods=["GET", "POST"])
 # @login_required
 @jwt_required()
 def uploadImage(userId):
-
-    curUserId = current_user.id
+    curUserId = str(current_user.id)
 
     if userId != curUserId:
         return make_response(
@@ -144,23 +144,30 @@ def uploadImage(userId):
     return make_response({"csrf_token": generate_csrf()}, 200)
 
 
-@app.route("/api/v1/users/<int:userId>/images/<string:fileName>", methods=["DELETE"])
+@app.route(
+    "/api/v1/users/<string:userId>/images/<string:fileName>/delete", methods=["GET", "DELETE"]
+)
 # @login_required
 @jwt_required()
 def deleteImage(userId, fileName):
-    curUserId = current_user.id
+    if request.method == "DELETE":
+        curUserId = str(current_user.id)
 
-    if userId != curUserId:
+        if userId != curUserId:
+            return make_response(
+                {"status": "error", "code": "401", "message": "User is not authorized"},
+                401,
+            )
+
+        fileExt = getExtension(request)
+        image = getImageByNameAndUserId(curUserId, fileName + fileExt)
+
+        if image:
+            image.delete()
+            return make_response("", 204)
+
         return make_response(
-            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+            {"status": "error", "code": "404", "message": "Image not found"}, 404
         )
 
-    image = getImageByNameAndUserId(curUserId, fileName)
-
-    if image:
-        image.delete()
-        return make_response("", 204)
-
-    return make_response(
-        {"status": "error", "code": "404", "message": "Image not found"}, 404
-    )
+    return make_response({"csrf_token": generate_csrf()}, 200)

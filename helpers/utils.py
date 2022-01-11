@@ -1,5 +1,6 @@
 from os import path
 from datetime import datetime
+from mimetypes import guess_extension
 
 def getRandomFileName(fileName):
 	name, ext = path.splitext(fileName)
@@ -7,3 +8,6 @@ def getRandomFileName(fileName):
 
 def flatten(arrDict):
 	return [item for sublist in arrDict.values() for item in sublist]
+
+def getExtension(req):
+    return guess_extension(req.headers['Content-type'].partition(';')[0].strip())

@@ -31,3 +31,8 @@ class User(me.Document, UserMixin):
     password = me.StringField()
     publicKey = me.StringField()
     meta = {"collection": "users"}
+
+class TokenBlocklist(me.Document):
+    jti = me.StringField()
+    created_at = me.DateTimeField()
+    meta = {"collections": "tokens"}
