@@ -95,10 +95,10 @@ def listImage():
 # NOTE: I have turned off csrf protection for logout route, so we don't have to
 # request a csrf key
 def logout():
-    global cookie
+    # global cookie
     logout_p = requests.post(
         "http://localhost:5000/api/logout",
-        headers={"Cookie": cookie},
+        # headers={"Cookie": cookie},
     )
     print("logout", logout_p.text)
     cookie = logout_p.headers["Set-Cookie"]
@@ -114,14 +114,14 @@ def logout():
 def uploadImage():
     # global cookie
     global access_token
-    global userId
+    global userId, publicKey
     # public_key_g = requests.get(
     #     "http://localhost:5000/api/v1/users/<int:userId>/public-key",
     #     headers={"Cookie": cookie},
     # )
     # public_key_data = json.loads(public_key_g.text)
     # print("public_key_data", public_key_data)
-    n, e = map(int, "".split(" "))
+    n, e = map(int, publicKey.split(" "))
 
     upload_img_g = requests.get(
         f"http://localhost:5000/api/v1/users/{userId}/images/upload",
@@ -279,7 +279,7 @@ def deleteImage():
 def getUserInformation():
     # global cookie
     global access_token
-    global userId
+    global userId, userName, publicKey
     user_info_g = requests.get(
         f"http://localhost:5000/api/v1/users/{userId}",
         headers={
@@ -290,15 +290,20 @@ def getUserInformation():
 
     user_info_g_data = json.loads(user_info_g.text)
     print("public_key_g_data", user_info_g_data)
+    userId = user_info_g_data['user_id']
+    userName = user_info_g_data['user_name']
+    publicKey = user_info_g_data['public_key']
 
-
-# GET - Success: {"status": "success", "code": "200", "data": {"public_key": "118403 97093"}}
+# GET - Success: {"status": "success", "code": "200", "data": {"user_id":
+# "a23415...", "user_name":"admin", "public_key": "118403 97093"}}
 # GET - Error: {"status": "error", "code": "404", "message": "User not found"}
 
 if __name__ == "__main__":
     # cookie = ""
     access_token = ""
     userId = ""
+    userName = ""
+    publicKey = ""
     # register()
     login()
     listImage()

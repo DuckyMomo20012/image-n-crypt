@@ -14,7 +14,11 @@ def getUserInfomation(userId):
             {
                 "status": "success",
                 "code": "200",
-                "data": {"user_name": user.username, "public_key": user.publicKey},
+                "data": {
+                    "user_id": user.id,
+                    "user_name": user.username,
+                    "public_key": user.publicKey,
+                },
             },
             200,
         )
