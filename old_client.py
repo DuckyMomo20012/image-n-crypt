@@ -44,6 +44,7 @@ def register():
 def login():
     # global cookie
     global access_token
+    global userId
     login_g = requests.get("http://localhost:5000/login")
     login_data = json.loads(login_g.text)
     csrfKey = login_data["csrf_token"]
@@ -63,6 +64,7 @@ def login():
     print("login_p", login_p.text)
     data = json.loads(login_p.text)
     access_token = data["access_token"]
+    userId = data["user_id"]
     print("access_token", access_token)
     # cookie = login_p.headers["Set-cookie"]
 
@@ -89,7 +91,9 @@ def listImage():
 
 # GET - Success: {"status": "success", "code": "200", "data": ["traffic-sign.png","bicycle.png"]}
 # GET - Success: {"status": "success", "code": "200", "data": []}
-# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 
 # 4. LOGOUT:
 
@@ -108,7 +112,10 @@ def logout():
     # cookie = logout_p.headers["Set-Cookie"]
 
 
-# Success: {"data":"User logged out","status":"success"}
+# POST - Success: {"status": "success", "code": "200", "data": "User logged
+# out"}
+# POST - Error: {"status":"error", "code":"422", "message":"Bad Authorization
+# header. Expected 'Authorization: Bearer <JWT>'"}
 
 # 5. UPLOAD IMAGE:
 
@@ -164,7 +171,9 @@ def uploadImage():
 
 
 # GET - Success: {"csrf_token": "eyJ0eXAi...""}
-# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
 # {"data":{"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
 # POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
@@ -205,7 +214,10 @@ def downloadImage():
 # GET - Success:
 # {"status": "success","code": "200","data": {"img_name":
 # "bicycle.png","img_content": "\u00ff...","quotient": "22 22...",},}
-# GET - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
 # GET - Error: {"status": "error", "code": "404", "message": "Image not found"}
 
 # 7. DOWNLOAD IMAGE ALL:
@@ -248,6 +260,8 @@ def downloadImageAll():
 # {"status": "success","code": "200","data": [],}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
 
 
 # 8. DELETE IMAGE:
@@ -288,7 +302,10 @@ def deleteImage():
 # GET - Success: {"csrf_token": "eyJ0eXAi...""}
 # DELETE - Success: "", 204 - No Content
 # DELETE - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
-# DELETE - Error: {"status": "error", "code": "404", "message": "Image not found"}
+# DELETE - Error: {"status": "error", "code": "404", "message": "Image not
+# found"}
+# DELETE - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
 
 # 9. GET USER INFORMATION:
 
@@ -315,6 +332,8 @@ def getUserInformation():
 # GET - Success: {"status": "success", "code": "200", "data": {"user_id":
 # "a23415...", "user_name":"admin", "public_key": "118403 97093"}}
 # GET - Error: {"status": "error", "code": "404", "message": "User not found"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
 
 
 # 10. GET USER INFORMATION:
@@ -338,18 +357,20 @@ def getAllUserInformation():
 # GET - Success: {"status": "success", "code": "200", "data": [{"user_id":
 # "a23415...", "user_name":"admin", "public_key": "118403 97093"}]}
 # GET - Success: {"status": "success", "code": "200", "data": []}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
 
 if __name__ == "__main__":
     # cookie = ""
     access_token = ""
-    userId = "61dd6f75cb9aa4cea4a70f0c"
+    userId = ""
     userName = ""
     publicKey = ""
     # register()
-    login()
+    # login()
+    listImage()
     logout()
-    getUserInformation()
-    # listImage()
+    # getUserInformation()
     # uploadImage()
     # downloadImage()
     # downloadImageAll()

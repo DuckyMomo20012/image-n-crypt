@@ -6,7 +6,6 @@ from auth.service import (
     getUserById,
     getUserByUserName,
     getTokenBlocklistByJTI,
-    getFirstTokenBlockList,
 )
 from flask_wtf.csrf import generate_csrf
 from helpers.utils import flatten
@@ -75,20 +74,22 @@ def user_lookup_callback(_jwt_header, jwt_data):
 def check_if_token_is_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
 
-    checkEmptyDB = getFirstTokenBlockList()
-
-    if not checkEmptyDB:
-        return False
-
     token_in_db = getTokenBlocklistByJTI(jti)
-    print("token_in_redis", token_in_db)
+
     return token_in_db is not None
 
 
 @jwt.revoked_token_loader
 def revoked_token_handler(jwt_header, jwt_payload):
     return make_response(
-        {"status": "error", "code": "401", "message": "User is not authorized"}, 401
+        {"status": "error", "code": "401", "message": "Token has been revoked"}, 401
+    )
+
+
+@jwt.invalid_token_loader
+def invalid_token_handler(reason):
+    return make_response(
+        {"status": "error", "code": "422", "message": f"{reason}"}, 422
     )
 
 
@@ -106,7 +107,7 @@ def register():
         password = data["password"]
         publicKey = data["publicKey"]
         users = getUserByUserName(username)
-        if len(users) > 0:
+        if users:
             return make_response(
                 {
                     "status": "error",
@@ -145,7 +146,7 @@ def login():
         data = request.form
         username = data["username"]
         password = data["password"]
-        user = getUserByUserName(username).first()
+        user = getUserByUserName(username)
         if not user:
             # Should return 404 instead
             return make_response(
@@ -165,7 +166,9 @@ def login():
             # user_identity_loader, in that function we only
             # use id to create JWT token
             access_token = create_access_token(identity=user)
-            return make_response({"access_token": access_token}, 200)
+            return make_response(
+                {"user_id": str(user.id), "access_token": access_token}, 200
+            )
         else:
             return make_response(
                 {
@@ -198,4 +201,6 @@ def logout():
     tokenBlock = TokenBlocklist(jti=jti, created_at=now)
     tokenBlock.save()
 
-    return make_response({"status": "success", "code": "200", "data": "User logged out"}, 200)
+    return make_response(
+        {"status": "success", "code": "200", "data": "User logged out"}, 200
+    )
