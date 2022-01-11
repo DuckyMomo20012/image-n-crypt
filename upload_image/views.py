@@ -4,10 +4,10 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_wtf.csrf import generate_csrf
-from auth.service import getUserById
-from upload_image.model import Image, ImageForm
+from upload_image.model import Image, ImageForm, ImagePermission
 from upload_image.service import getAllImageByUserId, getImageByNameAndUserId
 from helpers.utils import getRandomFileName, flatten, getExtension
+from os import path
 
 # from flask_login import current_user, login_required
 
@@ -26,7 +26,7 @@ def listImage(userId):
 
     images = getAllImageByUserId(curUserId)
     if images:
-        imageList = [img.nameImg for img in images]
+        imageList = [(img.nameImg + img.extImg) for img in images]
         return make_response(
             {"status": "success", "code": "200", "data": imageList}, 200
         )
@@ -45,8 +45,8 @@ def downloadImage(userId, fileName):
             {"status": "error", "code": "401", "message": "User is not authorized"}, 401
         )
 
-    fileExt = getExtension(request)
-    image = getImageByNameAndUserId(curUserId, fileName + fileExt)
+    # fileExt = getExtension(request)
+    image = getImageByNameAndUserId(curUserId, fileName)
 
     if image:
         data_byte = image.dataImg.read().decode("ISO-8859-1")
@@ -55,7 +55,7 @@ def downloadImage(userId, fileName):
                 "status": "success",
                 "code": "200",
                 "data": {
-                    "img_name": image.nameImg,
+                    "img_name": image.nameImg + image.extImg,
                     "img_content": data_byte,
                     "quotient": image.quotientImg,
                 },
@@ -86,7 +86,7 @@ def downloadImageAll(userId):
         for image in images:
             data_byte = image.dataImg.read().decode("ISO-8859-1")
             content = {
-                "img_name": image.nameImg,
+                "img_name": image.nameImg + image.extImg,
                 "img_content": data_byte,
                 "quotient": image.quotientImg,
             }
@@ -120,18 +120,28 @@ def uploadImage(userId):
         file = form.imageFile.data
         filename = secure_filename(file.filename)
 
+        fileSplitName, ext = path.splitext(filename)
+
         # Query to check duplicate file name
-        imageList = getImageByNameAndUserId(curUserId, filename)
+        imageList = getImageByNameAndUserId(curUserId, fileSplitName)
 
         if imageList:
-            filename = getRandomFileName(filename)
+            fileSplitName = getRandomFileName(fileSplitName)
 
         image = Image(
-            userId=userId, nameImg=filename, dataImg=file, quotientImg=quotient
+            userId=userId,
+            nameImg=fileSplitName,
+            dataImg=file,
+            quotientImg=quotient,
+            extImg=ext,
         )
         image.save()
         return make_response(
-            {"status": "success", "code": "200", "data": {"img_name": image.nameImg}},
+            {
+                "status": "success",
+                "code": "200",
+                "data": {"img_name": image.nameImg + image.extImg},
+            },
             200,
         )
 
@@ -145,7 +155,8 @@ def uploadImage(userId):
 
 
 @app.route(
-    "/api/v1/users/<string:userId>/images/<string:fileName>/delete", methods=["GET", "DELETE"]
+    "/api/v1/users/<string:userId>/images/<string:fileName>/delete",
+    methods=["GET", "DELETE"],
 )
 # @login_required
 @jwt_required()
@@ -159,8 +170,8 @@ def deleteImage(userId, fileName):
                 401,
             )
 
-        fileExt = getExtension(request)
-        image = getImageByNameAndUserId(curUserId, fileName + fileExt)
+        # fileExt = getExtension(request)
+        image = getImageByNameAndUserId(curUserId, fileName)
 
         if image:
             image.delete()
@@ -171,3 +182,112 @@ def deleteImage(userId, fileName):
         )
 
     return make_response({"csrf_token": generate_csrf()}, 200)
+
+
+@app.route(
+    "/api/v1/users/<string:userId>/images/<string:fileName>/permissions/<string:userPermissionId>",
+    methods=["GET", "PUT", "DELETE"],
+)
+@jwt_required()
+def shareImage(userId, fileName, userPermissionId):
+    curUserId = str(current_user.id)
+
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"},
+            401,
+        )
+
+    image = getImageByNameAndUserId(curUserId, fileName)
+
+    if image:
+        found = False
+        index = 0
+        for i, user in enumerate(image.permissions):
+            if user.userId == userPermissionId:
+                index = i
+                found = True
+                break
+        else:
+            found = False
+
+        if found:
+            if request.method == "DELETE":
+                image.permissions.pop(index)
+                image.save()
+                return make_response("", 204)
+
+            if request.method == "GET":
+                return make_response(
+                    {
+                        "status": "success",
+                        "code": "200",
+                        "data": image.permissions[index],
+                    },
+                    200,
+                )
+            if request.method == "PUT":
+                sharedUserRole = request.form["role"]
+                image.permissions[index]["role"] = sharedUserRole
+                return make_response("", 204)
+        else:
+            return make_response(
+                {
+                    "status": "error",
+                    "code": "404",
+                    "message": "Permission for User id not found",
+                }
+            )
+
+    return make_response(
+        {
+            "status": "error",
+            "code": "404",
+            "message": "Image not found",
+        }
+    )
+
+
+@app.route(
+    "/api/v1/users/<string:userId>/images/<string:fileName>/permissions",
+    methods=["GET", "POST"],
+)
+@jwt_required()
+def getImagePermissions(userId, fileName):
+    curUserId = str(current_user.id)
+
+    if userId != curUserId:
+        return make_response(
+            {"status": "error", "code": "401", "message": "User is not authorized"},
+            401,
+        )
+
+    image = getImageByNameAndUserId(curUserId, fileName)
+
+    if image:
+        if request.method == "POST":
+            sharedUserId = request.form["user_id"]
+            sharedUserRole = request.form["role"]
+
+            newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
+            image.permissions.append(newPermission)
+            image.save()
+            return make_response("", 201)
+        if request.method == "GET":
+            return make_response(
+                {
+                    "status": "success",
+                    "code": "200",
+                    "permissions": image.permissions,
+                    "csrf_token": generate_csrf(),
+                },
+                200,
+            )
+
+    return make_response(
+        {
+            "status": "error",
+            "code": "404",
+            "message": "Image not found",
+        }
+    )

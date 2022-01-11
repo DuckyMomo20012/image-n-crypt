@@ -25,13 +25,6 @@ class RegisterForm(FlaskForm):
         label="public_key", validators=[DataRequired("Public key is required")]
     )
 
-
-class User(me.Document, UserMixin):
-    username = me.StringField()
-    password = me.StringField()
-    publicKey = me.StringField()
-    meta = {"collection": "users"}
-
 class TokenBlocklist(me.Document):
     jti = me.StringField()
     created_at = me.DateTimeField()

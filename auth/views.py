@@ -1,12 +1,11 @@
 from flask import request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app, jwt, csrf
-from auth.model import User, LoginForm, RegisterForm, TokenBlocklist
-from auth.service import (
-    getUserById,
-    getUserByUserName,
-    getTokenBlocklistByJTI,
-)
+from auth.model import LoginForm, RegisterForm, TokenBlocklist
+from user.model import User
+from user.service import getUserById, getUserByUserName
+from auth.service import getTokenBlocklistByJTI
+
 from flask_wtf.csrf import generate_csrf
 from helpers.utils import flatten
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
@@ -195,7 +194,6 @@ def login():
 def logout():
     # logout_user()
     jti = get_jwt()["jti"]
-    print("jti", type(jti))
     now = datetime.now(timezone.utc)
 
     tokenBlock = TokenBlocklist(jti=jti, created_at=now)

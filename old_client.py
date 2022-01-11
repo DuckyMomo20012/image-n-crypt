@@ -193,7 +193,6 @@ def downloadImage():
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Content-type": "image/png",
         },
     )
     data = json.loads(download_img_g.text)
@@ -232,7 +231,6 @@ def downloadImageAll():
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Content-type": "image/png",
         },
     )
     data = json.loads(download_img_all_g.text)
@@ -278,7 +276,6 @@ def deleteImage():
         # headers={"Cookie": cookie}
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Content-type": "image/png",
         },
     )
     delete_img_g_data = json.loads(delete_img_g.text)
@@ -292,7 +289,6 @@ def deleteImage():
             "X-CSRFToken": csrfKey,
             "Cookie": cookie,
             "Authorization": f"Bearer {access_token}",
-            "Content-type": "image/png",
         },
     )
     # delete_img_d_data = json.loads(delete_img_d.text)
@@ -360,6 +356,59 @@ def getAllUserInformation():
 # GET - Error: {"status": "error", "code": "401", "message": "Token has been
 # revoked"}
 
+# 11. Share image:
+
+
+def getShareImageInfo():
+    global access_token
+    global userId
+
+    fileShare = "bicycle2_e.png"
+    userPermission = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(fileShare)
+    permission_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermission}",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    permission_info_g_data = json.loads(permission_info_g.text)
+    print("permission_info_g_data", permission_info_g_data)
+
+
+def shareImage():
+    global access_token
+    global userId
+
+    fileShare = "bicycle2_e.png"
+    userPermission = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(fileShare)
+
+    permission_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    permission_info_g_data = json.loads(permission_info_g.text)
+    print("permission_info_g_data", permission_info_g_data)
+    cookie = permission_info_g.headers["Set-Cookie"]
+    csrfKey = permission_info_g_data["csrf_token"]
+
+    permission_info_p = requests.post(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
+        data={"user_id": userPermission, "role": "read"},
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Cookie": cookie,
+            "X-CSRFToken": csrfKey,
+        },
+    )
+    # No response content
+    # permission_info_p_data = json.loads(permission_info_p.text)
+    # print("permission_info_g_data", permission_info_p_data)
+
+
 if __name__ == "__main__":
     # cookie = ""
     access_token = ""
@@ -367,11 +416,13 @@ if __name__ == "__main__":
     userName = ""
     publicKey = ""
     # register()
-    # login()
-    listImage()
-    logout()
-    # getUserInformation()
+    login()
+    # listImage()
+    getUserInformation()
+    shareImage()
     # uploadImage()
     # downloadImage()
+    # logout()
     # downloadImageAll()
     # deleteImage()
+    # getShareImageInfo()
