@@ -8,10 +8,12 @@ def mainMenu():
     while option != 0:
         try : 
             if option == 1:
+                #login()
+                print("Logged in successfully")
                 optionLogin()
             elif option == 2:
-                #optionRegister()
-                print("!!!")
+                #register()
+                print("Sign Up Success")
             elif option == 3:
                 sys.exit()
             else:
@@ -21,27 +23,40 @@ def mainMenu():
             print("Invalid choise. Enter 1 - 3")
 
 def optionLogin():
-    print("____LOGIN___")
+    print("____HOME___")
     print("1. List image")
     print("2. Upload image")
     print("3. Dowload all images")
-    print("4. Back")
+    print("4. Get User information")
+    print("5. Logout")
+    print("6. Back")
     option = int(input("Enter your option: "))
     while option != 0:
         try : 
             if option == 1:
+                #listImage()
                 optionInOptionLogin()
             elif option == 2:
                 print()
+                optionLogin()
             elif option == 3:
                 print()
+                optionLogin()
             elif option == 4:
+                #getUserInformation()
+                print ()
+                optionLogin()
+            elif option == 5:
+                #logout()
+                print("Logout successful")
+            elif option == 6:
                 mainMenu()
             else:
                 print("Invalid choise. Enter 1 - 4")
-                mainMenu()
+                optionLogin()
         except ValueError:
             print("Invalid choise. Enter 1 - 4")    
+
 def back():
     enter = int(input("Can you back(0.No - 1.Yes)? " ))
     while enter <2:
@@ -53,29 +68,24 @@ def back():
 def optionInOptionLogin():
     print("____IMAGE PROCESING___")
     print("1. Dowload image")
-    print("2. Save image")
-    print("3. Delete images")
-    print("4. Back")
+    print("2. Delete images")
+    print("3. Back")
     option = int(input("Enter your option: "))
     while option != 0:
         try : 
             if option == 1:
                 print()
-                #back()
+                back()
             elif option == 2:
+                #deleteImage()
                 back()
             elif option == 3:
-                back()
-            elif option == 4:
                 optionLogin()
             else:
-                print("Invalid choise. Enter 1 - 4")
-                optionLogin()
+                print("Invalid choise. Enter 1 - 3")
+                optionInOptionLogin()
         except ValueError:
-            print("Invalid choise. Enter 1 - 4")    
+            print("Invalid choise. Enter 1 - 3")    
 
-
-# def optionRegister():
-#     register()
 if __name__== "__main__":
     mainMenu()
