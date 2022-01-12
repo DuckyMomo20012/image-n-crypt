@@ -15,7 +15,7 @@ def register(username, password):
     csrfKey = register_data["csrf_token"]
     cookie = register_g.headers["Set-Cookie"]
 
-    print("register_g", register_g.text)
+    # print("register_g", register_g.text)
 
     e, d, n = function_support.create_write_key("", writeFile=True)
 
@@ -27,7 +27,8 @@ def register(username, password):
             "Cookie": cookie,
         },
     )
-    print("register_p", register_p.text)
+    # print("register_p", register_p.text)
+    return register_p.text
 
 
 # GET - Success: {"csrf_token": "eyJ0eXAi...""}
@@ -110,7 +111,8 @@ def logout():
         # headers={"Cookie": cookie},
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    print("logout", logout_p.text)
+    # print("logout", logout_p.text)
+    return logout_p.text
     # cookie = logout_p.headers["Set-Cookie"]
 
 

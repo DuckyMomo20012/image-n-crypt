@@ -6,7 +6,7 @@ def getInput(*args):
     return ans
 
 def handleRes(ob, msg="", extract=None):
-    if ob == None:
+    if ob == None or ob == "":
         return msg
     ob = json.loads(ob)
     if "status" in ob.keys():

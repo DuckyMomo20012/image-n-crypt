@@ -19,6 +19,7 @@ def mainMenu():
             ans = getInput("username", "password")
             res = register(username=ans["username"], password=ans["password"])
             handleRes(res, "Sign up successfully ")
+            mainMenu()
         elif option == 3:
             sys.exit()
         else:
@@ -35,7 +36,6 @@ def optionLogin():
     print("3. Dowload all images")
     print("4. Get User information")
     print("5. Logout")
-    print("6. Back")
     option = int(input("Enter your option: "))
     while option != 0:
         try:
@@ -59,16 +59,14 @@ def optionLogin():
                 handleRes(res, "Information: ")
                 optionLogin()
             elif option == 5:
-                logout()
-                print("Logout successful")
-                mainMenu()
-            elif option == 6:
+                res = logout()
+                handleRes(res, "Logout successfully")
                 mainMenu()
             else:
-                print("Invalid choice. Enter 1 - 4")
+                print("Invalid choice. Enter 1 - 5")
                 optionLogin()
         except ValueError:
-            print("Invalid choice. Enter 1 - 4")
+            print("Invalid choice. Enter 1 - 5")
 
 
 def back():
