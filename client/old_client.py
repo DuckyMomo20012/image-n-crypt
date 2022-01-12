@@ -129,7 +129,6 @@ def uploadImage(fileName):
     global access_token
     global userId
     global publicKey
-    print("publicKey", publicKey)
     # public_key_g = requests.get(
     #     "http://localhost:5000/api/v1/users/<string:userId>/public-key",
     #     headers={"Cookie": cookie},
@@ -137,7 +136,6 @@ def uploadImage(fileName):
     # public_key_data = json.loads(public_key_g.text)
     # print("public_key_data", public_key_data)
     if publicKey == "":
-        print("Get")
         getUserInformation()
     n, e = map(int, publicKey.split(" "))
 
@@ -334,7 +332,10 @@ def getUserInformation():
     userId = user_info_g_data["data"]["user_id"]
     userName = user_info_g_data["data"]["user_name"]
     publicKey = user_info_g_data["data"]["public_key"]
-    return str('{"data": {"user id": "%s", "userName": "%s", "publicKey": "%s"}}' % (str(userId), str(userName), str(publicKey)))
+    return str(
+        '{"data": {"user id": "%s", "userName": "%s", "publicKey": "%s"}}'
+        % (str(userId), str(userName), str(publicKey))
+    )
 
 
 # GET - Success: {"status": "success", "code": "200", "data": {"user_id":
@@ -371,21 +372,31 @@ def getAllUserInformation():
 # 11. Share image:
 
 
-def getShareImageInfo(fileShare, userPermissionId):
+def getShareImageInfo(fileShare, sharedUserId):
     global access_token
     global userId
 
     # fileShare = "bicycle2_e.png"
-    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
     permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         headers={
             "Authorization": f"Bearer {access_token}",
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
     print("permission_info_g_data", permission_info_g_data)
+
+
+# GET - Success: {"status": "success", "code": "200", "data": {'userId':
+# '61de598f170caaeac86ce44d', 'role': 'write'},}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "404", "message": "Image not found",}
+# GET - Error: {"status": "error", "code": "404", "message": "Permission for
+# User id not found",}
+
 
 def getShareImageAllInfo(fileShare):
     global access_token
@@ -407,6 +418,13 @@ def getShareImageAllInfo(fileShare):
     csrfKey = permission_info_g_data["csrf_token"]
 
 
+# GET - Success: {"status": "success", "code": "200", "data": [{'userId':
+# '61de598f170caaeac86ce44d', 'role': 'write'}],}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "404", "message": "Image not found",}
+
+
 def shareImage(fileShare, userPermission, role):
     global access_token
     global userId
@@ -422,7 +440,7 @@ def shareImage(fileShare, userPermission, role):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
+    # print("permission_info_g_data", permission_info_g_data)
     cookie = permission_info_g.headers["Set-Cookie"]
     csrfKey = permission_info_g_data["csrf_token"]
 
@@ -437,14 +455,24 @@ def shareImage(fileShare, userPermission, role):
     )
     if permission_info_p.text:
         permission_info_p_data = json.loads(permission_info_p.text)
-        print("permission_info_g_data", permission_info_p_data)
+    return permission_info_p.text
+    # print("permission_info_g_data", permission_info_p_data)
 
-def editImagePermissions(fileShare, userPermissionId, role):
+
+# POST - Success: "", 201
+# POST - Error: {"status": "error", "code": "409", "message": "Permission user
+# id is already exists",}
+# POST - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# POST - Error: {"status": "error", "code": "404", "message": "Image not found",}
+
+
+def editImagePermissions(fileShare, sharedUserId, role):
     global access_token
     global userId
 
     # fileShare = "bicycle2_e.png"
-    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
     permission_info_g = requests.get(
@@ -459,7 +487,7 @@ def editImagePermissions(fileShare, userPermissionId, role):
     csrfKey = permission_info_g_data["csrf_token"]
 
     permission_info_p = requests.put(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         data={"role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -468,12 +496,21 @@ def editImagePermissions(fileShare, userPermissionId, role):
         },
     )
 
-def deleteImagePermissions(fileShare, userPermissionId):
+
+# PUT - Success: "", 204
+# PUT - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# PUT - Error: {"status": "error", "code": "404", "message": "Image not found",}
+# PUT - Error: {"status": "error", "code": "404", "message": "Permission for
+# User id not found",}
+
+
+def deleteImagePermissions(fileShare, sharedUserId):
     global access_token
     global userId
 
     # fileShare = "bicycle2_e.png"
-    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
     permission_info_g = requests.get(
@@ -488,7 +525,7 @@ def deleteImagePermissions(fileShare, userPermissionId):
     csrfKey = permission_info_g_data["csrf_token"]
 
     permission_info_p = requests.delete(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         headers={
             "Authorization": f"Bearer {access_token}",
             "Cookie": cookie,
@@ -496,16 +533,25 @@ def deleteImagePermissions(fileShare, userPermissionId):
         },
     )
 
-def getShareImage(downloadFile, userPermissionId):
+
+# DELETE - Success: "", 204
+# DELETE - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# DELETE - Error: {"status": "error", "code": "404", "message": "Image not found",}
+# DELETE - Error: {"status": "error", "code": "404", "message": "Permission for
+# User id not found",}
+
+
+def getShareImage(downloadFile, sharedUserId):
     # global cookie
     global access_token
     global userId
     # downloadFile = "bicycle2_e.png"
-    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(downloadFile)
     downloadFile_d = "bicycle_d.png"
     download_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/v1/users/{userPermissionId}/images/{name}",
+        f"http://127.0.0.1:5000/api/v1/users/{sharedUserId}/images/{name}",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -519,31 +565,56 @@ def getShareImage(downloadFile, userPermissionId):
         q.write(quotientData)
     with open(imgName, "wb") as f:
         f.write(imgData.encode("ISO-8859-1"))
-    function_support.Decrypted(
-        path_ImageDecode=downloadFile,
-        path_private_key="rsa.txt",
-        save_imageDecrypted=downloadFile_d,
-    )
+
+    # Since the db didn't store the private, so the file can only be downloaded
+
+    # function_support.Decrypted(
+    #     path_ImageDecode=downloadFile,
+    #     path_private_key="rsa.txt",
+    #     save_imageDecrypted=downloadFile_d,
+    # )
 
 
-# if __name__ == "__main__":
-#     # cookie = ""
-#     access_token = ""
-#     userId = ""
-#     userName = ""
-#     publicKey = ""
-#     userPermissionId = "61de3861c23524e8eadb17f1"
-#     register(username="admin", password="admin")
-#     # login(username="admin", password="admin")
-#     # listImage()
-#     # downloadImage(downloadFile="bicycle2_e.png")
-#     # getShareImage()
-#     # getUserInformation()
-#     # getShareImageInfo()
-#     # shareImage()
-#     # getShareImageAllInfo()
-#     # uploadImage(fileName="bicycle2.png")
-#     # deleteImagePermissions()
-#     # logout()
-#     # downloadImageAll()
-#     # deleteImage(deleteFile="bicycle2_e")
+# GET - Success:
+# {"status": "success","code": "200","data": {"img_name":
+# "bicycle.png","img_content": "\u00ff...","quotient": "22 22...",},}
+# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
+# GET - Error: {"status": "error", "code": "401", "message": "Token has been
+# revoked"}
+# GET - Error: {"status": "error", "code": "404", "message": "Image not found"}
+
+if __name__ == "__main__":
+    # cookie = ""
+    access_token = ""
+    userId = ""
+    userName = ""
+    publicKey = ""
+
+    # GENERATE KEY
+
+    # function_support.create_write_key(dstPath="", writeFile=True)
+
+    # USER INFORMATION
+
+    # register(username="admin", password="admin")
+    # logout()
+    # login(username="admin", password="admin")
+    # getUserInformation()
+
+    # CRUD IMAGE
+
+    # listImage()
+    # uploadImage(fileName="bicycle2.png")
+    # downloadImage(downloadFile="bicycle2_e.png", privateKeyPath="rsa.txt")
+    # downloadImageAll(pathPrivateKey="rsa.txt")
+    # deleteImage(deleteFile="bicycle2_e")
+
+    # CRUD IMAGE PERMISSIONS
+
+    # getShareImage("bicycle2_e.png", "61de3cd4c23524e8eadb17f8")
+    # getShareImageInfo("bicycle2_e.png", "61de598f170caaeac86ce44d")
+    # shareImage("bicycle2_e.png", "61de598f170caaeac86ce442", "read")
+    # deleteImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d")
+    # editImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d", "write")
+    # getShareImageAllInfo("bicycle2_e.png")

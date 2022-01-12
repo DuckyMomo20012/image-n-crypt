@@ -5,7 +5,7 @@ from werkzeug.datastructures import CombinedMultiDict
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_wtf.csrf import generate_csrf
 from upload_image.model import Image, ImageForm, ImagePermission
-from upload_image.service import getAllImageByUserId, getImageByNameAndUserId
+from upload_image.service import *
 from helpers.utils import getRandomFileName, flatten
 from os import path
 import json
@@ -47,11 +47,10 @@ def downloadImage(userId, fileName):
     # fileExt = getExtension(request)
 
     if image:
-        imagePermissions = True
-        if len(image.permissions) > 0:
-            imagePermissions = image.permissions.get(userId=curUserId)
+        imagePermit = getImagePermissionsByUserId(userId, fileName, curUserId)
 
-        if not imagePermissions or userId != curUserId:
+        # XOR ?
+        if (not imagePermit) == (userId != curUserId):
             return make_response(
                 {"status": "error", "code": "401", "message": "User is not authorized"},
                 401,
@@ -196,7 +195,7 @@ def deleteImage(userId, fileName):
     methods=["GET", "PUT", "DELETE"],
 )
 @jwt_required()
-def shareImage(userId, fileName, userPermissionId):
+def editImagePermission(userId, fileName, userPermissionId):
     curUserId = str(current_user.id)
 
     if userId != curUserId:
@@ -208,51 +207,48 @@ def shareImage(userId, fileName, userPermissionId):
     image = getImageByNameAndUserId(curUserId, fileName)
 
     if image:
-        found = False
-        index = 0
-        for i, user in enumerate(image.permissions):
-            if user.userId == userPermissionId:
-                index = i
-                found = True
-                break
-        else:
-            found = False
-
-        if found:
-            if request.method == "DELETE":
-                image.permissions.pop(index)
-                image.save()
-                return make_response("", 204)
-
-            if request.method == "GET":
-                return make_response(
-                    {
-                        "status": "success",
-                        "code": "200",
-                        "data": image.permissions[index],
-                    },
-                    200,
-                )
-            if request.method == "PUT":
-                sharedUserRole = request.form["role"]
-                image.permissions[index]["role"] = sharedUserRole
-                image.save()
-                return make_response("", 204)
-        else:
+        imageOnePermit = getOneImagePermissionByUserId(
+            userId, fileName, userPermissionId
+        )
+        if not imageOnePermit:
             return make_response(
                 {
                     "status": "error",
                     "code": "404",
                     "message": "Permission for User id not found",
-                }
+                },
+                404,
             )
+
+        if request.method == "DELETE":
+            deleteImagePermissionByUserId(userId, fileName, userPermissionId)
+            # image.permissions.pop(index)
+            image.reload()
+            return make_response("", 204)
+        if request.method == "GET":
+            return make_response(
+                {
+                    "status": "success",
+                    "code": "200",
+                    "data": imageOnePermit,
+                },
+                200,
+            )
+        if request.method == "PUT":
+            sharedUserRole = request.form["role"]
+            editImageRolePermissionByUserId(
+                userId, fileName, userPermissionId, sharedUserRole
+            )
+            image.reload()
+            return make_response("", 204)
 
     return make_response(
         {
             "status": "error",
             "code": "404",
             "message": "Image not found",
-        }
+        },
+        404,
     )
 
 
@@ -261,7 +257,7 @@ def shareImage(userId, fileName, userPermissionId):
     methods=["GET", "POST"],
 )
 @jwt_required()
-def getImagePermissions(userId, fileName):
+def shareImage(userId, fileName):
     curUserId = str(current_user.id)
 
     if userId != curUserId:
@@ -276,9 +272,11 @@ def getImagePermissions(userId, fileName):
         if request.method == "POST":
             sharedUserId = request.form["user_id"]
             sharedUserRole = request.form["role"]
-            checkDuplicatePermission = image.permissions.get(userId=sharedUserId)
+            imageOnePermit = getOneImagePermissionByUserId(userId, fileName, sharedUserId)
+            print("imageOnePermit", imageOnePermit)
+
             # DB can find a permission has userId == curUserid
-            if checkDuplicatePermission:
+            if imageOnePermit:
                 return make_response(
                     {
                         "status": "error",

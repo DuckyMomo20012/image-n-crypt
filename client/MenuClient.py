@@ -82,7 +82,9 @@ def optionInOptionLogin():
     print("____IMAGE PROCESING___")
     print("1. Dowload image")
     print("2. Delete images")
-    print("3. Back")
+    print("3. Share images")
+    print("4. Get share images")
+    print("5. Back")
     option = int(input("Enter your option: "))
     while option != 0:
         try:
@@ -97,12 +99,22 @@ def optionInOptionLogin():
                 handleRes(res, "File deleted")
                 back()
             elif option == 3:
+                ans = getInput("file name", "user id to share", "role")
+                res = shareImage(ans["file name"], ans["user id to share"], ans["role"])
+                handleRes(res, "File shared")
+                back()
+            elif option == 4:
+                ans = getInput("file name", "user id")
+                res = getShareImage(ans["file name"], ans["user id"])
+                handleRes(res, "File downloaded")
+                back()
+            elif option == 5:
                 optionLogin()
             else:
-                print("Invalid choice. Enter 1 - 3")
+                print("Invalid choice. Enter 1 - 5")
                 optionInOptionLogin()
         except ValueError:
-            print("Invalid choice. Enter 1 - 3")
+            print("Invalid choice. Enter 1 - 5")
 
 
 if __name__ == "__main__":
