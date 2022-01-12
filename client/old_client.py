@@ -1,7 +1,6 @@
 from PIL import Image
 import requests
 import json
-from decode_encode import *
 from decode_encode import function_support
 from os import path
 
@@ -50,7 +49,7 @@ def login(username, password):
     csrfKey = login_data["csrf_token"]
     cookie = login_g.headers["Set-Cookie"]
 
-    print("login_p", login_g.text)
+    # print("login_p", login_g.text)
 
     # NOTE: When login, cookie will be reset
     login_p = requests.post(
@@ -61,11 +60,13 @@ def login(username, password):
             "Cookie": cookie,
         },
     )
-    print("login_p", login_p.text)
+    # print("login_p", login_p.text)
     data = json.loads(login_p.text)
-    access_token = data["access_token"]
-    userId = data["user_id"]
-    print("access_token", access_token)
+    if data:
+        access_token = data["access_token"]
+        userId = data["user_id"]
+        # print("access_token", access_token)
+        return str('{"data": {"user id": "%s"}}' % str(data["user_id"]))
     # cookie = login_p.headers["Set-cookie"]
 
 
@@ -86,7 +87,8 @@ def listImage():
         # headers={"Cookie": cookie},
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    print("list_img_g", list_img_g.text)
+    # print("list_img_g", list_img_g.text)
+    return list_img_g.text
 
 
 # GET - Success: {"status": "success", "code": "200", "data": ["traffic-sign.png","bicycle.png"]}
@@ -123,14 +125,17 @@ def logout():
 def uploadImage(fileName):
     # global cookie
     global access_token
-    global userId, publicKey
+    global userId
+    global publicKey
+    print("publicKey", publicKey)
     # public_key_g = requests.get(
     #     "http://localhost:5000/api/v1/users/<string:userId>/public-key",
     #     headers={"Cookie": cookie},
     # )
     # public_key_data = json.loads(public_key_g.text)
     # print("public_key_data", public_key_data)
-    if not publicKey:
+    if publicKey == "":
+        print("Get")
         getUserInformation()
     n, e = map(int, publicKey.split(" "))
 
@@ -143,7 +148,7 @@ def uploadImage(fileName):
     csrfKey = upload_img_data["csrf_token"]
     cookie = upload_img_g.headers["Set-Cookie"]
 
-    print("upload_img_g", upload_img_g.text)
+    # print("upload_img_g", upload_img_g.text)
 
     # NOTE: "imageFile" is field from ImageForm class
     # fileName = "bicycle2.png"
@@ -170,7 +175,8 @@ def uploadImage(fileName):
                 "Authorization": f"Bearer {access_token}",
             },
         )
-        print("upload_img_p", upload_img_p.text)
+        # print("upload_img_p", upload_img_p.text)
+        return upload_img_p.text
 
 
 # GET - Success: {"csrf_token": "eyJ0eXAi...""}
@@ -178,7 +184,7 @@ def uploadImage(fileName):
 # authorized"}
 # GET - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
-# {"data":{"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
+# {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}
 # POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
 
 # 6. DOWNLOAD IMAGE:
@@ -322,10 +328,11 @@ def getUserInformation():
     )
 
     user_info_g_data = json.loads(user_info_g.text)
-    print("public_key_g_data", user_info_g_data)
+    # print("public_key_g_data", user_info_g_data)
     userId = user_info_g_data["data"]["user_id"]
     userName = user_info_g_data["data"]["user_name"]
     publicKey = user_info_g_data["data"]["public_key"]
+    return str('{"data": {"user id": "%s", "userName": "%s", "publicKey": "%s"}}' % (str(userId), str(userName), str(publicKey)))
 
 
 # GET - Success: {"status": "success", "code": "200", "data": {"user_id":
@@ -517,24 +524,24 @@ def getShareImage(downloadFile, userPermissionId):
     )
 
 
-if __name__ == "__main__":
-    # cookie = ""
-    access_token = ""
-    userId = ""
-    userName = ""
-    publicKey = ""
-    userPermissionId = "61de3861c23524e8eadb17f1"
-    register(username="admin", password="admin")
-    # login(username="admin", password="admin")
-    # listImage()
-    # downloadImage(downloadFile="bicycle2_e.png")
-    # getShareImage()
-    # getUserInformation()
-    # getShareImageInfo()
-    # shareImage()
-    # getShareImageAllInfo()
-    # uploadImage(fileName="bicycle2.png")
-    # deleteImagePermissions()
-    # logout()
-    # downloadImageAll()
-    # deleteImage(deleteFile="bicycle2_e")
+# if __name__ == "__main__":
+#     # cookie = ""
+#     access_token = ""
+#     userId = ""
+#     userName = ""
+#     publicKey = ""
+#     userPermissionId = "61de3861c23524e8eadb17f1"
+#     register(username="admin", password="admin")
+#     # login(username="admin", password="admin")
+#     # listImage()
+#     # downloadImage(downloadFile="bicycle2_e.png")
+#     # getShareImage()
+#     # getUserInformation()
+#     # getShareImageInfo()
+#     # shareImage()
+#     # getShareImageAllInfo()
+#     # uploadImage(fileName="bicycle2.png")
+#     # deleteImagePermissions()
+#     # logout()
+#     # downloadImageAll()
+#     # deleteImage(deleteFile="bicycle2_e")

@@ -47,7 +47,9 @@ def downloadImage(userId, fileName):
     # fileExt = getExtension(request)
 
     if image:
-        imagePermissions = image.permissions.get(userId=curUserId)
+        imagePermissions = True
+        if len(image.permissions) > 0:
+            imagePermissions = image.permissions.get(userId=curUserId)
 
         if not imagePermissions or userId != curUserId:
             return make_response(
