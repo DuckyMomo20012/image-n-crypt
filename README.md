@@ -32,6 +32,10 @@ flask run
 > (JSON Web Token) to authenticate. So you may find some pieces of code that was
 > use cookie I left behind.
 
+You can use file "old_client.py" to test API endpoints. For the sake of
+simplicity, I stored "JWT access token", "User id" as global variables for easy
+access. (You can also see that I also stored cookie as global variable too).
+
 ## 2.0 REST API endpoints:
 
 <table>
@@ -83,11 +87,14 @@ flask run
 
 ## 2.1. Login:
 
-> **⚠️ ⚠️ NOTE:** Whenever user login or logout, that means user's session is over,
+> **⚠️ NOTE:** Whenever user login or logout, that means user's session is over,
 > so cookie will be reset. Also, the JWT token will be sent to blacklist.
 
 Currently when we login, the JWT token is stored on the client persistently ->
 Vulnerable to CSRF & XSS attacks.
+
+> **⚠️ NOTE:** Each form has its own cookie, so when we send a GET request to
+> request a form to submit, we have to set cookie for POST request
 
 <table>
 <tbody>
@@ -125,39 +132,41 @@ Vulnerable to CSRF & XSS attacks.
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-global access_token
-global userId
-login_g = requests.get("http://localhost:5000/login")
-login_data = json.loads(login_g.text)
-csrfKey = login_data["csrf_token"]
-cookie = login_g.headers["Set-Cookie"]
-# print("login_p", login_g.text)
-# ⚠️ NOTE: When login, cookie will be reset
-login_p = requests.post(
-    "http://localhost:5000/login",
-    data={"username": username, "password": password},
-    headers={
-        "X-CSRFToken": csrfKey,
-        "Cookie": cookie,
-    },
-)
-# print("login_p", login_p.text)
-data = json.loads(login_p.text)
-if data:
-    access_token = data["access_token"]
-    userId = data["user_id"]
-    # print("access_token", access_token)
-    return str('{"data": {"user id": "%s"}}' % str(data["user_id"]))
-# Reset cookie if you use flask-login for cookie based session
-# cookie = login_p.headers["Set-cookie"]
+def login(username, password):
+    # global cookie
+    global access_token
+    global userId
+    login_g = requests.get("http://localhost:5000/login")
+    login_data = json.loads(login_g.text)
+    csrfKey = login_data["csrf_token"]
+    cookie = login_g.headers["Set-Cookie"]
+
+    # print("login_p", login_g.text)
+
+    # NOTE: When login, cookie will be reset
+    login_p = requests.post(
+        "http://localhost:5000/login",
+        data={"username": username, "password": password},
+        headers={
+            "X-CSRFToken": csrfKey,
+            "Cookie": cookie,
+        },
+    )
+    print("login_p", login_p.text)
+    data = json.loads(login_p.text)
+    if data:
+        access_token = data["access_token"]
+        userId = data["user_id"]
+        # print("access_token", access_token)
+        return str('{"data": {"user id": "%s"}}' % str(data["user_id"]))
+    # cookie = login_p.headers["Set-cookie"]
 ```
 
 </details>
 
 ## 2.2. Logout:
 
-> ⚠️ NOTE: I have turned off CSRF protection for logout route, so we don't have to request a CSRF key.
+> **⚠️ NOTE:** I have turned off CSRF protection for logout route, so we don't have to request a CSRF key.
 
 <table>
 <tbody>
@@ -180,20 +189,21 @@ if data:
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-global access_token
-logout_p = requests.post(
-    "http://localhost:5000/logout",
-    # headers={"Cookie": cookie},
-    headers={"Authorization": f"Bearer {access_token}"},
-)
-# print("logout", logout_p.text)
-return logout_p.text
-# cookie = logout_p.headers["Set-Cookie"]
+def logout():
+    # global cookie
+    global access_token
+    logout_p = requests.post(
+        "http://localhost:5000/logout",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    # print("logout", logout_p.text)
+    return logout_p.text
+    # cookie = logout_p.headers["Set-Cookie"]
 ```
 
 </details>
@@ -245,27 +255,31 @@ When logged in, public and private for RSA algorithm is created for user at curr
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-register_g = requests.get("http://localhost:5000/register")
-register_data = json.loads(register_g.text)
-csrfKey = register_data["csrf_token"]
-cookie = register_g.headers["Set-Cookie"]
-# print("register_g", register_g.text)
-e, d, n = function_support.create_write_key("", writeFile=True)
-register_p = requests.post(
-    "http://localhost:5000/register",
-    data={"username": username, "password": password, "publicKey": f"{n} {e}"},
-    headers={
-        "X-CSRFToken": csrfKey,
-        "Cookie": cookie,
-    },
-)
-# print("register_p", register_p.text)
-return register_p.text
+def register(username, password):
+    # global cookie
+    register_g = requests.get("http://localhost:5000/register")
+    register_data = json.loads(register_g.text)
+    csrfKey = register_data["csrf_token"]
+    cookie = register_g.headers["Set-Cookie"]
+
+    # print("register_g", register_g.text)
+
+    e, d, n = function_support.create_write_key("", writeFile=True)
+
+    register_p = requests.post(
+        "http://localhost:5000/register",
+        data={"username": username, "password": password, "publicKey": f"{n} {e}"},
+        headers={
+            "X-CSRFToken": csrfKey,
+            "Cookie": cookie,
+        },
+    )
+    # print("register_p", register_p.text)
+    return register_p.text
 ```
 
 </details>
@@ -307,7 +321,7 @@ return register_p.text
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -327,7 +341,7 @@ return list_img_g.text
 
 ## 2.5. Upload image:
 
-> ⚠️ NOTE: Temporarily accepting .PNG image extension only.
+> **⚠️ NOTE:** Temporarily accepting .PNG image extension only.
 
 When user upload a image (.png), the image is encrypted with public key and
 return the encrypted image along with the "quotient.txt". The quotient later is
@@ -374,7 +388,7 @@ opened, but the opener may or may not understand the image.
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -400,7 +414,7 @@ upload_img_data = json.loads(upload_img_g.text)
 csrfKey = upload_img_data["csrf_token"]
 cookie = upload_img_g.headers["Set-Cookie"]
 # print("upload_img_g", upload_img_g.text)
-# ⚠️ NOTE: "imageFile" is field from ImageForm class
+# **⚠️ NOTE:** "imageFile" is field from ImageForm class
 # fileName = "bicycle2.png"
 name, ext = path.splitext(fileName)
 fileName_encrypt = name + "_e" + ext
@@ -477,7 +491,7 @@ quotient content downloaded to decrypt the message
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -558,7 +572,7 @@ function_support.Decrypted(
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -629,7 +643,7 @@ def downloadImageAll(pathPrivateKey):
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -706,7 +720,7 @@ def deleteImage(deleteFile):
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -778,7 +792,7 @@ def getUserInformation():
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -856,7 +870,7 @@ Only return one permissions which match the sharedUserId.
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -943,7 +957,7 @@ for POST request later.
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -1013,7 +1027,7 @@ def getShareImageAllInfo(fileShare):
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -1097,7 +1111,7 @@ def shareImage(fileShare, userPermission, role):
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -1177,7 +1191,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -1261,7 +1275,7 @@ for user
 </tbody>
 </table>
 
-<details open>
+<details>
 <summary>Code implementation</summary>
 
 ```python
@@ -1400,8 +1414,11 @@ User tries to request with missing token or invalid token. The message may vary.
 <td>
 
 ```json
-{"status":"error", "code":"422", "message":"Bad Authorization
-# header. Expected 'Authorization: Bearer <JWT>'"}
+{
+  "status": "error",
+  "code": "422",
+  "message": "Bad Authorization header. Expected 'Authorization: Bearer <JWT>'"
+}
 ```
 
 </td>

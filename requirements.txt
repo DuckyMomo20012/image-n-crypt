@@ -5,8 +5,5 @@ Flask-Reuploaded>=1.2.0
 Flask-JWT-Extended>=4.3.1
 Flask-Login>=0.5.0
 requests>=2.27.1
-bcrypt>=3.2.0
 Pillow>=9.0.0
 opencv-python>=4.5.5.62
-redis>=4.1.0
-# beautifulsoup4
