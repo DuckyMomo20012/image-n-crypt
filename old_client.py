@@ -130,6 +130,8 @@ def uploadImage(fileName):
     # )
     # public_key_data = json.loads(public_key_g.text)
     # print("public_key_data", public_key_data)
+    if not publicKey:
+        getUserInformation()
     n, e = map(int, publicKey.split(" "))
 
     upload_img_g = requests.get(
@@ -182,7 +184,7 @@ def uploadImage(fileName):
 # 6. DOWNLOAD IMAGE:
 
 
-def downloadImage(downloadFile):
+def downloadImage(downloadFile, privateKeyPath):
     # global cookie
     global access_token
     global userId
@@ -206,7 +208,7 @@ def downloadImage(downloadFile):
         f.write(imgData.encode("ISO-8859-1"))
     function_support.Decrypted(
         path_ImageDecode=downloadFile,
-        path_private_key="rsa.txt",
+        path_private_key=privateKeyPath,
         save_imageDecrypted=downloadFile_d,
     )
 
@@ -223,7 +225,7 @@ def downloadImage(downloadFile):
 # 7. DOWNLOAD IMAGE ALL:
 
 
-def downloadImageAll():
+def downloadImageAll(pathPrivateKey):
     # global cookie
     global access_token
     global userId
@@ -247,7 +249,7 @@ def downloadImageAll():
             f.write(imgContent.encode("ISO-8859-1"))
         function_support.Decrypted(
             path_ImageDecode=imgName,
-            path_private_key="rsa.txt",
+            path_private_key=pathPrivateKey,
             save_imageDecrypted=imgName,
         )
 
@@ -521,17 +523,18 @@ if __name__ == "__main__":
     userId = ""
     userName = ""
     publicKey = ""
-    # register()
-    # login()
-    # getShareImage()
+    userPermissionId = "61de3861c23524e8eadb17f1"
+    register(username="admin", password="admin")
+    # login(username="admin", password="admin")
     # listImage()
+    # downloadImage(downloadFile="bicycle2_e.png")
+    # getShareImage()
     # getUserInformation()
     # getShareImageInfo()
     # shareImage()
     # getShareImageAllInfo()
-    # uploadImage()
+    # uploadImage(fileName="bicycle2.png")
     # deleteImagePermissions()
-    # downloadImage()
     # logout()
     # downloadImageAll()
-    # deleteImage()
+    # deleteImage(deleteFile="bicycle2_e")

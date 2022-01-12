@@ -2,9 +2,15 @@ import numpy as np
 import random
 import base64
 import os
+from os import path
 import cv2
 
 BIT_NUMBER = 10
+
+from datetime import datetime
+
+def getRandomFileName(fileName):
+	return f"{fileName}_%s" % (datetime.now().strftime("%Y%m%d%H%M%S"))
 
 # tìm ước chung lớn nhất sử dụng thậ euclid mở rộn
 def GCD(a, b):
@@ -134,14 +140,18 @@ def powermod(x, e, n):
 
 
 # ghi file key
-def create_write_key(path="", writeFile=False):
+def create_write_key(dstPath="", writeFile=False):
     p, q = create_p_and_q(BIT_NUMBER)
     n, e, d = publicKey_privateKey(p, q)
     if writeFile:
-        with open(path + "rsa_pub.txt", "w") as publicKey:
+        fileName = "rsa.txt"
+        if os.path.exists(fileName):
+            splitFileName, ext = path.splitext(fileName)
+            fileName = getRandomFileName(splitFileName) + ext
+        with open(dstPath + "rsa_pub.txt", "w") as publicKey:
             publicKey.write("{} {}".format(n, e))
 
-        with open(path + "rsa.txt", "w") as private_key:
+        with open(dstPath + fileName, "w") as private_key:
             private_key.write("{} {}".format(d, n))
 
     return e, d, n

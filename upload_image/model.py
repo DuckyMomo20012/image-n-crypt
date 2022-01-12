@@ -26,4 +26,3 @@ class Image(me.Document):
     quotientImg = me.StringField()
     permissions = me.EmbeddedDocumentListField(ImagePermission, default=[])
     meta = {"collection": "images"}
-
