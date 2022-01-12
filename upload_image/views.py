@@ -6,8 +6,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_wtf.csrf import generate_csrf
 from upload_image.model import Image, ImageForm, ImagePermission
 from upload_image.service import getAllImageByUserId, getImageByNameAndUserId
-from helpers.utils import getRandomFileName, flatten, getExtension
+from helpers.utils import getRandomFileName, flatten
 from os import path
+import json
 
 # from flask_login import current_user, login_required
 
@@ -40,15 +41,19 @@ def listImage(userId):
 def downloadImage(userId, fileName):
     curUserId = str(current_user.id)
 
-    if userId != curUserId:
-        return make_response(
-            {"status": "error", "code": "401", "message": "User is not authorized"}, 401
-        )
+    # FIXME: Only get permission, instead of image
+    image = getImageByNameAndUserId(userId, fileName)
 
     # fileExt = getExtension(request)
-    image = getImageByNameAndUserId(curUserId, fileName)
 
     if image:
+        imagePermissions = image.permissions.get(userId=curUserId)
+
+        if not imagePermissions or userId != curUserId:
+            return make_response(
+                {"status": "error", "code": "401", "message": "User is not authorized"},
+                401,
+            )
         data_byte = image.dataImg.read().decode("ISO-8859-1")
         return make_response(
             {
@@ -229,6 +234,7 @@ def shareImage(userId, fileName, userPermissionId):
             if request.method == "PUT":
                 sharedUserRole = request.form["role"]
                 image.permissions[index]["role"] = sharedUserRole
+                image.save()
                 return make_response("", 204)
         else:
             return make_response(
@@ -268,6 +274,17 @@ def getImagePermissions(userId, fileName):
         if request.method == "POST":
             sharedUserId = request.form["user_id"]
             sharedUserRole = request.form["role"]
+            checkDuplicatePermission = image.permissions.get(userId=sharedUserId)
+            # DB can find a permission has userId == curUserid
+            if checkDuplicatePermission:
+                return make_response(
+                    {
+                        "status": "error",
+                        "code": "409",
+                        "message": "Permission user id is already exists",
+                    },
+                    409,
+                )
 
             newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
             image.permissions.append(newPermission)

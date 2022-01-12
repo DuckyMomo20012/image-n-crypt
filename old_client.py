@@ -9,7 +9,7 @@ from os import path
 
 # NOTE: Each form has its own cookie, so when we send a GET request to request a
 # form to submit, we have to set cookie for POST request
-def register():
+def register(username, password):
     # global cookie
     register_g = requests.get("http://localhost:5000/register")
     register_data = json.loads(register_g.text)
@@ -22,7 +22,7 @@ def register():
 
     register_p = requests.post(
         "http://localhost:5000/register",
-        data={"username": "admin", "password": "admin", "publicKey": f"{n} {e}"},
+        data={"username": username, "password": password, "publicKey": f"{n} {e}"},
         headers={
             "X-CSRFToken": csrfKey,
             "Cookie": cookie,
@@ -41,7 +41,7 @@ def register():
 # 2. LOGIN:
 
 # NOTE: Only login GET request have "Set-Cookie" header
-def login():
+def login(username, password):
     # global cookie
     global access_token
     global userId
@@ -55,7 +55,7 @@ def login():
     # NOTE: When login, cookie will be reset
     login_p = requests.post(
         "http://localhost:5000/login",
-        data={"username": "admin", "password": "admin"},
+        data={"username": username, "password": password},
         headers={
             "X-CSRFToken": csrfKey,
             "Cookie": cookie,
@@ -120,7 +120,7 @@ def logout():
 # 5. UPLOAD IMAGE:
 
 
-def uploadImage():
+def uploadImage(fileName):
     # global cookie
     global access_token
     global userId, publicKey
@@ -144,8 +144,9 @@ def uploadImage():
     print("upload_img_g", upload_img_g.text)
 
     # NOTE: "imageFile" is field from ImageForm class
-    fileName = "bicycle2.png"
-    fileName_encrypt = "bicycle2_e.png"
+    # fileName = "bicycle2.png"
+    name, ext = path.splitext(fileName)
+    fileName_encrypt = name + "_e" + ext
     function_support.Encrypted(
         fileName,
         n=n,
@@ -181,13 +182,13 @@ def uploadImage():
 # 6. DOWNLOAD IMAGE:
 
 
-def downloadImage():
+def downloadImage(downloadFile):
     # global cookie
     global access_token
     global userId
-    downloadFile = "bicycle2_e.png"
+    # downloadFile = "bicycle2_e.png"
     name, ext = path.splitext(downloadFile)
-    downloadFile_d = "bicycle_d.png"
+    downloadFile_d = name + "_d" + ext
     download_img_g = requests.get(
         f"http://127.0.0.1:5000/api/v1/users/{userId}/images/{name}",
         # headers={"Cookie": cookie},
@@ -265,11 +266,11 @@ def downloadImageAll():
 # 8. DELETE IMAGE:
 
 
-def deleteImage():
+def deleteImage(deleteFile):
     # global cookie
     global access_token
     global userId
-    deleteFile = "bicycle2_e.png"
+    # deleteFile = "bicycle2_e.png"
     name, ext = path.splitext(deleteFile)
     delete_img_g = requests.get(
         f"http://127.0.0.1:5000/api/v1/users/{userId}/images/{name}/delete",
@@ -359,15 +360,15 @@ def getAllUserInformation():
 # 11. Share image:
 
 
-def getShareImageInfo():
+def getShareImageInfo(fileShare, userPermissionId):
     global access_token
     global userId
 
-    fileShare = "bicycle2_e.png"
-    userPermission = "61dd6f75cb9aa4cea4a70f0c"
+    # fileShare = "bicycle2_e.png"
+    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
     permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermission}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
         headers={
             "Authorization": f"Bearer {access_token}",
         },
@@ -375,13 +376,32 @@ def getShareImageInfo():
     permission_info_g_data = json.loads(permission_info_g.text)
     print("permission_info_g_data", permission_info_g_data)
 
-
-def shareImage():
+def getShareImageAllInfo(fileShare):
     global access_token
     global userId
 
-    fileShare = "bicycle2_e.png"
+    # fileShare = "bicycle2_e.png"
     userPermission = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(fileShare)
+
+    permission_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    permission_info_g_data = json.loads(permission_info_g.text)
+    print("permission_info_g_data", permission_info_g_data)
+    cookie = permission_info_g.headers["Set-Cookie"]
+    csrfKey = permission_info_g_data["csrf_token"]
+
+
+def shareImage(fileShare, userPermission, role):
+    global access_token
+    global userId
+
+    # fileShare = "bicycle2_e.png"
+    # userPermission = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
     permission_info_g = requests.get(
@@ -397,16 +417,102 @@ def shareImage():
 
     permission_info_p = requests.post(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        data={"user_id": userPermission, "role": "read"},
+        data={"user_id": userPermission, "role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
             "Cookie": cookie,
             "X-CSRFToken": csrfKey,
         },
     )
-    # No response content
-    # permission_info_p_data = json.loads(permission_info_p.text)
-    # print("permission_info_g_data", permission_info_p_data)
+    if permission_info_p.text:
+        permission_info_p_data = json.loads(permission_info_p.text)
+        print("permission_info_g_data", permission_info_p_data)
+
+def editImagePermissions(fileShare, userPermissionId, role):
+    global access_token
+    global userId
+
+    # fileShare = "bicycle2_e.png"
+    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(fileShare)
+
+    permission_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    permission_info_g_data = json.loads(permission_info_g.text)
+    print("permission_info_g_data", permission_info_g_data)
+    cookie = permission_info_g.headers["Set-Cookie"]
+    csrfKey = permission_info_g_data["csrf_token"]
+
+    permission_info_p = requests.put(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
+        data={"role": role},
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Cookie": cookie,
+            "X-CSRFToken": csrfKey,
+        },
+    )
+
+def deleteImagePermissions(fileShare, userPermissionId):
+    global access_token
+    global userId
+
+    # fileShare = "bicycle2_e.png"
+    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(fileShare)
+
+    permission_info_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    permission_info_g_data = json.loads(permission_info_g.text)
+    print("permission_info_g_data", permission_info_g_data)
+    cookie = permission_info_g.headers["Set-Cookie"]
+    csrfKey = permission_info_g_data["csrf_token"]
+
+    permission_info_p = requests.delete(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{userPermissionId}",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Cookie": cookie,
+            "X-CSRFToken": csrfKey,
+        },
+    )
+
+def getShareImage(downloadFile, userPermissionId):
+    # global cookie
+    global access_token
+    global userId
+    # downloadFile = "bicycle2_e.png"
+    # userPermissionId = "61dd6f75cb9aa4cea4a70f0c"
+    name, ext = path.splitext(downloadFile)
+    downloadFile_d = "bicycle_d.png"
+    download_img_g = requests.get(
+        f"http://127.0.0.1:5000/api/v1/users/{userPermissionId}/images/{name}",
+        # headers={"Cookie": cookie},
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    data = json.loads(download_img_g.text)
+    imgData = data["data"]["img_content"]
+    imgName = data["data"]["img_name"]
+    quotientData = data["data"]["quotient"]
+    with open("quotient.txt", "w") as q:
+        q.write(quotientData)
+    with open(imgName, "wb") as f:
+        f.write(imgData.encode("ISO-8859-1"))
+    function_support.Decrypted(
+        path_ImageDecode=downloadFile,
+        path_private_key="rsa.txt",
+        save_imageDecrypted=downloadFile_d,
+    )
 
 
 if __name__ == "__main__":
@@ -416,13 +522,16 @@ if __name__ == "__main__":
     userName = ""
     publicKey = ""
     # register()
-    login()
+    # login()
+    # getShareImage()
     # listImage()
-    getUserInformation()
-    shareImage()
+    # getUserInformation()
+    # getShareImageInfo()
+    # shareImage()
+    # getShareImageAllInfo()
     # uploadImage()
+    # deleteImagePermissions()
     # downloadImage()
     # logout()
     # downloadImageAll()
     # deleteImage()
-    # getShareImageInfo()
