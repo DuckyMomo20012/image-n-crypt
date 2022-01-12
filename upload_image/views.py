@@ -272,7 +272,9 @@ def shareImage(userId, fileName):
         if request.method == "POST":
             sharedUserId = request.form["user_id"]
             sharedUserRole = request.form["role"]
-            imageOnePermit = getOneImagePermissionByUserId(userId, fileName, sharedUserId)
+            imageOnePermit = getOneImagePermissionByUserId(
+                userId, fileName, sharedUserId
+            )
             print("imageOnePermit", imageOnePermit)
 
             # DB can find a permission has userId == curUserid
@@ -295,8 +297,10 @@ def shareImage(userId, fileName):
                 {
                     "status": "success",
                     "code": "200",
-                    "permissions": image.permissions,
-                    "csrf_token": generate_csrf(),
+                    "data": {
+                        "permissions": image.permissions,
+                        "csrf_token": generate_csrf(),
+                    },
                 },
                 200,
             )

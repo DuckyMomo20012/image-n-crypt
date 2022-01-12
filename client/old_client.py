@@ -31,7 +31,7 @@ def register(username, password):
     return register_p.text
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# GET - Success: {"csrf_token": "eyJ0eXAi..."}
 # POST - Success: "", 201 - Created
 # POST - Error: {"status": "error","code": "409","message": "Username already
 # exists",},
@@ -61,7 +61,7 @@ def login(username, password):
             "Cookie": cookie,
         },
     )
-    # print("login_p", login_p.text)
+    print("login_p", login_p.text)
     data = json.loads(login_p.text)
     if data:
         access_token = data["access_token"]
@@ -71,8 +71,8 @@ def login(username, password):
     # cookie = login_p.headers["Set-cookie"]
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi...""}
-# POST - Success: {"access_token": "eyJ0eXAi..."}
+# GET - Success: {"csrf_token": "eyJ0eXAi..."}
+# POST - Success: {"access_token": "eyJ0eXAi...", "user_id": "61dea576762674330a3f17dc"}
 # POST - Error: {"status": "error","code": "422","message": "Username or password is invalid",}
 # POST - Error: {"status": "error", "code": "422", "message": "Password is required"}
 
@@ -179,12 +179,12 @@ def uploadImage(fileName):
         return upload_img_p.text
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# GET - Success: {"csrf_token": "eyJ0eXAi..."}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
 # GET - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
-# {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}
+# {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
 # POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
 
 # 6. DOWNLOAD IMAGE:
@@ -198,7 +198,7 @@ def downloadImage(downloadFile, privateKeyPath):
     name, ext = path.splitext(downloadFile)
     downloadFile_d = name + "_d" + ext
     download_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/v1/users/{userId}/images/{name}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -236,7 +236,7 @@ def downloadImageAll(pathPrivateKey):
     global access_token
     global userId
     download_img_all_g = requests.get(
-        f"http://127.0.0.1:5000/api/v1/users/{userId}/images/data",
+        f"http://localhost:5000/api/v1/users/{userId}/images/data",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -281,7 +281,7 @@ def deleteImage(deleteFile):
     # deleteFile = "bicycle2_e.png"
     name, ext = path.splitext(deleteFile)
     delete_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/v1/users/{userId}/images/{name}/delete",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
         # headers={"Cookie": cookie}
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -293,7 +293,7 @@ def deleteImage(deleteFile):
     cookie = delete_img_g.headers["Set-Cookie"]
 
     delete_img_d = requests.delete(
-        f"http://127.0.0.1:5000/api/v1/users/{userId}/images/{name}/delete",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
         headers={
             "X-CSRFToken": csrfKey,
             "Cookie": cookie,
@@ -304,7 +304,7 @@ def deleteImage(deleteFile):
     # print("delete_img_p_data", delete_img_d_data)
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi...""}
+# GET - Success: {"csrf_token": "eyJ0eXAi..."}
 # DELETE - Success: "", 204 - No Content
 # DELETE - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
 # DELETE - Error: {"status": "error", "code": "404", "message": "Image not
@@ -389,8 +389,8 @@ def getShareImageInfo(fileShare, sharedUserId):
     print("permission_info_g_data", permission_info_g_data)
 
 
-# GET - Success: {"status": "success", "code": "200", "data": {'userId':
-# '61de598f170caaeac86ce44d', 'role': 'write'},}
+# GET - Success: {"status": "success", "code": "200", "data": {"userId":
+# "61de598f170caaeac86ce44d", "role": "write"},}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
 # GET - Error: {"status": "error", "code": "404", "message": "Image not found",}
@@ -418,8 +418,9 @@ def getShareImageAllInfo(fileShare):
     csrfKey = permission_info_g_data["csrf_token"]
 
 
-# GET - Success: {"status": "success", "code": "200", "data": [{'userId':
-# '61de598f170caaeac86ce44d', 'role': 'write'}],}
+# GET - Success: {"status": "success", "code": "200", "data": {"permissions": [{"userId":
+# "61de598f170caaeac86ce44d", "role": "write"}], "csrf_token": "eyJ0eXAi..."},}
+# GET - Success: {"status": "success", "code": "200", "data": {"permissions": [], "csrf_token": "eyJ0eXAi..."},}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
 # GET - Error: {"status": "error", "code": "404", "message": "Image not found",}
@@ -551,7 +552,7 @@ def getShareImage(downloadFile, sharedUserId):
     name, ext = path.splitext(downloadFile)
     downloadFile_d = "bicycle_d.png"
     download_img_g = requests.get(
-        f"http://127.0.0.1:5000/api/v1/users/{sharedUserId}/images/{name}",
+        f"http://localhost:5000/api/v1/users/{sharedUserId}/images/{name}",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -599,7 +600,8 @@ if __name__ == "__main__":
 
     # register(username="admin", password="admin")
     # logout()
-    # login(username="admin", password="admin")
+    login(username="admin", password="admin")
+    # getUserInformation()
     # getUserInformation()
 
     # CRUD IMAGE
