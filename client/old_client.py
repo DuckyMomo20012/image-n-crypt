@@ -1,8 +1,9 @@
-from PIL import Image
 import requests
 import json
 from decode_encode import function_support
 from os import path
+
+# RETURN a string for handleRes in helper.py handling
 
 # 1. REGISTER:
 
@@ -12,6 +13,8 @@ def register(username, password):
     # global cookie
     register_g = requests.get("http://localhost:5000/register")
     register_data = json.loads(register_g.text)
+    if "csrf_token" not in register_data.keys():
+        return register_g.text
     csrfKey = register_data["csrf_token"]
     cookie = register_g.headers["Set-Cookie"]
 
@@ -47,6 +50,8 @@ def login(username, password):
     global userId
     login_g = requests.get("http://localhost:5000/login")
     login_data = json.loads(login_g.text)
+    if "csrf_token" not in login_data.keys():
+        return login_g.text
     csrfKey = login_data["csrf_token"]
     cookie = login_g.headers["Set-Cookie"]
 
@@ -61,13 +66,15 @@ def login(username, password):
             "Cookie": cookie,
         },
     )
-    print("login_p", login_p.text)
+    # print("login_p", login_p.text)
     data = json.loads(login_p.text)
-    if data:
+    if set(["user_id", "access_token"]).issubset(data.keys()):
         access_token = data["access_token"]
         userId = data["user_id"]
         # print("access_token", access_token)
         return str('{"data": {"user id": "%s"}}' % str(data["user_id"]))
+
+    return login_p.text
     # cookie = login_p.headers["Set-cookie"]
 
 
@@ -145,6 +152,8 @@ def uploadImage(fileName):
         headers={"Authorization": f"Bearer {access_token}"},
     )
     upload_img_data = json.loads(upload_img_g.text)
+    if "csrf_token" not in upload_img_data.keys():
+        return upload_img_g.text
     csrfKey = upload_img_data["csrf_token"]
     cookie = upload_img_g.headers["Set-Cookie"]
 
@@ -205,6 +214,8 @@ def downloadImage(downloadFile, privateKeyPath):
         },
     )
     data = json.loads(download_img_g.text)
+    if data["status"] == "error":
+        return download_img_g.text
     imgData = data["data"]["img_content"]
     imgName = data["data"]["img_name"]
     quotientData = data["data"]["quotient"]
@@ -243,6 +254,8 @@ def downloadImageAll(pathPrivateKey):
         },
     )
     data = json.loads(download_img_all_g.text)
+    if "data" not in data.keys():
+        return download_img_all_g.text
     imgData = data["data"]
 
     for image in imgData:
@@ -288,7 +301,9 @@ def deleteImage(deleteFile):
         },
     )
     delete_img_g_data = json.loads(delete_img_g.text)
-    print("delete_img_g_data", delete_img_g_data)
+    # print("delete_img_g_data", delete_img_g_data)
+    if "csrf_token" not in delete_img_g_data.keys():
+        return delete_img_g.text
     csrfKey = delete_img_g_data["csrf_token"]
     cookie = delete_img_g.headers["Set-Cookie"]
 
@@ -300,6 +315,8 @@ def deleteImage(deleteFile):
             "Authorization": f"Bearer {access_token}",
         },
     )
+    if delete_img_d.text:
+        return delete_img_d.text
     # delete_img_d_data = json.loads(delete_img_d.text)
     # print("delete_img_p_data", delete_img_d_data)
 
@@ -328,6 +345,8 @@ def getUserInformation():
     )
 
     user_info_g_data = json.loads(user_info_g.text)
+    if user_info_g_data["status"] == "error":
+        return user_info_g.text
     # print("public_key_g_data", user_info_g_data)
     userId = user_info_g_data["data"]["user_id"]
     userName = user_info_g_data["data"]["user_name"]
@@ -360,7 +379,8 @@ def getAllUserInformation():
     )
 
     user_info_g_data = json.loads(user_info_g.text)
-    print("public_key_g_data", user_info_g_data)
+    # print("public_key_g_data", user_info_g_data)
+    return user_info_g.text
 
 
 # GET - Success: {"status": "success", "code": "200", "data": [{"user_id":
@@ -386,7 +406,8 @@ def getShareImageInfo(fileShare, sharedUserId):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
+    # print("permission_info_g_data", permission_info_g_data)
+    return permission_info_g.text
 
 
 # GET - Success: {"status": "success", "code": "200", "data": {"userId":
@@ -413,9 +434,15 @@ def getShareImageAllInfo(fileShare):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
+    if permission_info_g_data["status"] == "error":
+        return permission_info_g.text
+    # print("permission_info_g_data", permission_info_g_data)
+    # cookie = permission_info_g.headers["Set-Cookie"]
+    # csrfKey = permission_info_g_data["csrf_token"]
+    return str(
+        '{"data": {"permissions": "%s"}}'
+        % (str(permission_info_g_data["data"]["permissions"]))
+    )
 
 
 # GET - Success: {"status": "success", "code": "200", "data": {"permissions": [{"userId":
@@ -442,8 +469,10 @@ def shareImage(fileShare, userPermission, role):
     )
     permission_info_g_data = json.loads(permission_info_g.text)
     # print("permission_info_g_data", permission_info_g_data)
+    if permission_info_g_data["status"] == "error":
+        return permission_info_g.text
+    csrfKey = permission_info_g_data['data']["csrf_token"]
     cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
 
     permission_info_p = requests.post(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
@@ -483,9 +512,11 @@ def editImagePermissions(fileShare, sharedUserId, role):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
+    # print("permission_info_g_data", permission_info_g_data)
+    if permission_info_g_data["status"] == "error":
+        return permission_info_g.text
     cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
+    csrfKey = permission_info_g_data["data"]["csrf_token"]
 
     permission_info_p = requests.put(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
@@ -496,6 +527,8 @@ def editImagePermissions(fileShare, sharedUserId, role):
             "X-CSRFToken": csrfKey,
         },
     )
+    if permission_info_p.text:
+        return permission_info_p.text
 
 
 # PUT - Success: "", 204
@@ -521,9 +554,11 @@ def deleteImagePermissions(fileShare, sharedUserId):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
+    # print("permission_info_g_data", permission_info_g_data)
+    if permission_info_g_data["status"] == "error":
+        return permission_info_g.text
     cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
+    csrfKey = permission_info_g_data["data"]["csrf_token"]
 
     permission_info_p = requests.delete(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
@@ -559,6 +594,8 @@ def getShareImage(downloadFile, sharedUserId):
         },
     )
     data = json.loads(download_img_g.text)
+    if data["status"] == "error":
+        return download_img_g.text
     imgData = data["data"]["img_content"]
     imgName = data["data"]["img_name"]
     quotientData = data["data"]["quotient"]
@@ -619,4 +656,4 @@ if __name__ == "__main__":
     # shareImage("bicycle2_e.png", "61de598f170caaeac86ce442", "read")
     # deleteImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d")
     # editImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d", "write")
-    # getShareImageAllInfo("bicycle2_e.png")
+    getShareImageAllInfo("bicycle2_e.png")

@@ -12,13 +12,16 @@ def mainMenu():
         if option == 1:
             ans = getInput("username", "password")
             res = login(username=ans["username"], password=ans["password"])
-            handleRes(res, "Logged in successfully ")
+            result = handleRes(res, "Logged in successfully ")
+            print(result)
             # print("Logged in successfully")
+            if "error" in result.lower():
+                mainMenu()
             optionLogin()
         elif option == 2:
             ans = getInput("username", "password")
             res = register(username=ans["username"], password=ans["password"])
-            handleRes(res, "Sign up successfully ")
+            print(handleRes(res, "Sign up successfully "))
             mainMenu()
         elif option == 3:
             sys.exit()
@@ -41,26 +44,26 @@ def optionLogin():
         try:
             if option == 1:
                 res = listImage()
-                handleRes(res, "Image list ")
+                print(handleRes(res, "Image list "))
                 optionInOptionLogin()
             elif option == 2:
                 ans = getInput("image_path")
                 getUserInformation()
                 res = uploadImage(ans["image_path"])
-                handleRes(res, "Upload image: ")
+                print(handleRes(res, "Upload image: "))
                 optionLogin()
             elif option == 3:
                 ans = getInput("private key")
                 res = downloadImageAll(ans["private key"])
-                handleRes(res, "Image downloaded")
+                print(handleRes(res, "Image downloaded"))
                 optionLogin()
             elif option == 4:
                 res = getUserInformation()
-                handleRes(res, "Information: ")
+                print(handleRes(res, "Information: "))
                 optionLogin()
             elif option == 5:
                 res = logout()
-                handleRes(res, "Logout successfully")
+                print(handleRes(res, "Logout successfully"))
                 mainMenu()
             else:
                 print("Invalid choice. Enter 1 - 5")
@@ -79,42 +82,60 @@ def back():
 
 
 def optionInOptionLogin():
-    print("____IMAGE PROCESING___")
+    print("____IMAGE PROCESSING___")
     print("1. Dowload image")
     print("2. Delete images")
     print("3. Share images")
-    print("4. Get share images")
-    print("5. Back")
+    print("4. Get shared image information")
+    print("5. Download shared images")
+    print("6. Delete image permission")
+    print("7. Edit image permission")
+    print("8. Back")
     option = int(input("Enter your option: "))
     while option != 0:
         try:
             if option == 1:
                 ans = getInput("file name", "private key")
                 res = downloadImage(ans["file name"], ans["private key"])
-                handleRes(res, "Image downloaded")
-                back()
+                print(handleRes(res, "Image downloaded"))
+                optionLogin()
             elif option == 2:
                 ans = getInput("delete file name")
                 res = deleteImage(ans["delete file name"])
-                handleRes(res, "File deleted")
-                back()
+                print(handleRes(res, "File deleted"))
+                optionLogin()
             elif option == 3:
                 ans = getInput("file name", "user id to share", "role")
                 res = shareImage(ans["file name"], ans["user id to share"], ans["role"])
-                handleRes(res, "File shared")
-                back()
+                print(handleRes(res, "File shared"))
+                optionLogin()
             elif option == 4:
-                ans = getInput("file name", "user id")
-                res = getShareImage(ans["file name"], ans["user id"])
-                handleRes(res, "File downloaded")
-                back()
+                ans = getInput("file name")
+                res = getShareImageAllInfo(ans["file name"])
+                print(handleRes(res, "Image permission(s) "))
+                optionLogin()
             elif option == 5:
+                ans = getInput("file name", "user share id")
+                res = getShareImage(ans["file name"], ans["user share id"])
+                print(handleRes(res, "File downloaded"))
+                optionLogin()
+            elif option == 6:
+                ans = getInput("file name", "user id")
+                res = deleteImagePermissions(ans["file name"], ans["user id"])
+                print(handleRes(res, "Permission deleted"))
+                optionLogin()
+            elif option == 7:
+                ans = getInput("file name", "user id", "role")
+                res = editImagePermissions(ans["file name"], ans["user id"], ans["role"])
+                print(handleRes(res, "Permission edited"))
+                optionLogin()
+            elif option == 8:
                 optionLogin()
             else:
-                print("Invalid choice. Enter 1 - 5")
+                print("Invalid choice. Enter 1 - 8")
                 optionInOptionLogin()
         except ValueError:
-            print("Invalid choice. Enter 1 - 5")
+            print("Invalid choice. Enter 1 - 8")
 
 
 if __name__ == "__main__":

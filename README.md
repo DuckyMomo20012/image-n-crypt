@@ -1428,8 +1428,9 @@ User tries to request with missing token or invalid token. The message may vary.
 
 # 3. TODO:
 
-- [ ] Set expiration time for token.
-- [ ] Allow user to refresh revoked token.
+- [ ] Set expiration time for token (NOTE: Added but don't know if it really works)
+- [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Add validator for only .PNG image file.
 - [ ] Support more image extensions, more file types.
+- [ ] Don't create key if registration failed.

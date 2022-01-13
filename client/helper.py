@@ -6,31 +6,29 @@ def getInput(*args):
     return ans
 
 def handleRes(ob, msg="", extract=None):
-    if ob == None or ob == "":
+    # print("ob", ob)
+    # print(type(ob))
+    if not ob:
         return msg
     ob = json.loads(ob)
     if "status" in ob.keys():
         if ob["status"] == "error":
-            print(f"Error: %s" % ob.get("message"))
-            return
+            return f"Error: %s" % ob.get("message")
 
     if "data" in ob.keys():
         if type(ob.get("data")) ==  list:
             if len(ob.get("data")) == 0:
-                print(msg + "No data")
+                return msg + "No data"
             result = msg
             for item in ob.get("data"):
                 if extract:
                     result += " " + json.dumps(item[extract])
                 else:
                     result += " " + json.dumps(item)
-            print(result)
-            return
+            return result
         if type(ob.get("data")) == dict:
-            print(msg + json.dumps(ob.get("data")))
-            return
-        print(msg + ob.get("data"))
-        return
+            return msg + json.dumps(ob.get("data"))
+        return msg + ob.get("data")
 
 
 if __name__ == "__main__":

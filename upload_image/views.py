@@ -47,7 +47,7 @@ def downloadImage(userId, fileName):
     # fileExt = getExtension(request)
 
     if image:
-        imagePermit = getImagePermissionsByUserId(userId, fileName, curUserId)
+        imagePermit = getOneImagePermissionByUserId(userId, fileName, curUserId)
 
         # XOR ?
         if (not imagePermit) == (userId != curUserId):
@@ -275,7 +275,6 @@ def shareImage(userId, fileName):
             imageOnePermit = getOneImagePermissionByUserId(
                 userId, fileName, sharedUserId
             )
-            print("imageOnePermit", imageOnePermit)
 
             # DB can find a permission has userId == curUserid
             if imageOnePermit:
