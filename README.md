@@ -6,19 +6,19 @@
 python -m venv .venv
 ```
 
-# 1.2. Activate environment:
+## 1.2. Activate environment:
 
 ```console
 .venv\Scripts\activate
 ```
 
-# 1.3. Install libs:
+## 1.3. Install libs:
 
 ```console
 pip install -r requirements.txt
 ```
 
-# 1.4. Start app:
+## 1.4. Start app:
 
 ```console
 flask run
@@ -36,7 +36,7 @@ You can use file "old_client.py" to test API endpoints. For the sake of
 simplicity, I stored "JWT access token", "User id" as global variables for easy
 access. (You can also see that I also stored cookie as global variable too).
 
-## 2.0 REST API endpoints:
+## 2.1. REST API endpoints:
 
 <table>
 <tbody>
@@ -85,7 +85,7 @@ access. (You can also see that I also stored cookie as global variable too).
 </tbody>
 </table>
 
-## 2.1. Login:
+## 2.2. Login:
 
 > **⚠️ NOTE:** Whenever user login or logout, that means user's session is over,
 > so cookie will be reset. Also, the JWT token will be sent to blacklist.
@@ -164,7 +164,7 @@ def login(username, password):
 
 </details>
 
-## 2.2. Logout:
+## 2.3. Logout:
 
 > **⚠️ NOTE:** I have turned off CSRF protection for logout route, so we don't have to request a CSRF key.
 
@@ -208,7 +208,7 @@ def logout():
 
 </details>
 
-## 2.3. Register:
+## 2.4. Register:
 
 ~~After register, user is logged in, so cookie is reset~~. User no longer login
 after registration.
@@ -284,7 +284,7 @@ def register(username, password):
 
 </details>
 
-## 2.4. List images:
+## 2.5. List images:
 
 <table>
 <tbody>
@@ -339,7 +339,7 @@ return list_img_g.text
 
 </details>
 
-## 2.5. Upload image:
+## 2.6. Upload image:
 
 > **⚠️ NOTE:** Temporarily accepting .PNG image extension only.
 
@@ -445,7 +445,7 @@ with open(fileName_encrypt, "rb") as f:
 
 </details>
 
-## 2.6. Download image:
+## 2.7. Download image:
 
 The URI should not have the file extension.
 
@@ -525,7 +525,7 @@ function_support.Decrypted(
 
 </details>
 
-## 2.7 Download ALL images:
+## 2.8. Download ALL images:
 
 <table>
 <tbody>
@@ -607,7 +607,7 @@ def downloadImageAll(pathPrivateKey):
 
 </details>
 
-## 2.8. Delete image:
+## 2.9. Delete image:
 
 <table>
 <tbody>
@@ -679,7 +679,7 @@ def deleteImage(deleteFile):
 
 </details>
 
-## 2.9. Get user information:
+## 2.10. Get user information:
 
 <table>
 <tbody>
@@ -749,7 +749,7 @@ def getUserInformation():
 
 </details>
 
-## 2.10. Get all user information:
+## 2.11. Get all user information:
 
 <table>
 <tbody>
@@ -813,7 +813,7 @@ def getAllUserInformation():
 
 </details>
 
-## 2.11. Get specific image permissions information:
+## 2.12. Get specific image permissions information:
 
 Only return one permissions which match the sharedUserId.
 
@@ -893,7 +893,7 @@ def getShareImageInfo(fileShare, sharedUserId):
 
 </details>
 
-## 2.12. Get image all permissions:
+## 2.13. Get image all permissions:
 
 Return a list of permissions for image. This response also include a CSRF token
 for POST request later.
@@ -983,7 +983,7 @@ def getShareImageAllInfo(fileShare):
 
 </details>
 
-## 2.13. Share image with specific user:
+## 2.14. Share image with specific user:
 
 <table>
 <tbody>
@@ -1067,7 +1067,7 @@ def shareImage(fileShare, userPermission, role):
 
 </details>
 
-## 2.14. Edit one image permission:
+## 2.15. Edit one image permission:
 
 <table>
 <tbody>
@@ -1147,7 +1147,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 
 </details>
 
-## 2.15. Delete one image permission:
+## 2.16. Delete one image permission:
 
 <table>
 <tbody>
@@ -1227,7 +1227,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 
 </details>
 
-## 2.16. Download shared image:
+## 2.17. Download shared image:
 
 Since the database didn't store private key, so client can't decrypt the image
 for user
@@ -1428,7 +1428,7 @@ User tries to request with missing token or invalid token. The message may vary.
 
 # 3. TODO:
 
-- [ ] Set expiration time for token (NOTE: Added but don't know if it really works)
+- [x] Set expiration time for token (NOTE: Added but don't know if it really works)
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Add validator for only .PNG image file.
