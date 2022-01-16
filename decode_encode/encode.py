@@ -1,6 +1,4 @@
-from cv2 import PyRotationWarper
 from function_support import *
-import json
 
 save_file = "Encrypt.png"
 pathImage = "1.png"

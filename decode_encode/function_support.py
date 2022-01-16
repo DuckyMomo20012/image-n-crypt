@@ -1,8 +1,5 @@
-import numpy as np
 import random
-import base64
 import os
-from os import path
 import cv2
 
 BIT_NUMBER = 10
@@ -146,7 +143,7 @@ def create_write_key(dstPath="", writeFile=False):
     if writeFile:
         fileName = "rsa.txt"
         if os.path.exists(fileName):
-            splitFileName, ext = path.splitext(fileName)
+            splitFileName, ext = os.path.splitext(fileName)
             fileName = getRandomFileName(splitFileName) + ext
         with open(dstPath + "rsa_pub.txt", "w") as publicKey:
             publicKey.write("{} {}".format(n, e))

@@ -18,13 +18,36 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## 1.4. Start app:
+# 2. HOW to use:
+
+## 2.1. Start server:
 
 ```console
 flask run
 ```
 
-# 2. REST API:
+## 2.2. Start client:
+
+You can use file "**old_client.py**" for customization:
+
+```console
+cd client & python old_client.py
+```
+
+or file "**MenuClient.py**" - poor crafted client console.
+
+```console
+cd client & python MenuClient.py
+```
+
+> **⚠️ NOTE:** If you got the error: "ModuleNotFoundError: No module named
+> 'decode_encode'", then you should set the PYTHONPATH:
+>
+> ```console
+> set PYTHONPATH=C:/Users/Alice/Desktop/crypto/
+> ```
+
+# 3. REST API:
 
 > At first, the server I built was based entirely on session cookie based
 > authentication using "Flask-Login" library. But after a few researches, I switched to
@@ -36,7 +59,9 @@ You can use file "old_client.py" to test API endpoints. For the sake of
 simplicity, I stored "JWT access token", "User id" as global variables for easy
 access. (You can also see that I also stored cookie as global variable too).
 
-## 2.1. REST API endpoints:
+> ⛔ IMPORTANT: CSRF protection is not required for REST API, so maybe I will have
+> to restructure everything 😭.
+## 3.1. REST API endpoints:
 
 <table>
 <tbody>
@@ -85,7 +110,7 @@ access. (You can also see that I also stored cookie as global variable too).
 </tbody>
 </table>
 
-## 2.2. Login:
+## 3.2. Login:
 
 > **⚠️ NOTE:** Whenever user login or logout, that means user's session is over,
 > so cookie will be reset. Also, the JWT token will be sent to blacklist.
@@ -164,7 +189,7 @@ def login(username, password):
 
 </details>
 
-## 2.3. Logout:
+## 3.3. Logout:
 
 > **⚠️ NOTE:** I have turned off CSRF protection for logout route, so we don't have to request a CSRF key.
 
@@ -208,7 +233,7 @@ def logout():
 
 </details>
 
-## 2.4. Register:
+## 3.4. Register:
 
 ~~After register, user is logged in, so cookie is reset~~. User no longer login
 after registration.
@@ -284,7 +309,7 @@ def register(username, password):
 
 </details>
 
-## 2.5. List images:
+## 3.5. List images:
 
 <table>
 <tbody>
@@ -339,7 +364,7 @@ return list_img_g.text
 
 </details>
 
-## 2.6. Upload image:
+## 3.6. Upload image:
 
 > **⚠️ NOTE:** Temporarily accepting .PNG image extension only.
 
@@ -445,7 +470,7 @@ with open(fileName_encrypt, "rb") as f:
 
 </details>
 
-## 2.7. Download image:
+## 3.7. Download image:
 
 The URI should not have the file extension.
 
@@ -525,7 +550,7 @@ function_support.Decrypted(
 
 </details>
 
-## 2.8. Download ALL images:
+## 3.8. Download ALL images:
 
 <table>
 <tbody>
@@ -607,7 +632,7 @@ def downloadImageAll(pathPrivateKey):
 
 </details>
 
-## 2.9. Delete image:
+## 3.9. Delete image:
 
 <table>
 <tbody>
@@ -679,7 +704,7 @@ def deleteImage(deleteFile):
 
 </details>
 
-## 2.10. Get user information:
+## 3.10. Get user information:
 
 <table>
 <tbody>
@@ -749,7 +774,7 @@ def getUserInformation():
 
 </details>
 
-## 2.11. Get all user information:
+## 3.11. Get all user information:
 
 <table>
 <tbody>
@@ -813,7 +838,7 @@ def getAllUserInformation():
 
 </details>
 
-## 2.12. Get specific image permissions information:
+## 3.12. Get specific image permissions information:
 
 Only return one permissions which match the sharedUserId.
 
@@ -893,7 +918,7 @@ def getShareImageInfo(fileShare, sharedUserId):
 
 </details>
 
-## 2.13. Get image all permissions:
+## 3.13. Get image all permissions:
 
 Return a list of permissions for image. This response also include a CSRF token
 for POST request later.
@@ -983,7 +1008,7 @@ def getShareImageAllInfo(fileShare):
 
 </details>
 
-## 2.14. Share image with specific user:
+## 3.14. Share image with specific user:
 
 <table>
 <tbody>
@@ -1067,7 +1092,7 @@ def shareImage(fileShare, userPermission, role):
 
 </details>
 
-## 2.15. Edit one image permission:
+## 3.15. Edit one image permission:
 
 <table>
 <tbody>
@@ -1147,7 +1172,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 
 </details>
 
-## 2.16. Delete one image permission:
+## 3.16. Delete one image permission:
 
 <table>
 <tbody>
@@ -1227,7 +1252,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 
 </details>
 
-## 2.17. Download shared image:
+## 3.17. Download shared image:
 
 Since the database didn't store private key, so client can't decrypt the image
 for user
@@ -1426,11 +1451,12 @@ User tries to request with missing token or invalid token. The message may vary.
 </tbody>
 </table>
 
-# 3. TODO:
+# 4. TODO:
 
-- [x] Set expiration time for token (NOTE: Added but don't know if it really works)
+- [ ] Important: Remove entirely CSRF protection.
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Add validator for only .PNG image file.
 - [ ] Support more image extensions, more file types.
 - [ ] Don't create key if registration failed.
+- [x] Set expiration time for token (NOTE: Added but don't know if it really works)
