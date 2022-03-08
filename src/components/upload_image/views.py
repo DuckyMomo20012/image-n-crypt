@@ -1,14 +1,12 @@
-from app import app
+from app import app, images
 from flask import request, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
-from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
-from flask_wtf.csrf import generate_csrf
+from flask_jwt_extended import jwt_required, current_user
 from src.components.upload_image.model import Image, ImageForm, ImagePermission
 from src.components.upload_image.service import *
 from src.helpers.utils import getRandomFileName, flatten
 from os import path
-import json
 
 # from flask_login import current_user, login_required
 
@@ -141,6 +139,9 @@ def uploadImage(userId):
             quotientImg=quotient,
             extImg=ext,
         )
+        # Save locally
+        images.save(request.files["imageFile"])
+        # Save on Mongo
         image.save()
         return make_response(
             {

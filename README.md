@@ -62,78 +62,131 @@ access. (You can also see that I also stored cookie as global variable too).
 ## 3.1. REST API endpoints:
 
 <table>
-    <tbody>
-        <tr>
-            <td> Method </td>
-            <td> URL </td>
-            <td> Description </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users </td>
-            <td> Get all users information </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt </td>
-            <td> Get user information </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
-            <td> Get user all images </td>
-        </tr>
-        <tr>
-            <td> POST </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
-            <td> Upload image </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/download-all </td>
-            <td> Download all images </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
-            <td> Download specific image </td>
-        </tr>
-        <tr>
-            <td> DELETE </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
-            <td> Delete specific image </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
-            <td> Get all image permissions </td>
-        </tr>
-        <tr>
-            <td> POST </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
-            <td> Share image to specific user (Grant permission) </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
-            <td> Get specific permission of image </td>
-        </tr>
-        <tr>
-            <td> PUT </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
-            <td> Edit specific permission of image </td>
-        </tr>
-        <tr>
-            <td> DELETE </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
-            <td> Delete specific permission of image </td>
-        </tr>
-        <tr>
-            <td> GET </td>
-            <td> http://localhost:5000/api/v1/users/&ltstring:sharedUserId&gt/images/&ltstring:fileName&gt </td>
-            <td> Download shared image (the same as download specific image) </td>
-        </tr>
-    </tbody>
+<tbody>
+<tr>
+<td> Method </td>
+<td> URL </td>
+<td> Description </td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users </td>
+<td>
+
+[Get all users information](#311-get-all-user-information)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt </td>
+<td>
+
+[Get user information](#310-get-user-information)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
+<td>
+
+[Get user all images](#35-list-images)
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
+<td>
+
+[Upload image](#36-upload-image)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/download-all </td>
+<td>
+
+[Download all images](#38-download-all-images)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
+<td>
+
+[Download specific image](#37-download-image)
+
+</td>
+</tr>
+<tr>
+<td> DELETE </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
+<td>
+
+[Delete specific image](#39-delete-image)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
+<td>
+
+[Get all image permissions](#313-get-image-all-permissions)
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
+<td>
+
+[Share image to specific user (Grant permission)](#314-share-image-with-specific-user)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+<td>
+
+[Get specific permission of image](#312-get-specific-image-permissions-information)
+
+</td>
+</tr>
+<tr>
+<td> PUT </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+<td>
+
+[Edit specific permission of image](#315-edit-one-image-permission)
+
+</td>
+</tr>
+<tr>
+<td> DELETE </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+<td>
+
+[Delete specific permission of image](#316-delete-one-image-permission)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/users/&ltstring:sharedUserId&gt/images/&ltstring:fileName&gt </td>
+<td>
+
+[Download shared image (the same as download specific image)](#317-download-shared-image)
+
+</td>
+</tr>
+</tbody>
+
 </table>
 
 ## 3.2. Login:
@@ -411,6 +464,16 @@ When encrypt the image with RSA algorithm, the image is broken and can't open.
 Use quotient is use for modulo the encrypt message, so the image still can be
 opened, but the opener may or may not understand the image.
 
+Why server only accept .png files?
+
+Well, the client can't not decrypt other file extensions after encrypted, so
+it's an one-way upload. You can tweak it in file [app.py](./app.py)
+
+Where the images are saved?
+
+In MongoDB cluster and [local (./src/assets/)](./src/assets/). You can also
+change save location in file [app.py](./app.py)
+
 <table>
 <tbody>
 <tr>
@@ -418,16 +481,6 @@ opened, but the opener may or may not understand the image.
 </tr>
 <tr>
 <td> Method </td> <td> Status </td> <td> Code </td> <td> Response </td>
-</tr>
-<tr>
-<td> GET </td> <td> Success </td> <td> 200 </td>
-<td>
-
-```json
-{ "csrf_token": "eyJ0eXAi..." }
-```
-
-</td>
 </tr>
 <tr>
 <td> POST </td> <td> Success </td> <td> 200 </td>
@@ -476,6 +529,7 @@ def uploadImage(fileName):
     with open(fileName_encrypt, "rb") as f:
         upload_img_p = requests.post(
             f"http://localhost:5000/api/v1/users/{userId}/images",
+            # Please send a file with this format!
             files={"imageFile": f},
             data={"quotient": quotient},
             headers={
@@ -664,16 +718,6 @@ def downloadImageAll(pathPrivateKey):
 </tr>
 <tr>
 <td> Method </td> <td> Status </td> <td> Code </td> <td> Response </td>
-</tr>
-<tr>
-<td> GET </td> <td> Success </td> <td> 200 </td>
-<td>
-
-```json
-{ "csrf_token": "eyJ0eXAi..." }
-```
-
-</td>
 </tr>
 <tr>
 <td> DELETE </td> <td> Success </td> <td> 204 </td> <td> No Content - No response </td>
@@ -1444,8 +1488,8 @@ User tries to request with missing token or invalid token. The message may vary.
 
 - [x] Important: Remove entirely CSRF protection. Keeps CSRF for Authentication
 - [x] Set expiration time for token (NOTE: Added but don't know if it really works)
+- [x] Add validator for only .PNG image file.
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
-- [ ] Add validator for only .PNG image file.
 - [ ] Support more image extensions, more file types.
 - [ ] Don't create key if registration failed.

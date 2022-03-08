@@ -157,6 +157,7 @@ def uploadImage(fileName):
     with open(fileName_encrypt, "rb") as f:
         upload_img_p = requests.post(
             f"http://localhost:5000/api/v1/users/{userId}/images",
+            # Please send a file with this format!
             files={"imageFile": f},
             data={"quotient": quotient},
             headers={
@@ -172,7 +173,8 @@ def uploadImage(fileName):
 # POST - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
 # {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
-# POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
+# POST - Error: {"status": "error", "code": "422", "message": "PNG images only!,
+# Image file is required, Quotient data is required"}
 
 # 6. DOWNLOAD IMAGE:
 
