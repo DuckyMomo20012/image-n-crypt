@@ -18,7 +18,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-# 2. HOW to use:
+# 2. How to use:
 
 ## 2.1. Start server:
 
@@ -28,16 +28,16 @@ flask run
 
 ## 2.2. Start client:
 
-You can use file "**old_client.py**" for customization:
+You can use file ["**api.py**"](./client/api.py) for custom requests:
 
 ```console
-cd client & python old_client.py
+cd client & python api.py
 ```
 
-or file "**MenuClient.py**" - poor crafted client console.
+or file ["**main.py**"](./client/main.py) - poorly crafted client console.
 
 ```console
-cd client & python MenuClient.py
+cd client & python main.py
 ```
 
 > **⚠️ NOTE:** If you got the error: "ModuleNotFoundError: No module named
@@ -55,59 +55,85 @@ cd client & python MenuClient.py
 > (JSON Web Token) to authenticate. So you may find some pieces of code that was
 > use cookie I left behind.
 
-You can use file "old_client.py" to test API endpoints. For the sake of
+You can use file "api.py" to test API endpoints. For the sake of
 simplicity, I stored "JWT access token", "User id" as global variables for easy
 access. (You can also see that I also stored cookie as global variable too).
 
-> ⛔ IMPORTANT: CSRF protection is not required for REST API, so maybe I will have
-> to restructure everything 😭.
 ## 3.1. REST API endpoints:
 
 <table>
-<tbody>
-<tr>
-<td> Method </td> <td> URL </td> <td> Description </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users </td> <td> Get all users information </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt </td> <td> Get user information </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td> <td> Get user all images </td>
-</tr>
-<tr>
-<td> POST </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/upload </td> <td> Upload image </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/data </td> <td> Download all images </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td> <td> Download specific image </td>
-</tr>
-<tr>
-<td> DELETE </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/delete </td> <td> Delete specific image </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td> <td> Get all image permissions </td>
-</tr>
-<tr>
-<td> POST </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td> <td> Share image to specific user (Grant permission) </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td> <td> Get specific permission of image </td>
-</tr>
-<tr>
-<td> PUT </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td> <td> Edit specific permission of image </td>
-</tr>
-<tr>
-<td> DELETE </td> <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td> <td> Delete specific permission of image </td>
-</tr>
-<tr>
-<td> GET </td> <td> http://localhost:5000/api/v1/users/&ltstring:sharedUserId&gt/images/&ltstring:fileName&gt </td> <td> Download shared image (the same as download specific image) </td>
-</tr>
-</tbody>
+    <tbody>
+        <tr>
+            <td> Method </td>
+            <td> URL </td>
+            <td> Description </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users </td>
+            <td> Get all users information </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt </td>
+            <td> Get user information </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
+            <td> Get user all images </td>
+        </tr>
+        <tr>
+            <td> POST </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
+            <td> Upload image </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/download-all </td>
+            <td> Download all images </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
+            <td> Download specific image </td>
+        </tr>
+        <tr>
+            <td> DELETE </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
+            <td> Delete specific image </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
+            <td> Get all image permissions </td>
+        </tr>
+        <tr>
+            <td> POST </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
+            <td> Share image to specific user (Grant permission) </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+            <td> Get specific permission of image </td>
+        </tr>
+        <tr>
+            <td> PUT </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+            <td> Edit specific permission of image </td>
+        </tr>
+        <tr>
+            <td> DELETE </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions/&ltstring:userPermissionId&gt </td>
+            <td> Delete specific permission of image </td>
+        </tr>
+        <tr>
+            <td> GET </td>
+            <td> http://localhost:5000/api/v1/users/&ltstring:sharedUserId&gt/images/&ltstring:fileName&gt </td>
+            <td> Download shared image (the same as download specific image) </td>
+        </tr>
+    </tbody>
 </table>
 
 ## 3.2. Login:
@@ -163,6 +189,8 @@ def login(username, password):
     global userId
     login_g = requests.get("http://localhost:5000/login")
     login_data = json.loads(login_g.text)
+    if "csrf_token" not in login_data.keys():
+        return login_g.text
     csrfKey = login_data["csrf_token"]
     cookie = login_g.headers["Set-Cookie"]
 
@@ -177,13 +205,15 @@ def login(username, password):
             "Cookie": cookie,
         },
     )
-    print("login_p", login_p.text)
+    # print("login_p", login_p.text)
     data = json.loads(login_p.text)
-    if data:
+    if set(["user_id", "access_token"]).issubset(data.keys()):
         access_token = data["access_token"]
         userId = data["user_id"]
         # print("access_token", access_token)
         return str('{"data": {"user id": "%s"}}' % str(data["user_id"]))
+
+    return login_p.text
     # cookie = login_p.headers["Set-cookie"]
 ```
 
@@ -288,6 +318,8 @@ def register(username, password):
     # global cookie
     register_g = requests.get("http://localhost:5000/register")
     register_data = json.loads(register_g.text)
+    if "csrf_token" not in register_data.keys():
+        return register_g.text
     csrfKey = register_data["csrf_token"]
     cookie = register_g.headers["Set-Cookie"]
 
@@ -350,16 +382,17 @@ def register(username, password):
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-global access_token
-global userId
-list_img_g = requests.get(
-    f"http://localhost:5000/api/v1/users/{userId}/images",
-    # headers={"Cookie": cookie},
-    headers={"Authorization": f"Bearer {access_token}"},
-)
-# print("list_img_g", list_img_g.text)
-return list_img_g.text
+def listImage():
+    # global cookie
+    global access_token
+    global userId
+    list_img_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images",
+        # headers={"Cookie": cookie},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    # print("list_img_g", list_img_g.text)
+    return list_img_g.text
 ```
 
 </details>
@@ -381,7 +414,7 @@ opened, but the opener may or may not understand the image.
 <table>
 <tbody>
 <tr>
-<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/upload </td>
+<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images </td>
 </tr>
 <tr>
 <td> Method </td> <td> Status </td> <td> Code </td> <td> Response </td>
@@ -417,55 +450,40 @@ opened, but the opener may or may not understand the image.
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-global access_token
-global userId
-global publicKey
-# public_key_g = requests.get(
-#     "http://localhost:5000/api/v1/users/<string:userId>/public-key",
-#     headers={"Cookie": cookie},
-# )
-# public_key_data = json.loads(public_key_g.text)
-# print("public_key_data", public_key_data)
-if publicKey == "":
-    getUserInformation()
-n, e = map(int, publicKey.split(" "))
-upload_img_g = requests.get(
-    f"http://localhost:5000/api/v1/users/{userId}/images/upload",
-    # headers={"Cookie": cookie},
-    headers={"Authorization": f"Bearer {access_token}"},
-)
-upload_img_data = json.loads(upload_img_g.text)
-csrfKey = upload_img_data["csrf_token"]
-cookie = upload_img_g.headers["Set-Cookie"]
-# print("upload_img_g", upload_img_g.text)
-# **⚠️ NOTE:** "imageFile" is field from ImageForm class
-# fileName = "bicycle2.png"
-name, ext = path.splitext(fileName)
-fileName_encrypt = name + "_e" + ext
-function_support.Encrypted(
-    fileName,
-    n=n,
-    e=e,
-    save_imageEncrypted=fileName_encrypt,
-    save_quotient="quotient.txt",
-)
-q = open("quotient.txt", "r")
-quotient = q.read()
-q.close()
-with open(fileName_encrypt, "rb") as f:
-    upload_img_p = requests.post(
-        f"http://localhost:5000/api/v1/users/{userId}/images/upload",
-        files={"imageFile": f},
-        data={"quotient": quotient},
-        headers={
-            "X-CSRFToken": csrfKey,
-            "Cookie": cookie,
-            "Authorization": f"Bearer {access_token}",
-        },
+def uploadImage(fileName):
+    # global cookie
+    global access_token
+    global userId
+    global publicKey
+    if publicKey == "":
+        getUserInformation()
+    n, e = map(int, publicKey.split(" "))
+
+    # NOTE: "imageFile" is field from ImageForm class
+    # fileName = "bicycle2.png"
+    name, ext = path.splitext(fileName)
+    fileName_encrypt = name + "_e" + ext
+    function_support.Encrypted(
+        fileName,
+        n=n,
+        e=e,
+        save_imageEncrypted=fileName_encrypt,
+        save_quotient="quotient.txt",
     )
-    # print("upload_img_p", upload_img_p.text)
-    return upload_img_p.text
+    q = open("quotient.txt", "r")
+    quotient = q.read()
+    q.close()
+    with open(fileName_encrypt, "rb") as f:
+        upload_img_p = requests.post(
+            f"http://localhost:5000/api/v1/users/{userId}/images",
+            files={"imageFile": f},
+            data={"quotient": quotient},
+            headers={
+                "Authorization": f"Bearer {access_token}",
+            },
+        )
+        # print("upload_img_p", upload_img_p.text)
+        return upload_img_p.text
 ```
 
 </details>
@@ -520,32 +538,35 @@ quotient content downloaded to decrypt the message
 <summary>Code implementation</summary>
 
 ```python
-# global cookie
-global access_token
-global userId
-# downloadFile = "bicycle2_e.png"
-name, ext = path.splitext(downloadFile)
-downloadFile_d = name + "_d" + ext
-download_img_g = requests.get(
-    f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
-    # headers={"Cookie": cookie},
-    headers={
-        "Authorization": f"Bearer {access_token}",
-    },
-)
-data = json.loads(download_img_g.text)
-imgData = data["data"]["img_content"]
-imgName = data["data"]["img_name"]
-quotientData = data["data"]["quotient"]
-with open("quotient.txt", "w") as q:
-    q.write(quotientData)
-with open(imgName, "wb") as f:
-    f.write(imgData.encode("ISO-8859-1"))
-function_support.Decrypted(
-    path_ImageDecode=downloadFile,
-    path_private_key=privateKeyPath,
-    save_imageDecrypted=downloadFile_d,
-)
+def downloadImage(downloadFile, privateKeyPath):
+    # global cookie
+    global access_token
+    global userId
+    # downloadFile = "bicycle2_e.png"
+    name, ext = path.splitext(downloadFile)
+    downloadFile_d = name + "_d" + ext
+    download_img_g = requests.get(
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
+        # headers={"Cookie": cookie},
+        headers={
+            "Authorization": f"Bearer {access_token}",
+        },
+    )
+    data = json.loads(download_img_g.text)
+    if data["status"] == "error":
+        return download_img_g.text
+    imgData = data["data"]["img_content"]
+    imgName = data["data"]["img_name"]
+    quotientData = data["data"]["quotient"]
+    with open("quotient.txt", "w") as q:
+        q.write(quotientData)
+    with open(imgName, "wb") as f:
+        f.write(imgData.encode("ISO-8859-1"))
+    function_support.Decrypted(
+        path_ImageDecode=downloadFile,
+        path_private_key=privateKeyPath,
+        save_imageDecrypted=downloadFile_d,
+    )
 ```
 
 </details>
@@ -555,7 +576,7 @@ function_support.Decrypted(
 <table>
 <tbody>
 <tr>
-<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/data </td>
+<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/download-all </td>
 </tr>
 <tr>
 <td> Method </td> <td> Status </td> <td> Code </td> <td> Response </td>
@@ -606,13 +627,15 @@ def downloadImageAll(pathPrivateKey):
     global access_token
     global userId
     download_img_all_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/data",
+        f"http://localhost:5000/api/v1/users/{userId}/images/download-all",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
         },
     )
     data = json.loads(download_img_all_g.text)
+    if "data" not in data.keys():
+        return download_img_all_g.text
     imgData = data["data"]
 
     for image in imgData:
@@ -637,7 +660,7 @@ def downloadImageAll(pathPrivateKey):
 <table>
 <tbody>
 <tr>
-<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/delete </td>
+<td> URL </td> <td colspan=3> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt </td>
 </tr>
 <tr>
 <td> Method </td> <td> Status </td> <td> Code </td> <td> Response </td>
@@ -678,26 +701,15 @@ def deleteImage(deleteFile):
     global userId
     # deleteFile = "bicycle2_e.png"
     name, ext = path.splitext(deleteFile)
-    delete_img_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
-        # headers={"Cookie": cookie}
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    delete_img_g_data = json.loads(delete_img_g.text)
-    print("delete_img_g_data", delete_img_g_data)
-    csrfKey = delete_img_g_data["csrf_token"]
-    cookie = delete_img_g.headers["Set-Cookie"]
 
     delete_img_d = requests.delete(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
         headers={
-            "X-CSRFToken": csrfKey,
-            "Cookie": cookie,
             "Authorization": f"Bearer {access_token}",
         },
     )
+    if delete_img_d.text:
+        return delete_img_d.text
     # delete_img_d_data = json.loads(delete_img_d.text)
     # print("delete_img_p_data", delete_img_d_data)
 ```
@@ -762,6 +774,8 @@ def getUserInformation():
     )
 
     user_info_g_data = json.loads(user_info_g.text)
+    if user_info_g_data["status"] == "error":
+        return user_info_g.text
     # print("public_key_g_data", user_info_g_data)
     userId = user_info_g_data["data"]["user_id"]
     userName = user_info_g_data["data"]["user_name"]
@@ -833,7 +847,8 @@ def getAllUserInformation():
     )
 
     user_info_g_data = json.loads(user_info_g.text)
-    print("public_key_g_data", user_info_g_data)
+    # print("public_key_g_data", user_info_g_data)
+    return user_info_g.text
 ```
 
 </details>
@@ -913,7 +928,8 @@ def getShareImageInfo(fileShare, sharedUserId):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
+    # print("permission_info_g_data", permission_info_g_data)
+    return permission_info_g.text
 ```
 
 </details>
@@ -1001,9 +1017,15 @@ def getShareImageAllInfo(fileShare):
         },
     )
     permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
+    if permission_info_g_data["status"] == "error":
+        return permission_info_g.text
+    # print("permission_info_g_data", permission_info_g_data)
+    # cookie = permission_info_g.headers["Set-Cookie"]
+    # csrfKey = permission_info_g_data["csrf_token"]
+    return str(
+        '{"data": {"permissions": "%s"}}'
+        % (str(permission_info_g_data["data"]["permissions"]))
+    )
 ```
 
 </details>
@@ -1064,24 +1086,11 @@ def shareImage(fileShare, userPermission, role):
     # userPermission = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    # print("permission_info_g_data", permission_info_g_data)
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
-
     permission_info_p = requests.post(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
         data={"user_id": userPermission, "role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
     if permission_info_p.text:
@@ -1148,26 +1157,15 @@ def editImagePermissions(fileShare, sharedUserId, role):
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
-
     permission_info_p = requests.put(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         data={"role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
+    if permission_info_p.text:
+        return permission_info_p.text
 ```
 
 </details>
@@ -1220,7 +1218,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 <summary>Code implementation</summary>
 
 ```python
-def editImagePermissions(fileShare, sharedUserId, role):
+def deleteImagePermissions(fileShare, sharedUserId):
     global access_token
     global userId
 
@@ -1228,26 +1226,15 @@ def editImagePermissions(fileShare, sharedUserId, role):
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    print("permission_info_g_data", permission_info_g_data)
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["csrf_token"]
-
-    permission_info_p = requests.put(
+    permission_info_d = requests.delete(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
-        data={"role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
+
+    if permission_info_d.text:
+        return permission_info_d.text
 ```
 
 </details>
@@ -1320,6 +1307,8 @@ def getShareImage(downloadFile, sharedUserId):
         },
     )
     data = json.loads(download_img_g.text)
+    if data["status"] == "error":
+        return download_img_g.text
     imgData = data["data"]["img_content"]
     imgName = data["data"]["img_name"]
     quotientData = data["data"]["quotient"]
@@ -1453,10 +1442,10 @@ User tries to request with missing token or invalid token. The message may vary.
 
 # 4. TODO:
 
-- [ ] Important: Remove entirely CSRF protection.
+- [x] Important: Remove entirely CSRF protection. Keeps CSRF for Authentication
+- [x] Set expiration time for token (NOTE: Added but don't know if it really works)
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Add validator for only .PNG image file.
 - [ ] Support more image extensions, more file types.
 - [ ] Don't create key if registration failed.
-- [x] Set expiration time for token (NOTE: Added but don't know if it really works)

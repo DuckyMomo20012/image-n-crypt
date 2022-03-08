@@ -1,6 +1,7 @@
 import sys
-from client.old_client import *
+from client.api import *
 from client.helper import *
+
 
 def mainMenu():
     print("___MENU___")
@@ -126,7 +127,9 @@ def optionInOptionLogin():
                 optionLogin()
             elif option == 7:
                 ans = getInput("file name", "user id", "role")
-                res = editImagePermissions(ans["file name"], ans["user id"], ans["role"])
+                res = editImagePermissions(
+                    ans["file name"], ans["user id"], ans["role"]
+                )
                 print(handleRes(res, "Permission edited"))
                 optionLogin()
             elif option == 8:

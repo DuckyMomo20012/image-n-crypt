@@ -1,6 +1,6 @@
 import requests
 import json
-from decode_encode import function_support
+from src.components.decode_encode import function_support
 from os import path
 
 # RETURN a string for handleRes in helper.py handling
@@ -136,28 +136,9 @@ def uploadImage(fileName):
     global access_token
     global userId
     global publicKey
-    # public_key_g = requests.get(
-    #     "http://localhost:5000/api/v1/users/<string:userId>/public-key",
-    #     headers={"Cookie": cookie},
-    # )
-    # public_key_data = json.loads(public_key_g.text)
-    # print("public_key_data", public_key_data)
     if publicKey == "":
         getUserInformation()
     n, e = map(int, publicKey.split(" "))
-
-    upload_img_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/upload",
-        # headers={"Cookie": cookie},
-        headers={"Authorization": f"Bearer {access_token}"},
-    )
-    upload_img_data = json.loads(upload_img_g.text)
-    if "csrf_token" not in upload_img_data.keys():
-        return upload_img_g.text
-    csrfKey = upload_img_data["csrf_token"]
-    cookie = upload_img_g.headers["Set-Cookie"]
-
-    # print("upload_img_g", upload_img_g.text)
 
     # NOTE: "imageFile" is field from ImageForm class
     # fileName = "bicycle2.png"
@@ -175,12 +156,10 @@ def uploadImage(fileName):
     q.close()
     with open(fileName_encrypt, "rb") as f:
         upload_img_p = requests.post(
-            f"http://localhost:5000/api/v1/users/{userId}/images/upload",
+            f"http://localhost:5000/api/v1/users/{userId}/images",
             files={"imageFile": f},
             data={"quotient": quotient},
             headers={
-                "X-CSRFToken": csrfKey,
-                "Cookie": cookie,
                 "Authorization": f"Bearer {access_token}",
             },
         )
@@ -188,10 +167,9 @@ def uploadImage(fileName):
         return upload_img_p.text
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi..."}
-# GET - Error: {"status": "error", "code": "401", "message": "User is not
+# POST - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
-# GET - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
+# POST - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
 # {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
 # POST - Error: {"status": "error", "code": "422", "message": "Image file is required"}
@@ -247,7 +225,7 @@ def downloadImageAll(pathPrivateKey):
     global access_token
     global userId
     download_img_all_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/data",
+        f"http://localhost:5000/api/v1/users/{userId}/images/download-all",
         # headers={"Cookie": cookie},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -293,25 +271,10 @@ def deleteImage(deleteFile):
     global userId
     # deleteFile = "bicycle2_e.png"
     name, ext = path.splitext(deleteFile)
-    delete_img_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
-        # headers={"Cookie": cookie}
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    delete_img_g_data = json.loads(delete_img_g.text)
-    # print("delete_img_g_data", delete_img_g_data)
-    if "csrf_token" not in delete_img_g_data.keys():
-        return delete_img_g.text
-    csrfKey = delete_img_g_data["csrf_token"]
-    cookie = delete_img_g.headers["Set-Cookie"]
 
     delete_img_d = requests.delete(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/delete",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
         headers={
-            "X-CSRFToken": csrfKey,
-            "Cookie": cookie,
             "Authorization": f"Bearer {access_token}",
         },
     )
@@ -321,7 +284,6 @@ def deleteImage(deleteFile):
     # print("delete_img_p_data", delete_img_d_data)
 
 
-# GET - Success: {"csrf_token": "eyJ0eXAi..."}
 # DELETE - Success: "", 204 - No Content
 # DELETE - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
 # DELETE - Error: {"status": "error", "code": "404", "message": "Image not
@@ -446,8 +408,8 @@ def getShareImageAllInfo(fileShare):
 
 
 # GET - Success: {"status": "success", "code": "200", "data": {"permissions": [{"userId":
-# "61de598f170caaeac86ce44d", "role": "write"}], "csrf_token": "eyJ0eXAi..."},}
-# GET - Success: {"status": "success", "code": "200", "data": {"permissions": [], "csrf_token": "eyJ0eXAi..."},}
+# "61de598f170caaeac86ce44d", "role": "write"}],}
+# GET - Success: {"status": "success", "code": "200", "data": {"permissions": [],}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
 # GET - Error: {"status": "error", "code": "404", "message": "Image not found",}
@@ -461,26 +423,11 @@ def shareImage(fileShare, userPermission, role):
     # userPermission = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    # print("permission_info_g_data", permission_info_g_data)
-    if permission_info_g_data["status"] == "error":
-        return permission_info_g.text
-    csrfKey = permission_info_g_data['data']["csrf_token"]
-    cookie = permission_info_g.headers["Set-Cookie"]
-
     permission_info_p = requests.post(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
         data={"user_id": userPermission, "role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
     if permission_info_p.text:
@@ -505,26 +452,11 @@ def editImagePermissions(fileShare, sharedUserId, role):
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    # print("permission_info_g_data", permission_info_g_data)
-    if permission_info_g_data["status"] == "error":
-        return permission_info_g.text
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["data"]["csrf_token"]
-
     permission_info_p = requests.put(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         data={"role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
     if permission_info_p.text:
@@ -547,27 +479,15 @@ def deleteImagePermissions(fileShare, sharedUserId):
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
-    permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions",
-        headers={
-            "Authorization": f"Bearer {access_token}",
-        },
-    )
-    permission_info_g_data = json.loads(permission_info_g.text)
-    # print("permission_info_g_data", permission_info_g_data)
-    if permission_info_g_data["status"] == "error":
-        return permission_info_g.text
-    cookie = permission_info_g.headers["Set-Cookie"]
-    csrfKey = permission_info_g_data["data"]["csrf_token"]
-
-    permission_info_p = requests.delete(
+    permission_info_d = requests.delete(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
         headers={
             "Authorization": f"Bearer {access_token}",
-            "Cookie": cookie,
-            "X-CSRFToken": csrfKey,
         },
     )
+
+    if permission_info_d.text:
+        return permission_info_d.text
 
 
 # DELETE - Success: "", 204
@@ -639,7 +559,7 @@ if __name__ == "__main__":
     # logout()
     login(username="admin", password="admin")
     # getUserInformation()
-    # getUserInformation()
+    # getAllUserInformation()
 
     # CRUD IMAGE
 
@@ -651,9 +571,9 @@ if __name__ == "__main__":
 
     # CRUD IMAGE PERMISSIONS
 
-    # getShareImage("bicycle2_e.png", "61de3cd4c23524e8eadb17f8")
-    # getShareImageInfo("bicycle2_e.png", "61de598f170caaeac86ce44d")
-    # shareImage("bicycle2_e.png", "61de598f170caaeac86ce442", "read")
+    # getShareImage("bicycle2_e.png", "61dea576762674330a3f17dc")
+    # getShareImageInfo("bicycle2_e.png", "622725d4856271abe593a645")
+    # shareImage("bicycle2_e.png", "622725d4856271abe593a645", "read")
     # deleteImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d")
     # editImagePermissions("bicycle2_e.png", "61de598f170caaeac86ce44d", "write")
-    getShareImageAllInfo("bicycle2_e.png")
+    # getShareImageAllInfo("bicycle2_e.png")

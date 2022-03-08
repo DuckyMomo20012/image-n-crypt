@@ -1,12 +1,12 @@
 from app import app
-from flask import request, jsonify, make_response
+from flask import request, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 from flask_jwt_extended import jwt_required, get_jwt_identity, current_user
 from flask_wtf.csrf import generate_csrf
-from upload_image.model import Image, ImageForm, ImagePermission
-from upload_image.service import *
-from helpers.utils import getRandomFileName, flatten
+from src.components.upload_image.model import Image, ImageForm, ImagePermission
+from src.components.upload_image.service import *
+from src.helpers.utils import getRandomFileName, flatten
 from os import path
 import json
 
@@ -74,7 +74,7 @@ def downloadImage(userId, fileName):
     )
 
 
-@app.route("/api/v1/users/<string:userId>/images/data", methods=["GET"])
+@app.route("/api/v1/users/<string:userId>/images/download-all", methods=["GET"])
 # @login_required
 @jwt_required()
 def downloadImageAll(userId):
@@ -105,7 +105,7 @@ def downloadImageAll(userId):
     return make_response({"status": "success", "code": "200", "data": []}, 200)
 
 
-@app.route("/api/v1/users/<string:userId>/images/upload", methods=["GET", "POST"])
+@app.route("/api/v1/users/<string:userId>/images", methods=["POST"])
 # @login_required
 @jwt_required()
 def uploadImage(userId):
@@ -157,12 +157,10 @@ def uploadImage(userId):
             {"status": "error", "code": "422", "message": errorMessage}, 422
         )
 
-    return make_response({"csrf_token": generate_csrf()}, 200)
-
 
 @app.route(
-    "/api/v1/users/<string:userId>/images/<string:fileName>/delete",
-    methods=["GET", "DELETE"],
+    "/api/v1/users/<string:userId>/images/<string:fileName>",
+    methods=["DELETE"],
 )
 # @login_required
 @jwt_required()
@@ -186,8 +184,6 @@ def deleteImage(userId, fileName):
         return make_response(
             {"status": "error", "code": "404", "message": "Image not found"}, 404
         )
-
-    return make_response({"csrf_token": generate_csrf()}, 200)
 
 
 @app.route(
@@ -298,7 +294,6 @@ def shareImage(userId, fileName):
                     "code": "200",
                     "data": {
                         "permissions": image.permissions,
-                        "csrf_token": generate_csrf(),
                     },
                 },
                 200,

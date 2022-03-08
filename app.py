@@ -25,4 +25,4 @@ csrf = CSRFProtect(app)
 
 # DB
 db = MongoEngine(app)
-from views import *
+from src.views import *
