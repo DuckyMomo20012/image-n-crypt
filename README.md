@@ -235,7 +235,7 @@ Vulnerable to CSRF & XSS attacks.
 </table>
 
 <details open>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def login(username, password):
@@ -300,7 +300,7 @@ def login(username, password):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def logout():
@@ -365,7 +365,7 @@ When logged in, public and private for RSA algorithm is created for user at the 
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def register(username, password):
@@ -433,7 +433,7 @@ def register(username, password):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def listImage():
@@ -501,7 +501,7 @@ change save location in file [app.py](./app.py)
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def uploadImage(fileName):
@@ -590,7 +590,7 @@ quotient content downloaded to decrypt the message.
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def downloadImage(downloadFile, privateKeyPath):
@@ -674,7 +674,7 @@ def downloadImage(downloadFile, privateKeyPath):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def downloadImageAll(pathPrivateKey):
@@ -737,7 +737,7 @@ def downloadImageAll(pathPrivateKey):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def deleteImage(deleteFile):
@@ -803,7 +803,7 @@ def deleteImage(deleteFile):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def getUserInformation():
@@ -877,7 +877,7 @@ def getUserInformation():
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def getAllUserInformation():
@@ -956,7 +956,7 @@ Only return one permission that matches the sharedUserId.
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def getShareImageInfo(fileShare, sharedUserId):
@@ -1044,7 +1044,7 @@ for POST request later.
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def getShareImageAllInfo(fileShare):
@@ -1120,7 +1120,7 @@ def getShareImageAllInfo(fileShare):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def shareImage(fileShare, userPermission, role):
@@ -1191,7 +1191,7 @@ def shareImage(fileShare, userPermission, role):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def editImagePermissions(fileShare, sharedUserId, role):
@@ -1260,7 +1260,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def deleteImagePermissions(fileShare, sharedUserId):
@@ -1333,7 +1333,7 @@ for user
 </table>
 
 <details>
-<summary>Code implementation</summary>
+<summary>Example request</summary>
 
 ```python
 def getShareImage(downloadFile, sharedUserId):
@@ -1488,6 +1488,8 @@ The user tries to request with the missing token or invalid token. The message m
 ## 4. RSA encryption algorithm:
 
 ### 4.1. Generate keys:
+
+Code for Extended Euclid can be found in file [function_support](https://github.com/DuckyMomo20012/crypto/blob/master/src/components/decode_encode/function_support.py#L13)
 
 <details>
 <summary>Pseudo code</summary>
