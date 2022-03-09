@@ -6,10 +6,12 @@ BIT_NUMBER = 10
 
 from datetime import datetime
 
-def getRandomFileName(fileName):
-	return f"{fileName}_%s" % (datetime.now().strftime("%Y%m%d%H%M%S"))
 
-# tìm ước chung lớn nhất sử dụng thậ euclid mở rộn
+def getRandomFileName(fileName):
+    return f"{fileName}_%s" % (datetime.now().strftime("%Y%m%d%H%M%S"))
+
+
+# Find greatest common divisor (GCD) using Extended Euclid
 def GCD(a, b):
     d, x, y = 0, 0, 0
     if b > a:
@@ -35,7 +37,7 @@ def GCD(a, b):
 _mrpt_num_trials = 5
 
 
-def is_probable_prime(n):
+def isProbablePrime(n):
     assert n >= 2
     if n == 2:
         return True
@@ -44,71 +46,68 @@ def is_probable_prime(n):
     s = 0
     d = n - 1
     while True:
-        thuong, du = divmod(d, 2)
-        if du == 1:
+        quotient, remainder = divmod(d, 2)
+        if remainder == 1:
             break
         s += 1
-        d = thuong
-    assert 2 ** s * d == n - 1
+        d = quotient
+    assert 2**s * d == n - 1
 
-    def try_composite(a):
+    def tryComposite(a):
         if pow(a, d, n) == 1:  # a^d mod n
             return False
         for i in range(s):
-            if pow(a, 2 ** i * d, n) == n - 1:
+            if pow(a, 2**i * d, n) == n - 1:
                 return False
         return True
 
     for i in range(_mrpt_num_trials):
         a = random.randrange(2, n)
-        if try_composite(a):
+        if tryComposite(a):
             return False
     return True
 
 
-# kiểm tra nguyên tố
-def check_prime(num):
+# Check prime
+def checkPrime(num):
     n = num
     if n < 0:
         n = -n
-    count = 0
     for i in range(2, n):
         if num % i == 0:
             return False
     return True
 
 
-# tính n = p*q
 def calculate_n(p, q):
     return p * q
 
 
-# tính phi_n = (p-1) * (q -1)
 def calculate_phi_n(p, q):
     return (p - 1) * (q - 1)
 
 
-# sử dụng Miller để check prime
-def create_Prime(bit):
+# Use Miller Rabin to check prime
+def generatePrime(bit):
     p = random.getrandbits(bit)
-    while is_probable_prime(p) != True or p == 1:
+    while isProbablePrime(p) != True or p == 1:
         p = random.getrandbits(bit)
         if p % 2 == 0:
             p = p | 1
     return p
 
 
-# tạo hai số nguyên tố p và q
-def create_p_and_q(n):
-    p = create_Prime(n)
-    q = create_Prime(n)
+# Generate prime p and q
+def generate_p_and_q(n):
+    p = generatePrime(n)
+    q = generatePrime(n)
     while p == q:
-        q = create_Prime(n)
+        q = generatePrime(n)
     return p, q
 
 
-# hàm genkey trả về n,e,d
-def publicKey_privateKey(p, q):
+# Generate public key and private key
+def generateKeys(p, q):
     n = calculate_n(p, q)
     phi_n = calculate_phi_n(q, p)
     u, x, d = 0, 0, 0
@@ -121,7 +120,6 @@ def publicKey_privateKey(p, q):
     return n, e, d
 
 
-# pow mod
 def powermod(x, e, n):
     y = e
     res = 1
@@ -136,10 +134,10 @@ def powermod(x, e, n):
     return res
 
 
-# ghi file key
-def create_write_key(dstPath="", writeFile=False):
-    p, q = create_p_and_q(BIT_NUMBER)
-    n, e, d = publicKey_privateKey(p, q)
+# Write keys to files
+def generateAndWriteKeyToFile(dstPath="", writeFile=False):
+    p, q = generate_p_and_q(BIT_NUMBER)
+    n, e, d = generateKeys(p, q)
     if writeFile:
         fileName = "rsa.txt"
         if os.path.exists(fileName):
@@ -154,84 +152,84 @@ def create_write_key(dstPath="", writeFile=False):
     return e, d, n
 
 
-def read_file(filename):
+def readFile(filename):
     with open(filename, "r") as f:
         data = f.read()
     return data
 
 
-# ma hoa vì mã màu tối đa là 255 nên file save_quotient sẽ chưa thương của phần tử sau khi được mã hóa RSA.
+# Because color code has maximum is 255, so file quotientSaveDst will store
+# quotient of each pixels after encrypted.
 def Encrypted(
-    pathImage,
+    imgPath,
     e=None,
     n=None,
-    path_pbKey=None,
-    save_imageEncrypted="encode_img.png",
-    save_quotient="quotient.txt",
+    publicKeyPath=None,
+    imgEncryptedSaveDst="encode_img.png",
+    quotientSaveDst="quotient.txt",
 ):
-    if not path_pbKey and not e and not n:
+    if not publicKeyPath and not e and not n:
         raise Exception("Public key is missing")
     # e, n directly passed into function has more priority than text file
-    if path_pbKey and not e and not n:
-        public_key = read_file(path_pbKey)
-        n, e = map(int, public_key.split(" "))
+    if publicKeyPath and not e and not n:
+        publicKey = readFile(publicKeyPath)
+        n, e = map(int, publicKey.split(" "))
 
-    if not e or not n and not path_pbKey:
+    if not e or not n and not publicKeyPath:
         raise Exception("Public key is missing.")
 
-    if not os.path.exists(pathImage):
-        raise Exception('Image path is not exist')
+    if not os.path.exists(imgPath):
+        raise Exception("Image path is not exist")
 
-    img = cv2.imread(pathImage)
+    img = cv2.imread(imgPath)
 
-    f = open(save_quotient, "w")
+    f = open(quotientSaveDst, "w")
     for i in range(3):
         for j in range(img.shape[0]):
             for l in range(img.shape[1]):
-                tem = img[j, l, i]
-                du1 = powermod(tem, e, n)
-                du2 = powermod(du1, 1, 256)
-                thuong = int(du1 / 256)
-                img[j, l, i] = du2
-                f.write(str(thuong) + " ")
+                pixel = img[j, l, i]
+                remainder1 = powermod(pixel, e, n)
+                remainder2 = powermod(remainder1, 1, 256)
+                quotient = int(remainder1 / 256)
+                img[j, l, i] = remainder2
+                f.write(str(quotient) + " ")
     f.close()
-    cv2.imwrite(save_imageEncrypted, img)
+    cv2.imwrite(imgEncryptedSaveDst, img)
     return img
 
 
 def Decrypted(
-    path_ImageDecode,
+    imgEncryptedPath,
     d=None,
     n=None,
-    path_private_key=None,
-    save_imageDecrypted="decode_imge.png",
-    path_file_quotient="quotient.txt",
+    privateKeyPath=None,
+    imgDecryptedSaveDst="decode_img.png",
+    quotientPath="quotient.txt",
 ):
-    if not path_private_key and not d and not n:
+    if not privateKeyPath and not d and not n:
         raise Exception("Private key is missing")
     # d, n directly passed into function has more priority than text file
-    if path_private_key and not d and not n:
-        private_key = read_file(path_private_key)
+    if privateKeyPath and not d and not n:
+        private_key = readFile(privateKeyPath)
         d, n = map(int, private_key.split(" "))
 
-    if not os.path.exists(path_ImageDecode):
-        raise Exception('Image path is not exist')
+    if not os.path.exists(imgEncryptedPath):
+        raise Exception("Image path is not exist")
 
-    if not os.path.exists(path_file_quotient):
-        raise Exception('Quotient path is not exist')
+    if not os.path.exists(quotientPath):
+        raise Exception("Quotient path is not exist")
 
-
-    img = cv2.imread(path_ImageDecode)
-    quotient = read_file(path_file_quotient)
+    img = cv2.imread(imgEncryptedPath)
+    quotient = readFile(quotientPath)
     list_quotient = quotient.split(" ")
 
     index = 0
     for i in range(3):
         for j in range(img.shape[0]):
             for l in range(img.shape[1]):
-                tem = img[j, l, i]
-                c = tem + int(list_quotient[index]) * 256
+                pixel = img[j, l, i]
+                c = pixel + int(list_quotient[index]) * 256
                 img[j, l, i] = powermod(c, d, n)
                 index = index + 1
-    cv2.imwrite(save_imageDecrypted, img)
+    cv2.imwrite(imgDecryptedSaveDst, img)
     return img

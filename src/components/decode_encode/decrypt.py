@@ -9,7 +9,12 @@ save_file = "Decrypt.png"
 # phần dư khi lưu khi chia cho 256 để đưa mã màu về khoảng [0,255]
 quotient = "quotient.txt"
 if __name__ == "__main__":
-    img = Decrypted(path_ImageDecode=path_Name, path_private_key="rsa.txt", save_imageDecrypted=save_file, path_file_quotient=quotient)
+    img = Decrypted(
+        imgEncryptedPath=path_Name,
+        privateKeyPath="rsa.txt",
+        imgDecryptedSaveDst=save_file,
+        quotientPath=quotient,
+    )
 
     cv2.imshow("image", img)
     cv2.waitKey(0)

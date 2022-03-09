@@ -46,7 +46,7 @@ cd client & python main.py
 > 'decode_encode'" or something equivalent, then you should set the PYTHONPATH in the console:
 >
 > ```console
-> set PYTHONPATH=C:/Users/Alice/Desktop/crypto/
+> set PYTHONPATH=C:/Users/Alice/Desktop/flask-server/
 > ```
 
 ## 3. REST API:

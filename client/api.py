@@ -20,7 +20,7 @@ def register(username, password):
 
     # print("register_g", register_g.text)
 
-    e, d, n = function_support.create_write_key("", writeFile=True)
+    e, d, n = function_support.generateAndWriteKeyToFile("", writeFile=True)
 
     register_p = requests.post(
         "http://localhost:5000/register",
@@ -148,8 +148,8 @@ def uploadImage(fileName):
         fileName,
         n=n,
         e=e,
-        save_imageEncrypted=fileName_encrypt,
-        save_quotient="quotient.txt",
+        imgEncryptedSaveDst=fileName_encrypt,
+        quotientSaveDst="quotient.txt",
     )
     q = open("quotient.txt", "r")
     quotient = q.read()
@@ -204,9 +204,9 @@ def downloadImage(downloadFile, privateKeyPath):
     with open(imgName, "wb") as f:
         f.write(imgData.encode("ISO-8859-1"))
     function_support.Decrypted(
-        path_ImageDecode=downloadFile,
-        path_private_key=privateKeyPath,
-        save_imageDecrypted=downloadFile_d,
+        imgEncryptedPath=downloadFile,
+        privateKeyPath=privateKeyPath,
+        imgDecryptedSaveDst=downloadFile_d,
     )
 
 
@@ -247,9 +247,9 @@ def downloadImageAll(pathPrivateKey):
         with open(imgName, "wb") as f:
             f.write(imgContent.encode("ISO-8859-1"))
         function_support.Decrypted(
-            path_ImageDecode=imgName,
-            path_private_key=pathPrivateKey,
-            save_imageDecrypted=imgName,
+            imgEncryptedPath=imgName,
+            privateKeyPath=pathPrivateKey,
+            imgDecryptedSaveDst=imgName,
         )
 
 
@@ -560,7 +560,7 @@ if __name__ == "__main__":
     # register(username="admin", password="admin")
     # logout()
     login(username="admin", password="admin")
-    # getUserInformation()
+    getUserInformation()
     # getAllUserInformation()
 
     # CRUD IMAGE

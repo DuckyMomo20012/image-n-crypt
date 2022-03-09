@@ -42,20 +42,26 @@ from datetime import timezone, datetime
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
-    # when JWT is created, "id" is passed in private claim: "sub", in payload section.
+    # when JWT is created, "id" is passed in private claim: "sub", in payload
+    # section of JWT.
     # Then when user_lookup_loader is called, in "jwt_data" we can access "id"
     # via "sub".
+
+    # This function pass user (User object from model) to create JWT
+
+    # See more in login function
     curUser = json.loads(user.to_json())
     return {"id": curUser["_id"]["$oid"]}
 
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
-    # {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
+    print("jwt_data", jwt_data)
+    # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
     # '88d6273b-be35-446d-af03-8efc417937d2', 'type': 'access', 'sub': {'id':
     # '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386, 'exp': 1641893286}
 
-    # Extract "id" claim from JWT token, then we can query "id" and return
+    # This function extract "id" claim from JWT token, then we can query "id" and return
     # current user
     # jwt_data["jti"] is kinda a jwt id?
     userId = jwt_data["sub"]["id"]
