@@ -1,32 +1,34 @@
-# 1. Installation:
+# Flask server for encrypting images
 
-## 1.1. Install environment:
+## 1. Installation:
+
+### 1.1. Install environment:
 
 ```console
 python -m venv .venv
 ```
 
-## 1.2. Activate environment:
+### 1.2. Activate environment:
 
 ```console
 .venv\Scripts\activate
 ```
 
-## 1.3. Install libs:
+### 1.3. Install libs:
 
 ```console
 pip install -r requirements.txt
 ```
 
-# 2. How to use:
+## 2. How to use:
 
-## 2.1. Start server:
+### 2.1. Start server:
 
 ```console
 flask run
 ```
 
-## 2.2. Start client:
+### 2.2. Start client:
 
 You can use file ["**api.py**"](./client/api.py) for custom requests:
 
@@ -41,25 +43,25 @@ cd client & python main.py
 ```
 
 > **⚠️ NOTE:** If you got the error: "ModuleNotFoundError: No module named
-> 'decode_encode'", then you should set the PYTHONPATH:
+> 'decode_encode'" or something equivalent, then you should set the PYTHONPATH in the console:
 >
 > ```console
 > set PYTHONPATH=C:/Users/Alice/Desktop/crypto/
 > ```
 
-# 3. REST API:
+## 3. REST API:
 
-> At first, the server I built was based entirely on session cookie based
-> authentication using "Flask-Login" library. But after a few researches, I switched to
-> token based authentication with "Flask-JWT-Extended" library, which use JWT
+> At first, the server I built was based entirely on session cookie-based
+> authentication using the "Flask-Login" library. But after a few kinds of research, I switched to
+> token-based authentication with "Flask-JWT-Extended" library, which uses JWT
 > (JSON Web Token) to authenticate. So you may find some pieces of code that was
 > use cookie I left behind.
 
-You can use file "api.py" to test API endpoints. For the sake of
+You can use the file "api.py" to test API endpoints. For the sake of
 simplicity, I stored "JWT access token", "User id" as global variables for easy
-access. (You can also see that I also stored cookie as global variable too).
+access. (You can also see that I stored cookie as a global variable too).
 
-## 3.1. REST API endpoints:
+### 3.1. REST API endpoints:
 
 <table>
 <tbody>
@@ -145,7 +147,7 @@ access. (You can also see that I also stored cookie as global variable too).
 <td> http://localhost:5000/api/v1/users/&ltstring:userId&gt/images/&ltstring:fileName&gt/permissions </td>
 <td>
 
-[Share image to specific user (Grant permission)](#314-share-image-with-specific-user)
+[Share image to a specific user (Grant permission)](#314-share-image-with-specific-user)
 
 </td>
 </tr>
@@ -189,16 +191,16 @@ access. (You can also see that I also stored cookie as global variable too).
 
 </table>
 
-## 3.2. Login:
+### 3.2. Login:
 
-> **⚠️ NOTE:** Whenever user login or logout, that means user's session is over,
-> so cookie will be reset. Also, the JWT token will be sent to blacklist.
+> **⚠️ NOTE:** Whenever users log in or log out, that means the user's session is over,
+> so the cookie will be reset. Also, the JWT token will be sent to the blacklist.
 
-Currently when we login, the JWT token is stored on the client persistently ->
+Currently, when we log in, the JWT token is stored on the client persistently ->
 Vulnerable to CSRF & XSS attacks.
 
-> **⚠️ NOTE:** Each form has its own cookie, so when we send a GET request to
-> request a form to submit, we have to set cookie for POST request
+> **⚠️ NOTE:** Each form has its cookie, so when we send a GET request to
+> request a form to submit, we have to set a cookie for POST request
 
 <table>
 <tbody>
@@ -272,9 +274,9 @@ def login(username, password):
 
 </details>
 
-## 3.3. Logout:
+### 3.3. Logout:
 
-> **⚠️ NOTE:** I have turned off CSRF protection for logout route, so we don't have to request a CSRF key.
+> **⚠️ NOTE:** I have turned off CSRF protection for the logout route, so we don't have to request a CSRF key.
 
 <table>
 <tbody>
@@ -316,18 +318,17 @@ def logout():
 
 </details>
 
-## 3.4. Register:
+### 3.4. Register:
 
-~~After register, user is logged in, so cookie is reset~~. User no longer login
+~~After registering, the user is logged in, so the cookie is reset~~. User no longer log in
 after registration.
 
-When logged in, public and private for RSA algorithm is created for user at current directory
-(directory where client is running):
+When logged in, public and private for RSA algorithm is created for user at the current directory
+(the directory where the client is running):
 
-- Public key is save with file name: "rsa_pub.txt".
+- Public key is saved with the file name: "rsa_pub.txt".
 
-- Private key is save with file name: "rsa.txt". If the file name is already
-  exists, then the file name will be append with the timestamp. E.g: rsa_20220112162809.txt
+- Private key is saved with the file name: "rsa.txt". If the file name already exists, then the file name will be appended with the timestamp. E.g: rsa_20220112162809.txt
 
 <table>
 <tbody>
@@ -394,7 +395,7 @@ def register(username, password):
 
 </details>
 
-## 3.5. List images:
+### 3.5. List images:
 
 <table>
 <tbody>
@@ -450,26 +451,26 @@ def listImage():
 
 </details>
 
-## 3.6. Upload image:
+### 3.6. Upload image:
 
 > **⚠️ NOTE:** Temporarily accepting .PNG image extension only.
 
-When user upload a image (.png), the image is encrypted with public key and
-return the encrypted image along with the "quotient.txt". The quotient later is
+When the user uploads an image (.png), the image is encrypted with a public key and
+returns the encrypted image along with the "quotient.txt". The quotient later is
 sent along with the image content.
 
-Why there is a quotient file?
+- Why there is a quotient file?
 
-When encrypt the image with RSA algorithm, the image is broken and can't open.
-Use quotient is use for modulo the encrypt message, so the image still can be
+When encrypting the image with RSA algorithm, the image is broken and can't open.
+Use quotient is used for modulo the encrypted message, so the image still can be
 opened, but the opener may or may not understand the image.
 
-Why server only accept .png files?
+- Why server only accept .png files?
 
-Well, the client can't not decrypt other file extensions after encrypted, so
-it's an one-way upload. You can tweak it in file [app.py](./app.py)
+Well, the client can't decrypt other file extensions after encrypted, so
+it's a one-way upload. You can tweak it in file [app.py](./app.py)
 
-Where the images are saved?
+- Where the images are saved?
 
 In MongoDB cluster and [local (./src/assets/)](./src/assets/). You can also
 change save location in file [app.py](./app.py)
@@ -542,12 +543,12 @@ def uploadImage(fileName):
 
 </details>
 
-## 3.7. Download image:
+### 3.7. Download image:
 
 The URI should not have the file extension.
 
-The file is downloaded then client use the private key from local and the
-quotient content downloaded to decrypt the message
+The file is downloaded then the client uses the private key from local and the
+quotient content downloaded to decrypt the message.
 
 <table>
 <tbody>
@@ -625,7 +626,7 @@ def downloadImage(downloadFile, privateKeyPath):
 
 </details>
 
-## 3.8. Download ALL images:
+### 3.8. Download ALL images:
 
 <table>
 <tbody>
@@ -709,7 +710,7 @@ def downloadImageAll(pathPrivateKey):
 
 </details>
 
-## 3.9. Delete image:
+### 3.9. Delete image:
 
 <table>
 <tbody>
@@ -760,7 +761,7 @@ def deleteImage(deleteFile):
 
 </details>
 
-## 3.10. Get user information:
+### 3.10. Get user information:
 
 <table>
 <tbody>
@@ -832,7 +833,7 @@ def getUserInformation():
 
 </details>
 
-## 3.11. Get all user information:
+### 3.11. Get all user information:
 
 <table>
 <tbody>
@@ -897,9 +898,9 @@ def getAllUserInformation():
 
 </details>
 
-## 3.12. Get specific image permissions information:
+### 3.12. Get specific image permissions information:
 
-Only return one permissions which match the sharedUserId.
+Only return one permission that matches the sharedUserId.
 
 <table>
 <tbody>
@@ -978,9 +979,9 @@ def getShareImageInfo(fileShare, sharedUserId):
 
 </details>
 
-## 3.13. Get image all permissions:
+### 3.13. Get image all permissions:
 
-Return a list of permissions for image. This response also include a CSRF token
+Return a list of permissions for the image. This response also includes a CSRF token
 for POST request later.
 
 <table>
@@ -1074,7 +1075,7 @@ def getShareImageAllInfo(fileShare):
 
 </details>
 
-## 3.14. Share image with specific user:
+### 3.14. Share image with a specific user:
 
 <table>
 <tbody>
@@ -1145,7 +1146,7 @@ def shareImage(fileShare, userPermission, role):
 
 </details>
 
-## 3.15. Edit one image permission:
+### 3.15. Edit one image permission:
 
 <table>
 <tbody>
@@ -1214,7 +1215,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
 
 </details>
 
-## 3.16. Delete one image permission:
+### 3.16. Delete one image permission:
 
 <table>
 <tbody>
@@ -1283,9 +1284,9 @@ def deleteImagePermissions(fileShare, sharedUserId):
 
 </details>
 
-## 3.17. Download shared image:
+### 3.17. Download shared image:
 
-Since the database didn't store private key, so client can't decrypt the image
+Since the database didn't store a private key, so the client can't decrypt the image
 for user
 
 <table>
@@ -1372,13 +1373,13 @@ def getShareImage(downloadFile, sharedUserId):
 
 </details>
 
-## Form validation error:
+### 3.18. Form validation error:
 
 Before each POST request, typically the client has to send a GET request to get
-the html form with the CSRF token. But with this server, client only get CSRF
-token, then user send a POST request with the form content within the request
-body. The request body then passed in the form class and validated by the form.
-If the form content is failed, then the this response is sent back to client.
+the html form with the CSRF token. But with this server, the client only gets CSRF
+token, then the user sends a POST request with the form content within the request
+body. The request body then passed in the form class and was validated by the form.
+If the form content is failed, then this response is sent back to the client.
 
 <table>
 <tbody>
@@ -1414,7 +1415,7 @@ If the form content is failed, then the this response is sent back to client.
 </tbody>
 </table>
 
-## Not Authorized error:
+### 3.19. Not Authorized error:
 
 The user ID of decoded JWT token doesn't match the resources we request.
 
@@ -1436,9 +1437,9 @@ The user ID of decoded JWT token doesn't match the resources we request.
 </tbody>
 </table>
 
-## Revoked token error:
+### 3.20. Revoked token error:
 
-User tries to request with the revoked token.
+The user tries to request with the revoked token.
 
 <table>
 <tbody>
@@ -1458,9 +1459,9 @@ User tries to request with the revoked token.
 </tbody>
 </table>
 
-## Invalid token error:
+### 3.21. Invalid token error:
 
-User tries to request with missing token or invalid token. The message may vary.
+The user tries to request with the missing token or invalid token. The message may vary.
 
 <table>
 <tbody>
@@ -1484,12 +1485,102 @@ User tries to request with missing token or invalid token. The message may vary.
 </tbody>
 </table>
 
-# 4. TODO:
+## 4. RSA encryption algorithm:
+
+### 4.1. Generate keys:
+
+<details>
+<summary>Pseudo code</summary>
+
+```
+FUNCTION generateKeys(p, q):
+    n <- p * q
+    phi_n <- (q - 1) * (p - 1)
+    u, x, d <- 0, 0, 0
+    e = 0
+    while u != 1:
+        e = random.randint(2, phi_n - 1)
+        u, x, d <- GCD(phi_n, e) # Extended Euclid
+        if d < 0 then
+            d <- phi_n + d
+    return n, e, d
+END FUNCTION
+```
+
+</details>
+
+### 4.2. Encryption:
+
+<details>
+<summary>Pseudo code</summary>
+
+```
+FUNCTION Encrypt(pathImage, path_pbKey, save_imageEncrypted="encode_img.png", save_quotient="quotient.txt"):
+    img = cv2.imread(pathImage)
+    public_key = read_file(path_pbKey)
+    data = public_key.split(" ")
+    n = int(data[0])
+    e = int(data[0])
+    str1 = ""
+    f = open(save_quotient, 'w')
+    for i = 0 to 3:
+        for j = 0 to img.shape[0]
+            for l = 0 to img.shape[1]
+                tem <- img[j, l, i]
+                du1 <- (tem ^ e) % n
+                thuong = int(du1/256)
+                du2 <- du1 - 256 * thuong
+                img[j, l, i] <- du2
+                f.write(str(thuong) + " ")
+            end for
+        end for
+    end for
+    f.close()
+    cv2.imwrite(save_imageEncrypted, img)
+    return img
+END FUNCTION
+```
+
+</details>
+
+### 4.3. Decryption:
+
+<details>
+<summary>Pseudo code</summary>
+
+```
+FUNCTION Decrypt(path_ImageDecode, path_private_key, save_imageDecrypted="decode_img.png", path_file_quotient="quotient.txt"):
+    img = cv2.imread(path_ImageDecode)
+    private_key = read_file(path_private_key)
+    quotient = read_file(path_file_quotient)
+    list_quotient = quotient.split(" ")
+
+    d_n = private_key.split(" ")
+    d <- int(d_n[0])
+    n <- int(d_n[1])
+    index = 0
+    for i = 0 to 3:
+        for j = 0 to img.shape[0]
+            for l = 0 to img.shape[1]:
+                tem <- img[j, l, i]
+                c <- tem + int(list_quotient[index]) * 256
+                img[j, l, i] <- (c ^ d) % n
+                index <- index + 1
+            end for
+        end for
+    end for
+    cv2.imwrite(save_imageDecrypted, img)
+    return img
+END FUNCTION
+```
+
+</details>
+
+## 5. TODO:
 
 - [x] Important: Remove entirely CSRF protection. Keeps CSRF for Authentication
-- [x] Set expiration time for token (NOTE: Added but don't know if it really works)
+- [x] Set the expiration time for the token (NOTE: Added but don't know if it works)
 - [x] Add validator for only .PNG image file.
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Support more image extensions, more file types.
-- [ ] Don't create key if registration failed.
