@@ -17,7 +17,7 @@ A safety file storage (basic)
 - Registration.
 - Login.
 - Storing image: app client encrypt image with RSA and send request to server to store image.
-  - Image encrypted is required to be openable and can't be recognized by attackers.
+  - Image encrypted is required to be **openable** and can't be recognized by attackers.
 - View image list.
 - Download image: client download encrypted images and decrypt it using user RSA private key.
   - Download one image.
@@ -326,7 +326,12 @@ def login(username, password):
 
 ### 3.3. Logout:
 
-> **⚠️ NOTE:** I have turned off CSRF protection for the logout route, so we don't have to request a CSRF key.
+> **⚠️ NOTE:** I have turned off CSRF protection for the logout route, so we
+> don't have to request a CSRF key.
+
+- After user logged out, user's JWT token will be sent to block list (revoked), so
+  attacker can't use the same token to log in.
+- Currently not support retrieving revoked tokens.
 
 <table>
 <tbody>
