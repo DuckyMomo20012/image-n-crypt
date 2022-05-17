@@ -2,7 +2,7 @@ import mongoengine as me
 from flask_wtf import FlaskForm
 import wtforms as wf
 from wtforms.validators import DataRequired
-from flask_login import UserMixin
+# from flask_login import UserMixin
 
 
 class LoginForm(FlaskForm):
