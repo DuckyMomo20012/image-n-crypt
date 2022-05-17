@@ -143,7 +143,8 @@ def uploadImage(fileName):
     # NOTE: "imageFile" is field from ImageForm class
     # fileName = "bicycle2.png"
     name, ext = path.splitext(fileName)
-    fileName_encrypt = name + "_e" + ext
+    # fileName_encrypt = name + "_e" + ext
+    fileName_encrypt = name + ext
     function_support.Encrypted(
         fileName,
         n=n,
@@ -185,7 +186,8 @@ def downloadImage(downloadFile, privateKeyPath):
     global userId
     # downloadFile = "bicycle2_e.png"
     name, ext = path.splitext(downloadFile)
-    downloadFile_d = name + "_d" + ext
+    # downloadFile_d = name + "_d" + ext
+    downloadFile_d = name + ext
     download_img_g = requests.get(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
         # headers={"Cookie": cookie},

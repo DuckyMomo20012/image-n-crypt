@@ -54,8 +54,8 @@ def optionLogin():
                 print(handleRes(res, "Upload image: "))
                 optionLogin()
             elif option == 3:
-                ans = getInput("private key")
-                res = downloadImageAll(ans["private key"])
+                ans = getInput("private key file")
+                res = downloadImageAll(ans["private key file"])
                 print(handleRes(res, "Image downloaded"))
                 optionLogin()
             elif option == 4:
@@ -64,7 +64,7 @@ def optionLogin():
                 optionLogin()
             elif option == 5:
                 res = logout()
-                print(handleRes(res, "Logout successfully"))
+                print(handleRes(res, "Logout successfully "))
                 mainMenu()
             else:
                 print("Invalid choice. Enter 1 - 5")
@@ -84,9 +84,9 @@ def back():
 
 def optionInOptionLogin():
     print("____IMAGE PROCESSING___")
-    print("1. Dowload image")
-    print("2. Delete images")
-    print("3. Share images")
+    print("1. Download image")
+    print("2. Delete image")
+    print("3. Share image")
     print("4. Get shared image information")
     print("5. Download shared images")
     print("6. Delete image permission")
@@ -96,8 +96,8 @@ def optionInOptionLogin():
     while option != 0:
         try:
             if option == 1:
-                ans = getInput("file name", "private key")
-                res = downloadImage(ans["file name"], ans["private key"])
+                ans = getInput("file name", "private key file")
+                res = downloadImage(ans["file name"], ans["private key file"])
                 print(handleRes(res, "Image downloaded"))
                 optionLogin()
             elif option == 2:

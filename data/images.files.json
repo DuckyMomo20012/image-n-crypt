@@ -1,0 +1,17 @@
+[{
+  "_id": {
+    "$oid": "62838ad61dc6fa1a0cd84c44"
+  },
+  "width": 292,
+  "height": 172,
+  "format": "PNG",
+  "thumbnail_id": null,
+  "md5": "1b2bd7dda67aad950bcad6b818f0a6ad",
+  "chunkSize": 261120,
+  "length": 20202,
+  "uploadDate": {
+    "$date": {
+      "$numberLong": "1652787926614"
+    }
+  }
+}]

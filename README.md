@@ -1,4 +1,5 @@
 # Flask server for storing encrypted images
+
 A safety file storage (basic)
 
 ## Tech stacks:
@@ -16,17 +17,17 @@ A safety file storage (basic)
 - Registration.
 - Login.
 - Storing image: app client encrypt image with RSA and send request to server to store image.
-    - Image encrypted is required to be openable and can't be recognized by attackers.
+  - Image encrypted is required to be openable and can't be recognized by attackers.
 - View image list.
 - Download image: client download encrypted images and decrypt it using user RSA private key.
-    - Download one image.
-    - Download all images.
- - Share image with others: other users can download image.
- - After registration, account is created with these information:
-    - username.
-    - ID.
-    - RSA public key (provided by user when register).
- - Server connect with client by using REST api.
+  - Download one image.
+  - Download all images.
+- Share image with others: other users can download image.
+- After registration, account is created with these information:
+  - username.
+  - ID.
+  - RSA public key (provided by client app for user after registration).
+- Server connect with client by using REST api.
 
 ## 1. Installation:
 
@@ -49,6 +50,27 @@ pip install -r requirements.txt
 ```
 
 ## 2. How to use:
+
+- You can create MongoDB using sample dataset from folder `data`.
+- Password and RSA private key file for sample users:
+
+```
+admin:
+    password: admin
+    private key: rsa_admin.txt
+admin2:
+    password: admin
+    private key: rsa_admin2.txt
+admin2:
+    password: admin
+    private key: rsa_admin3.txt
+```
+
+### 2.1. Rename config.py & change DB URI (Important):
+
+- Rename `config.example.py` to `config.py`
+- Change `MONGODB_HOST` to your MongoDB URI. E.g:
+  `mongodb+srv://<username>:<password>@crypto-image.u1r0p.mongodb.net/CryptoImage`
 
 ### 2.1. Start server:
 
@@ -490,18 +512,19 @@ sent along with the image content.
 - Why there is a quotient file?
 
 When encrypting the image with RSA algorithm, the image is broken and can't open.
-Use quotient is used for modulo the encrypted message, so the image still can be
-opened, but the opener may or may not understand the image.
+The main purpose of quotient is used for modulo the encrypted message, so the image **still can be
+opened**, but the opener may or may not understand the image. This feature is
+intentionally implemented.
 
 - Why server only accept .png files?
 
-Well, the client can't decrypt other file extensions after encrypted, so
-it's a one-way upload. You can tweak it in file [app.py](./app.py)
+Well, the client can't decrypt other file extensions than .png after encrypted, so
+it's a one-way upload if you use other extensions. However, if you want, you can tweak accept file extensions in file [app.py](./app.py)
 
 - Where the images are saved?
 
 In MongoDB cluster and [local (./src/assets/)](./src/assets/). You can also
-change save location in file [app.py](./app.py)
+change local save location in file [app.py](./app.py)
 
 <table>
 <tbody>
@@ -1614,3 +1637,5 @@ END FUNCTION
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Support more image extensions, more file types.
+- [ ] Client support decrypt image service.
+- [ ] Handle file permissions (read/write)
