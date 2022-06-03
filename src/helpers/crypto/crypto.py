@@ -160,7 +160,7 @@ def readFile(filename):
 
 # Because color code has maximum is 255, so file quotientSaveDst will store
 # quotient of each pixels after encrypted.
-def Encrypted(
+def encrypt(
     imgPath,
     e=None,
     n=None,
@@ -198,7 +198,7 @@ def Encrypted(
     return img
 
 
-def Decrypted(
+def decrypt(
     imgEncryptedPath,
     d=None,
     n=None,

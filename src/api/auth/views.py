@@ -1,13 +1,13 @@
 from flask import request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app, jwt, csrf
-from src.components.auth.model import LoginForm, RegisterForm, TokenBlocklist
-from src.components.user.model import User
-from src.components.user.service import getUserById, getUserByUserName
-from src.components.auth.service import getTokenBlocklistByJTI
+from src.api.auth.model import LoginForm, RegisterForm, TokenBlocklist
+from src.api.user.model import User
+from src.api.user.service import getUserById, getUserByUserName
+from src.api.auth.service import getTokenBlocklistByJTI
 
 from flask_wtf.csrf import generate_csrf
-from src.helpers.utils import flatten
+from src.utils import flatten
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 import json
 from datetime import timezone, datetime

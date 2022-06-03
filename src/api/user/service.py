@@ -1,4 +1,4 @@
-from src.components.user.model import User
+from src.api.user.model import User
 
 
 def getUserByUserName(username):
