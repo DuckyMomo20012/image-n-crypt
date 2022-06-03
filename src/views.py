@@ -1,7 +1,5 @@
 from app import app
-from src.api.auth.views import *
-from src.api.upload_image.views import *
-from src.api.user.views import *
+from src.api import *
 from flask import render_template
 
 

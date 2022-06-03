@@ -3,8 +3,8 @@ from flask import request, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 from flask_jwt_extended import jwt_required, current_user
-from src.api.upload_image.model import Image, ImageForm, ImagePermission
-from src.api.upload_image.service import *
+from src.api.users.images.model import Image, ImageForm, ImagePermission
+from src.api.users.images.service import *
 from src.utils import getRandomFileName, flatten
 from os import path
 
