@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restx import Api
-from src.api.auth.views import ns_auth as auth_api
-from src.api.users.views import ns_users as users_api
+from src.api.v1.auth.views import ns_auth as auth_api
+from src.api.v1.users.views import ns_users as users_api
 
 
 # JWT views need to be imported for app.py to work

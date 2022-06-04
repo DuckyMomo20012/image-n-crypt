@@ -1,4 +1,4 @@
-from src.api.auth.model import TokenBlocklist
+from src.api.v1.auth.model import TokenBlocklist
 
 
 def getTokenBlocklistByJTI(jti):

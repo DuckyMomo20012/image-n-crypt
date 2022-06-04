@@ -1,5 +1,5 @@
-from src.api.blueprint import blueprint
-from src.api.blueprint import (
+from src.api.v1.blueprint import blueprint
+from src.api.v1.blueprint import (
     user_identity_lookup,
     user_lookup_callback,
     check_if_token_is_revoked,

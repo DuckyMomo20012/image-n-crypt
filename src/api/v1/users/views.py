@@ -1,6 +1,6 @@
 from flask import make_response
 from flask_jwt_extended import jwt_required
-from src.api.users.service import getUserById, getAllUsers
+from src.api.v1.users.service import getUserById, getAllUsers
 import json
 from flask_restx import Resource, Namespace
 

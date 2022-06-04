@@ -3,13 +3,13 @@ from flask import request, make_response
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import CombinedMultiDict
 from flask_jwt_extended import jwt_required, current_user
-from src.api.users.images.model import Image, ImageForm, ImagePermission
-from src.api.users.images.service import *
+from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
+from src.api.v1.users.images.service import *
 from src.utils import getRandomFileName, flatten
 from os import path
 from flask_restx import Resource
 
-from src.api.users.views import ns_users
+from src.api.v1.users.views import ns_users
 
 
 @ns_users.route("/<string:userId>/images")

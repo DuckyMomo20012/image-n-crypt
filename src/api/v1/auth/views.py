@@ -1,10 +1,10 @@
 from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import jwt, csrf
-from src.api.auth.model import LoginForm, RegisterForm, TokenBlocklist
-from src.api.users.model import User
-from src.api.users.service import getUserById, getUserByUserName
-from src.api.auth.service import getTokenBlocklistByJTI
+from src.api.v1.auth.model import LoginForm, RegisterForm, TokenBlocklist
+from src.api.v1.users.model import User
+from src.api.v1.users.service import getUserById, getUserByUserName
+from src.api.v1.auth.service import getTokenBlocklistByJTI
 from flask_restx import Resource, Namespace
 
 from flask_wtf.csrf import generate_csrf
