@@ -49,6 +49,22 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+### 1.4. Export PYTHONPATH (Important):
+
+Change directory to folder `flask-server`:
+
+Windows:
+
+```console
+set PYTHONPATH=C:/Users/Alice/Desktop/flask-server/
+```
+
+Linux:
+
+```bash
+export PYTHONPATH=$(pwd)
+```
+
 ## 2. How to use:
 
 - You can create MongoDB using sample dataset from folder `data`.
@@ -93,11 +109,7 @@ cd client & python main.py
 ```
 
 > **⚠️ NOTE:** If you got the error: "ModuleNotFoundError: No module named
-> 'decode_encode'" or something equivalent, then you should set the PYTHONPATH in the console:
->
-> ```console
-> set PYTHONPATH=C:/Users/Alice/Desktop/flask-server/
-> ```
+> 'src'" or something equivalent, then you have to set the PYTHONPATH.
 
 ## 3. REST API:
 
@@ -434,7 +446,7 @@ def register(username, password):
 
     # print("register_g", register_g.text)
 
-    e, d, n = function_support.create_write_key("", writeFile=True)
+    e, d, n = Crypto.generateAndWriteKeyToFile("", writeFile=True)
 
     register_p = requests.post(
         "http://localhost:5000/register",
@@ -572,13 +584,14 @@ def uploadImage(fileName):
     # NOTE: "imageFile" is field from ImageForm class
     # fileName = "bicycle2.png"
     name, ext = path.splitext(fileName)
-    fileName_encrypt = name + "_e" + ext
-    function_support.Encrypted(
+    # fileName_encrypt = name + "_e" + ext
+    fileName_encrypt = name + ext
+    Crypto.encrypt(
         fileName,
         n=n,
         e=e,
-        save_imageEncrypted=fileName_encrypt,
-        save_quotient="quotient.txt",
+        imgEncryptedSaveDst=fileName_encrypt,
+        quotientSaveDst="quotient.txt",
     )
     q = open("quotient.txt", "r")
     quotient = q.read()
@@ -655,7 +668,8 @@ def downloadImage(downloadFile, privateKeyPath):
     global userId
     # downloadFile = "bicycle2_e.png"
     name, ext = path.splitext(downloadFile)
-    downloadFile_d = name + "_d" + ext
+    # downloadFile_d = name + "_d" + ext
+    downloadFile_d = name + ext
     download_img_g = requests.get(
         f"http://localhost:5000/api/v1/users/{userId}/images/{name}",
         # headers={"Cookie": cookie},
@@ -673,10 +687,10 @@ def downloadImage(downloadFile, privateKeyPath):
         q.write(quotientData)
     with open(imgName, "wb") as f:
         f.write(imgData.encode("ISO-8859-1"))
-    function_support.Decrypted(
-        path_ImageDecode=downloadFile,
-        path_private_key=privateKeyPath,
-        save_imageDecrypted=downloadFile_d,
+    Crypto.decrypt(
+        imgEncryptedPath=downloadFile,
+        privateKeyPath=privateKeyPath,
+        imgDecryptedSaveDst=downloadFile_d,
     )
 ```
 
@@ -757,10 +771,10 @@ def downloadImageAll(pathPrivateKey):
             q.write(quotientData)
         with open(imgName, "wb") as f:
             f.write(imgContent.encode("ISO-8859-1"))
-        function_support.Decrypted(
-            path_ImageDecode=imgName,
-            path_private_key=pathPrivateKey,
-            save_imageDecrypted=imgName,
+        Crypto.decrypt(
+            imgEncryptedPath=imgName,
+            privateKeyPath=pathPrivateKey,
+            imgDecryptedSaveDst=imgName,
         )
 ```
 
@@ -1419,12 +1433,6 @@ def getShareImage(downloadFile, sharedUserId):
         f.write(imgData.encode("ISO-8859-1"))
 
     # Since the db didn't store the private, so the file can only be downloaded
-
-    # function_support.Decrypted(
-    #     path_ImageDecode=downloadFile,
-    #     path_private_key="rsa.txt",
-    #     save_imageDecrypted=downloadFile_d,
-    # )
 ```
 
 </details>
@@ -1545,7 +1553,7 @@ The user tries to request with the missing token or invalid token. The message m
 
 ### 4.1. Generate keys:
 
-Code for Extended Euclid can be found in file [function_support](https://github.com/DuckyMomo20012/crypto/blob/master/src/components/decode_encode/function_support.py#L13)
+Code for Extended Euclid can be found in file [function_support](https://github.com/DuckyMomo20012/crypto/blob/master/src/helpers/crypto/crypto.py#L15)
 
 <details>
 <summary>Pseudo code</summary>

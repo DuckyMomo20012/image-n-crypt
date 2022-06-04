@@ -1,4 +1,4 @@
-from src.components.upload_image.model import Image
+from src.api.users.images.model import Image
 from mongoengine.queryset.visitor import Q
 
 

@@ -1,6 +1,6 @@
 import requests
 import json
-from src.components.decode_encode import function_support
+from src.helpers import crypto as Crypto
 from os import path
 
 # RETURN a string for handleRes in helper.py handling
@@ -20,7 +20,7 @@ def register(username, password):
 
     # print("register_g", register_g.text)
 
-    e, d, n = function_support.generateAndWriteKeyToFile("", writeFile=True)
+    e, d, n = Crypto.generateAndWriteKeyToFile("", writeFile=True)
 
     register_p = requests.post(
         "http://localhost:5000/register",
@@ -145,7 +145,7 @@ def uploadImage(fileName):
     name, ext = path.splitext(fileName)
     # fileName_encrypt = name + "_e" + ext
     fileName_encrypt = name + ext
-    function_support.Encrypted(
+    Crypto.encrypt(
         fileName,
         n=n,
         e=e,
@@ -205,7 +205,7 @@ def downloadImage(downloadFile, privateKeyPath):
         q.write(quotientData)
     with open(imgName, "wb") as f:
         f.write(imgData.encode("ISO-8859-1"))
-    function_support.Decrypted(
+    Crypto.decrypt(
         imgEncryptedPath=downloadFile,
         privateKeyPath=privateKeyPath,
         imgDecryptedSaveDst=downloadFile_d,
@@ -248,7 +248,7 @@ def downloadImageAll(pathPrivateKey):
             q.write(quotientData)
         with open(imgName, "wb") as f:
             f.write(imgContent.encode("ISO-8859-1"))
-        function_support.Decrypted(
+        Crypto.decrypt(
             imgEncryptedPath=imgName,
             privateKeyPath=pathPrivateKey,
             imgDecryptedSaveDst=imgName,
@@ -530,12 +530,6 @@ def getShareImage(downloadFile, sharedUserId):
 
     # Since the db didn't store the private, so the file can only be downloaded
 
-    # function_support.Decrypted(
-    #     path_ImageDecode=downloadFile,
-    #     path_private_key="rsa.txt",
-    #     save_imageDecrypted=downloadFile_d,
-    # )
-
 
 # GET - Success:
 # {"status": "success","code": "200","data": {"img_name":
@@ -555,7 +549,7 @@ if __name__ == "__main__":
 
     # GENERATE KEY
 
-    # function_support.create_write_key(dstPath="", writeFile=True)
+    # Crypto.create_write_key(dstPath="", writeFile=True)
 
     # USER INFORMATION
 

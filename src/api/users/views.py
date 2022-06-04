@@ -1,7 +1,7 @@
 from app import app
 from flask import make_response
 from flask_jwt_extended import jwt_required
-from src.components.user.service import getUserById, getAllUsers
+from src.api.users.service import getUserById, getAllUsers
 import json
 
 
