@@ -1,4 +1,4 @@
-from src.api.users.model import User
+from src.api.v1.users.model import User
 
 
 def getUserByUserName(username):

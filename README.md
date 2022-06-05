@@ -134,6 +134,51 @@ access. (You can also see that I stored cookie as a global variable too).
 </tr>
 <tr>
 <td> GET </td>
+<td> http://localhost:5000/api/v1/auth/login </td>
+<td>
+
+[Get CSRF login token](#32-login)
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> http://localhost:5000/api/v1/auth/login </td>
+<td>
+
+[Login user](#32-login)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
+<td> http://localhost:5000/api/v1/auth/register </td>
+<td>
+
+[Get CSRF register token](#34-register)
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> http://localhost:5000/api/v1/auth/register </td>
+<td>
+
+[Register user](#34-register)
+
+</td>
+</tr>
+<tr>
+<td> POST </td>
+<td> http://localhost:5000/api/v1/auth/logout </td>
+<td>
+
+[Logout user](#33-logout)
+
+</td>
+</tr>
+<tr>
+<td> GET </td>
 <td> http://localhost:5000/api/v1/users </td>
 <td>
 
@@ -304,7 +349,7 @@ def login(username, password):
     # global cookie
     global access_token
     global userId
-    login_g = requests.get("http://localhost:5000/login")
+    login_g = requests.get("http://localhost:5000/api/v1/auth/login")
     login_data = json.loads(login_g.text)
     if "csrf_token" not in login_data.keys():
         return login_g.text
@@ -315,7 +360,7 @@ def login(username, password):
 
     # NOTE: When login, cookie will be reset
     login_p = requests.post(
-        "http://localhost:5000/login",
+        "http://localhost:5000/api/v1/auth/login",
         data={"username": username, "password": password},
         headers={
             "X-CSRFToken": csrfKey,
@@ -374,7 +419,7 @@ def logout():
     # global cookie
     global access_token
     logout_p = requests.post(
-        "http://localhost:5000/logout",
+        "http://localhost:5000/api/v1/auth/logout",
         # headers={"Cookie": cookie},
         headers={"Authorization": f"Bearer {access_token}"},
     )
@@ -437,7 +482,7 @@ When logged in, public and private for RSA algorithm is created for user at the 
 ```python
 def register(username, password):
     # global cookie
-    register_g = requests.get("http://localhost:5000/register")
+    register_g = requests.get("http://localhost:5000/api/v1/auth/register")
     register_data = json.loads(register_g.text)
     if "csrf_token" not in register_data.keys():
         return register_g.text
@@ -449,7 +494,7 @@ def register(username, password):
     e, d, n = Crypto.generateAndWriteKeyToFile("", writeFile=True)
 
     register_p = requests.post(
-        "http://localhost:5000/register",
+        "http://localhost:5000/api/v1/auth/register",
         data={"username": username, "password": password, "publicKey": f"{n} {e}"},
         headers={
             "X-CSRFToken": csrfKey,
@@ -1553,24 +1598,23 @@ The user tries to request with the missing token or invalid token. The message m
 
 ### 4.1. Generate keys:
 
-Code for Extended Euclid can be found in file [function_support](https://github.com/DuckyMomo20012/crypto/blob/master/src/helpers/crypto/crypto.py#L15)
+Code for Extended Euclid can be found in file [crypto.py](https://github.com/DuckyMomo20012/crypto/blob/master/src/helpers/crypto/crypto.py#L15)
 
 <details>
-<summary>Pseudo code</summary>
+<summary>Code implementation</summary>
 
-```
-FUNCTION generateKeys(p, q):
-    n <- p * q
-    phi_n <- (q - 1) * (p - 1)
-    u, x, d <- 0, 0, 0
+```python
+def generateKeys(p, q):
+    n = calculate_n(p, q)
+    phi_n = calculate_phi_n(q, p)
+    u, x, d = 0, 0, 0
     e = 0
     while u != 1:
         e = random.randint(2, phi_n - 1)
-        u, x, d <- GCD(phi_n, e) # Extended Euclid
-        if d < 0 then
-            d <- phi_n + d
+        u, x, d = GCD(phi_n, e)
+        if d < 0:
+            d = phi_n + d
     return n, e, d
-END FUNCTION
 ```
 
 </details>
@@ -1578,33 +1622,45 @@ END FUNCTION
 ### 4.2. Encryption:
 
 <details>
-<summary>Pseudo code</summary>
+<summary>Code implementation</summary>
 
-```
-FUNCTION Encrypt(pathImage, path_pbKey, save_imageEncrypted="encode_img.png", save_quotient="quotient.txt"):
-    img = cv2.imread(pathImage)
-    public_key = read_file(path_pbKey)
-    data = public_key.split(" ")
-    n = int(data[0])
-    e = int(data[0])
-    str1 = ""
-    f = open(save_quotient, 'w')
-    for i = 0 to 3:
-        for j = 0 to img.shape[0]
-            for l = 0 to img.shape[1]
-                tem <- img[j, l, i]
-                du1 <- (tem ^ e) % n
-                thuong = int(du1/256)
-                du2 <- du1 - 256 * thuong
-                img[j, l, i] <- du2
-                f.write(str(thuong) + " ")
-            end for
-        end for
-    end for
+```python
+def encrypt(
+    imgPath,
+    e=None,
+    n=None,
+    publicKeyPath=None,
+    imgEncryptedSaveDst="encode_img.png",
+    quotientSaveDst="quotient.txt",
+):
+    if not publicKeyPath and not e and not n:
+        raise Exception("Public key is missing")
+    # e, n directly passed into function has more priority than text file
+    if publicKeyPath and not e and not n:
+        publicKey = readFile(publicKeyPath)
+        n, e = map(int, publicKey.split(" "))
+
+    if not e or not n and not publicKeyPath:
+        raise Exception("Public key is missing.")
+
+    if not os.path.exists(imgPath):
+        raise Exception("Image path is not exist")
+
+    img = cv2.imread(imgPath)
+
+    f = open(quotientSaveDst, "w")
+    for i in range(3):
+        for j in range(img.shape[0]):
+            for l in range(img.shape[1]):
+                pixel = img[j, l, i]
+                remainder1 = powermod(pixel, e, n)
+                remainder2 = powermod(remainder1, 1, 256)
+                quotient = int(remainder1 / 256)
+                img[j, l, i] = remainder2
+                f.write(str(quotient) + " ")
     f.close()
-    cv2.imwrite(save_imageEncrypted, img)
+    cv2.imwrite(imgEncryptedSaveDst, img)
     return img
-END FUNCTION
 ```
 
 </details>
@@ -1612,32 +1668,44 @@ END FUNCTION
 ### 4.3. Decryption:
 
 <details>
-<summary>Pseudo code</summary>
+<summary>Code implementation</summary>
 
-```
-FUNCTION Decrypt(path_ImageDecode, path_private_key, save_imageDecrypted="decode_img.png", path_file_quotient="quotient.txt"):
-    img = cv2.imread(path_ImageDecode)
-    private_key = read_file(path_private_key)
-    quotient = read_file(path_file_quotient)
+```python
+def decrypt(
+    imgEncryptedPath,
+    d=None,
+    n=None,
+    privateKeyPath=None,
+    imgDecryptedSaveDst="decode_img.png",
+    quotientPath="quotient.txt",
+):
+    if not privateKeyPath and not d and not n:
+        raise Exception("Private key is missing")
+    # d, n directly passed into function has more priority than text file
+    if privateKeyPath and not d and not n:
+        private_key = readFile(privateKeyPath)
+        d, n = map(int, private_key.split(" "))
+
+    if not os.path.exists(imgEncryptedPath):
+        raise Exception("Image path is not exist")
+
+    if not os.path.exists(quotientPath):
+        raise Exception("Quotient path is not exist")
+
+    img = cv2.imread(imgEncryptedPath)
+    quotient = readFile(quotientPath)
     list_quotient = quotient.split(" ")
 
-    d_n = private_key.split(" ")
-    d <- int(d_n[0])
-    n <- int(d_n[1])
     index = 0
-    for i = 0 to 3:
-        for j = 0 to img.shape[0]
-            for l = 0 to img.shape[1]:
-                tem <- img[j, l, i]
-                c <- tem + int(list_quotient[index]) * 256
-                img[j, l, i] <- (c ^ d) % n
-                index <- index + 1
-            end for
-        end for
-    end for
-    cv2.imwrite(save_imageDecrypted, img)
+    for i in range(3):
+        for j in range(img.shape[0]):
+            for l in range(img.shape[1]):
+                pixel = img[j, l, i]
+                c = pixel + int(list_quotient[index]) * 256
+                img[j, l, i] = powermod(c, d, n)
+                index = index + 1
+    cv2.imwrite(imgDecryptedSaveDst, img)
     return img
-END FUNCTION
 ```
 
 </details>
