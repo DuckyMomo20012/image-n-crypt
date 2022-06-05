@@ -11,7 +11,7 @@ from os import path
 # form to submit, we have to set cookie for POST request
 def register(username, password):
     # global cookie
-    register_g = requests.get("http://localhost:5000/register")
+    register_g = requests.get("http://localhost:5000/api/v1/auth/register")
     register_data = json.loads(register_g.text)
     if "csrf_token" not in register_data.keys():
         return register_g.text
@@ -23,7 +23,7 @@ def register(username, password):
     e, d, n = Crypto.generateAndWriteKeyToFile("", writeFile=True)
 
     register_p = requests.post(
-        "http://localhost:5000/register",
+        "http://localhost:5000/api/v1/auth/register",
         data={"username": username, "password": password, "publicKey": f"{n} {e}"},
         headers={
             "X-CSRFToken": csrfKey,
@@ -48,7 +48,7 @@ def login(username, password):
     # global cookie
     global access_token
     global userId
-    login_g = requests.get("http://localhost:5000/login")
+    login_g = requests.get("http://localhost:5000/api/v1/auth/login")
     login_data = json.loads(login_g.text)
     if "csrf_token" not in login_data.keys():
         return login_g.text
@@ -59,7 +59,7 @@ def login(username, password):
 
     # NOTE: When login, cookie will be reset
     login_p = requests.post(
-        "http://localhost:5000/login",
+        "http://localhost:5000/api/v1/auth/login",
         data={"username": username, "password": password},
         headers={
             "X-CSRFToken": csrfKey,
@@ -114,7 +114,7 @@ def logout():
     # global cookie
     global access_token
     logout_p = requests.post(
-        "http://localhost:5000/logout",
+        "http://localhost:5000/api/v1/auth/logout",
         # headers={"Cookie": cookie},
         headers={"Authorization": f"Bearer {access_token}"},
     )

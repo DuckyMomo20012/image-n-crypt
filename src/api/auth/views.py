@@ -1,10 +1,11 @@
-from flask import request, jsonify, make_response
+from flask import request, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import app, jwt, csrf
+from app import jwt, csrf
 from src.api.auth.model import LoginForm, RegisterForm, TokenBlocklist
 from src.api.users.model import User
 from src.api.users.service import getUserById, getUserByUserName
 from src.api.auth.service import getTokenBlocklistByJTI
+from flask_restx import Resource, Namespace
 
 from flask_wtf.csrf import generate_csrf
 from src.utils import flatten
@@ -12,32 +13,10 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 import json
 from datetime import timezone, datetime
 
-# @login_manager.user_loader
-# def load_user(user_id):
-#     userDoc = getUserById(user_id)
-#     if not userDoc:
-#         return AnonymousUserMixin()
-
-#     userObj = json.loads(userDoc.to_json())
-#     # id field inherited from UserMixin class (from flask_login)
-#     user = User(
-#         id=userObj["_id"]["$oid"],
-#         username=userObj["username"],
-#         password=userObj["password"],
-#     )
-#     return user
-
-
-# @login_manager.unauthorized_handler
-# def unauthorized():
-#     # If unauthorize then redirect to login
-#     return jsonify(
-#         {
-#             "status": "Unauthorized",
-#             "code": 401,
-#             "message": "The request could not be authenticated",
-#         }
-#     )
+# Namespace will prepend all routes with /auth, E.g: /auth/login,
+# /auth/register, /auth/logout
+# You can name it like auth_api or auth_namespace
+ns_auth = Namespace("auth", description="Authentication related operations")
 
 
 @jwt.user_identity_loader
@@ -56,7 +35,6 @@ def user_identity_lookup(user):
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
-    print("jwt_data", jwt_data)
     # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
     # '88d6273b-be35-446d-af03-8efc417937d2', 'type': 'access', 'sub': {'id':
     # '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386, 'exp': 1641893286}
@@ -98,113 +76,115 @@ def invalid_token_handler(reason):
     )
 
 
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    # pass request data to form
-    form = RegisterForm()
-    # Don't have to pass request.form or check POST request, because
-    # validate_on_submit automatically do that
-    if form.validate_on_submit():
-        data = request.form
-        # NOTE: the field we access MUST persist with the field. Otherwise, we
-        # will get the 400 Bad request
-        username = data["username"]
-        password = data["password"]
-        publicKey = data["publicKey"]
-        users = getUserByUserName(username)
-        if users:
+@ns_auth.route("/register")
+class Register(Resource):
+    def get(self):
+        # Don't have to call jsonify since we return a dict
+        return make_response({"csrf_token": generate_csrf()}, 200)
+
+    def post(self):
+        # pass request data to form
+        form = RegisterForm()
+        # Don't have to pass request.form or check POST request, because
+        # validate_on_submit automatically do that
+        if form.validate_on_submit():
+            data = request.form
+            # NOTE: the field we access MUST persist with the field. Otherwise, we
+            # will get the 400 Bad request
+            username = data["username"]
+            password = data["password"]
+            publicKey = data["publicKey"]
+            userList = getUserByUserName(username)
+            if userList:
+                return make_response(
+                    {
+                        "status": "error",
+                        "code": "409",
+                        "message": "Username already exists",
+                    },
+                    409,
+                )
+
+            user = User(
+                username=username,
+                password=generate_password_hash(password, "sha256"),
+                publicKey=publicKey,
+            )
+            user.save()
+            return make_response("", 201)
+
+        if form.errors:
+            errorMessage = ", ".join(flatten(form.errors))
             return make_response(
-                {
-                    "status": "error",
-                    "code": "409",
-                    "message": "Username already exists",
-                },
-                409,
+                {"status": "error", "code": "422", "message": errorMessage}, 422
             )
 
-        user = User(
-            username=username,
-            password=generate_password_hash(password, "sha256"),
-            publicKey=publicKey,
-        )
-        user.save()
-        return make_response("", 201)
 
-    if form.errors:
-        errorMessage = ", ".join(flatten(form.errors))
+@ns_auth.route("/login")
+class Login(Resource):
+    def get(self):
+        return make_response({"csrf_token": generate_csrf()}, 200)
+
+    def post(self):
+        # pass request data to form
+        form = LoginForm()
+
+        # Don't have to pass request.form or check POST request, because
+        # validate_on_submit automatically do that
+        if form.validate_on_submit():
+            data = request.form
+            username = data["username"]
+            password = data["password"]
+            user = getUserByUserName(username)
+            if not user:
+                # Should return 404 instead
+                return make_response(
+                    {
+                        "status": "error",
+                        "code": "422",
+                        "message": "Username or password is invalid",
+                    },
+                    422,
+                )
+
+            # print(user.to_json())
+
+            if check_password_hash(user.password, password):
+                # We passed in a User object, this user will be handled in
+                # user_identity_loader, in that function we only
+                # use id to create JWT token
+                access_token = create_access_token(identity=user)
+                return make_response(
+                    {"user_id": str(user.id), "access_token": access_token}, 200
+                )
+            else:
+                return make_response(
+                    {
+                        "status": "error",
+                        "code": "422",
+                        "message": "Username or password is invalid",
+                    },
+                    422,
+                )
+
+        if form.errors:
+            errorMessage = ", ".join(flatten(form.errors))
+            return make_response(
+                {"status": "error", "code": "422", "message": errorMessage}, 422
+            )
+
+
+@ns_auth.route("/logout")
+class Logout(Resource):
+    @csrf.exempt
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()["jti"]
+        now = datetime.now(timezone.utc)
+
+        tokenBlock = TokenBlocklist(jti=jti, created_at=now)
+        tokenBlock.save()
+
         return make_response(
-            {"status": "error", "code": "422", "message": errorMessage}, 422
+            {"status": "success", "code": "200", "data": "User logged out"}, 200
         )
-
-    # Don't have to call jsonify since we return a dict
-    return make_response({"csrf_token": generate_csrf()}, 200)
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    # pass request data to form
-    form = LoginForm()
-
-    # Don't have to pass request.form or check POST request, because
-    # validate_on_submit automatically do that
-    if form.validate_on_submit():
-        data = request.form
-        username = data["username"]
-        password = data["password"]
-        user = getUserByUserName(username)
-        if not user:
-            # Should return 404 instead
-            return make_response(
-                {
-                    "status": "error",
-                    "code": "422",
-                    "message": "Username or password is invalid",
-                },
-                422,
-            )
-
-        # print(user.to_json())
-
-        if check_password_hash(user.password, password):
-            # login_user(user)
-            # We passed in a User object, this user will be handled in
-            # user_identity_loader, in that function we only
-            # use id to create JWT token
-            access_token = create_access_token(identity=user)
-            return make_response(
-                {"user_id": str(user.id), "access_token": access_token}, 200
-            )
-        else:
-            return make_response(
-                {
-                    "status": "error",
-                    "code": "422",
-                    "message": "Username or password is invalid",
-                },
-                422,
-            )
-
-    if form.errors:
-        errorMessage = ", ".join(flatten(form.errors))
-        return make_response(
-            {"status": "error", "code": "422", "message": errorMessage}, 422
-        )
-
-    return make_response({"csrf_token": generate_csrf()}, 200)
-
-
-@app.route("/logout", methods=["POST"])
-@csrf.exempt
-# @login_required
-@jwt_required()
-def logout():
-    # logout_user()
-    jti = get_jwt()["jti"]
-    now = datetime.now(timezone.utc)
-
-    tokenBlock = TokenBlocklist(jti=jti, created_at=now)
-    tokenBlock.save()
-
-    return make_response(
-        {"status": "success", "code": "200", "data": "User logged out"}, 200
-    )

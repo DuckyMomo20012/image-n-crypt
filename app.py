@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_mongoengine import MongoEngine
+
 # from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_wtf.csrf import CSRFProtect
@@ -9,6 +10,8 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 ACCESS_EXPIRES = timedelta(hours=1)
 
 app = Flask(__name__)
+
+
 app.config.from_object("config.Config")
 app.config.from_object("config.DBConfig")
 app.config.from_object("config.JWTConfig")
@@ -32,4 +35,8 @@ csrf = CSRFProtect(app)
 
 # DB
 db = MongoEngine(app)
-from src.views import *
+
+# Import both blueprints and jwt functions
+from src.api import *
+
+app.register_blueprint(v1_blueprint, url_prefix="/api/v1")
