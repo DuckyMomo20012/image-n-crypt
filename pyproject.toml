@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "file-crypto"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+environs = "^9.5.0"
+Flask = "^2.1.2"
+Flask-JWT-Extended = "^4.4.1"
+flask-mongoengine = "^1.0.0"
+flask-restx = "^0.5.1"
+Flask-Reuploaded = "^1.2.0"
+Flask-WTF = "^1.0.1"
+mongoengine = "^0.24.1"
+opencv-python = "^4.5.5"
+Pillow = "^9.1.1"
+requests = "^2.27.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

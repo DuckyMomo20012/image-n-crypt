@@ -78,6 +78,7 @@ def invalid_token_handler(reason):
 
 @ns_auth.route("/register")
 class Register(Resource):
+    @ns_auth.response(200, "Success")
     def get(self):
         # Don't have to call jsonify since we return a dict
         return make_response({"csrf_token": generate_csrf()}, 200)
@@ -122,6 +123,7 @@ class Register(Resource):
 
 @ns_auth.route("/login")
 class Login(Resource):
+    @ns_auth.response(200, "Success")
     def get(self):
         return make_response({"csrf_token": generate_csrf()}, 200)
 
