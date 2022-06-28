@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "image-n-crypt"
+version = "0.1.0"
+description = "A safety file storage"
+authors = ["Duong Vinh <tienvinh.duong4@gmail.com>"]
+
+[tool.poe.tasks]
+dev = "flask run"
+lint = "flake8"
+"sort_import" = "isort ."
+pretty = "black ."
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
+
+[tool.poetry.dependencies]
+python = "^3.9"
+environs = "^9.5.0"
+Flask-JWT-Extended = "^4.4.2"
+flask-mongoengine = "^1.0.0"
+flask-restx = "^0.5.1"
+Flask-Reuploaded = "^1.2.0"
+Flask-WTF = "^1.0.1"
+Flask = "^2.1.2"
+mongoengine = "^0.24.1"
+opencv-python = "^4.6.0"
+Pillow = "^9.1.1"
+requests = "^2.28.0"
+
+
+[tool.poetry.dev-dependencies]
+poethepoet = "^0.14.0"
+black = {version = "^22.3.0", allow-prereleases = true}
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+mypy = "^0.961"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
