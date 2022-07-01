@@ -265,12 +265,8 @@ class ShareImage(Resource):
         imageOnePermit = getOneImagePermission(userId, fileName, sharedUserId)
         # DB can find a permission has userId == curUserId
         if imageOnePermit:
-            return make_response(
-                {
-                    "message": "Permission user id is already exists",
-                },
-                409,
-            )
+            abort(409, description="Permission user id is already exists")
+
         newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
         image.permissions.append(newPermission)
         image.save()

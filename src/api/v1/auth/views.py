@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 
 from app import csrf, jwt
-from flask import make_response, request
+from flask import abort, make_response, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from flask_restx import Namespace, Resource
 from flask_wtf.csrf import generate_csrf
@@ -108,12 +108,7 @@ class Register(Resource):
             publicKey = data["publicKey"]
             userList = getUserByUserName(username)
             if userList:
-                return make_response(
-                    {
-                        "message": "Username already exists",
-                    },
-                    409,
-                )
+                abort(409, description="Username already exists")
 
             user = User(
                 username=username,
