@@ -80,12 +80,7 @@ class ListAndUploadImage(Resource):
 
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
-            return make_response(
-                {
-                    "message": errorMessage,
-                },
-                422,
-            )
+            abort(422, description=errorMessage)
 
 
 @ns_users.route("/<string:userId>/images/<string:fileName>")

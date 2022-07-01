@@ -120,12 +120,7 @@ class Register(Resource):
 
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
-            return make_response(
-                {
-                    "message": errorMessage,
-                },
-                422,
-            )
+            abort(422, description=errorMessage)
 
 
 @ns_auth.route("/login")
@@ -147,12 +142,7 @@ class Login(Resource):
             user = getUserByUserName(username)
             if not user:
                 # Should return 404 instead
-                return make_response(
-                    {
-                        "message": "Username or password is invalid",
-                    },
-                    422,
-                )
+                abort(422, description="Username or password is invalid")
 
             # print(user.to_json())
 
@@ -169,21 +159,11 @@ class Login(Resource):
                     200,
                 )
             else:
-                return make_response(
-                    {
-                        "message": "Username or password is invalid",
-                    },
-                    422,
-                )
+                abort(422, description="Username or password is invalid")
 
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
-            return make_response(
-                {
-                    "message": errorMessage,
-                },
-                422,
-            )
+            abort(422, description=errorMessage)
 
 
 @ns_auth.route("/logout")
