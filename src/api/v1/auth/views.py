@@ -1,17 +1,17 @@
-from flask import request, make_response
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import jwt, csrf
+import json
+from datetime import datetime, timezone
+
+from app import csrf, jwt
+from flask import make_response, request
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required
+from flask_restx import Namespace, Resource
+from flask_wtf.csrf import generate_csrf
 from src.api.v1.auth.model import LoginForm, RegisterForm, TokenBlocklist
+from src.api.v1.auth.service import getTokenBlocklistByJTI
 from src.api.v1.users.model import User
 from src.api.v1.users.service import getUserById, getUserByUserName
-from src.api.v1.auth.service import getTokenBlocklistByJTI
-from flask_restx import Resource, Namespace
-
-from flask_wtf.csrf import generate_csrf
 from src.utils import flatten
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt
-import json
-from datetime import timezone, datetime
+from werkzeug.security import check_password_hash, generate_password_hash
 
 # Namespace will prepend all routes with /auth, E.g: /auth/login,
 # /auth/register, /auth/logout
@@ -65,14 +65,20 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 @jwt.revoked_token_loader
 def revoked_token_handler(jwt_header, jwt_payload):
     return make_response(
-        {"status": "error", "code": "401", "message": "Token has been revoked"}, 401
+        {
+            "message": "Token has been revoked",
+        },
+        401,
     )
 
 
 @jwt.invalid_token_loader
 def invalid_token_handler(reason):
     return make_response(
-        {"status": "error", "code": "422", "message": f"{reason}"}, 422
+        {
+            "message": f"{reason}",
+        },
+        422,
     )
 
 
@@ -81,7 +87,12 @@ class Register(Resource):
     @ns_auth.response(200, "Success")
     def get(self):
         # Don't have to call jsonify since we return a dict
-        return make_response({"csrf_token": generate_csrf()}, 200)
+        return make_response(
+            {
+                "csrf_token": generate_csrf(),
+            },
+            200,
+        )
 
     def post(self):
         # pass request data to form
@@ -99,8 +110,6 @@ class Register(Resource):
             if userList:
                 return make_response(
                     {
-                        "status": "error",
-                        "code": "409",
                         "message": "Username already exists",
                     },
                     409,
@@ -117,7 +126,10 @@ class Register(Resource):
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
             return make_response(
-                {"status": "error", "code": "422", "message": errorMessage}, 422
+                {
+                    "message": errorMessage,
+                },
+                422,
             )
 
 
@@ -142,8 +154,6 @@ class Login(Resource):
                 # Should return 404 instead
                 return make_response(
                     {
-                        "status": "error",
-                        "code": "422",
                         "message": "Username or password is invalid",
                     },
                     422,
@@ -157,13 +167,15 @@ class Login(Resource):
                 # use id to create JWT token
                 access_token = create_access_token(identity=user)
                 return make_response(
-                    {"user_id": str(user.id), "access_token": access_token}, 200
+                    {
+                        "user_id": str(user.id),
+                        "access_token": access_token,
+                    },
+                    200,
                 )
             else:
                 return make_response(
                     {
-                        "status": "error",
-                        "code": "422",
                         "message": "Username or password is invalid",
                     },
                     422,
@@ -172,7 +184,10 @@ class Login(Resource):
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
             return make_response(
-                {"status": "error", "code": "422", "message": errorMessage}, 422
+                {
+                    "message": errorMessage,
+                },
+                422,
             )
 
 
@@ -188,5 +203,8 @@ class Logout(Resource):
         tokenBlock.save()
 
         return make_response(
-            {"status": "success", "code": "200", "data": "User logged out"}, 200
+            {
+                "message": "User logged out",
+            },
+            200,
         )

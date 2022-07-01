@@ -1,8 +1,9 @@
-from flask import make_response
-from flask_jwt_extended import jwt_required
-from src.api.v1.users.service import getUserById, getAllUsers
 import json
-from flask_restx import Resource, Namespace
+
+from flask import jsonify, make_response
+from flask_jwt_extended import jwt_required
+from flask_restx import Namespace, Resource
+from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
 ns_users = Namespace("users", description="User related operations")
@@ -26,15 +27,14 @@ class GetAllUserInformation(Resource):
                 data.append(content)
 
             return make_response(
-                {
-                    "status": "success",
-                    "code": "200",
-                    "data": [*data],
-                },
+                jsonify([*data]),
                 200,
             )
 
-        return make_response({"status": "success", "code": "200", "data": []}, 200)
+        return make_response(
+            jsonify([]),
+            200,
+        )
 
 
 @ns_users.route("/<string:userId>")
@@ -45,19 +45,18 @@ class GetUserInformation(Resource):
         if user:
             return make_response(
                 {
-                    "status": "success",
-                    "code": "200",
-                    "data": {
-                        "user_id": user["_id"]["$oid"],
-                        "user_name": user["username"],
-                        "public_key": user["publicKey"],
-                    },
+                    "user_id": user["_id"]["$oid"],
+                    "user_name": user["username"],
+                    "public_key": user["publicKey"],
                 },
                 200,
             )
 
         return make_response(
-            {"status": "error", "code": "404", "message": "User not found"}, 404
+            {
+                "message": "User not found",
+            },
+            404,
         )
 
 

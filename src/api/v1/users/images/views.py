@@ -1,7 +1,7 @@
 from os import path
 
 from app import images as localImage
-from flask import make_response, request
+from flask import jsonify, make_response, request
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, fields
 from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
@@ -31,10 +31,14 @@ class ListAndUploadImage(Resource):
         if images:
             imageList = [(img.nameImg + img.extImg) for img in images]
             return make_response(
-                {"status": "success", "code": "200", "data": imageList}, 200
+                jsonify(imageList),
+                200,
             )
 
-        return make_response({"status": "success", "code": "200", "data": []}, 200)
+        return make_response(
+            jsonify([]),
+            200,
+        )
 
     @jwt_required()
     def post(self, userId):
@@ -79,9 +83,7 @@ class ListAndUploadImage(Resource):
             image.save()
             return make_response(
                 {
-                    "status": "success",
-                    "code": "200",
-                    "data": {"img_name": image.nameImg + image.extImg},
+                    "img_name": image.nameImg + image.extImg,
                 },
                 200,
             )
@@ -89,7 +91,10 @@ class ListAndUploadImage(Resource):
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
             return make_response(
-                {"status": "error", "code": "422", "message": errorMessage}, 422
+                {
+                    "message": errorMessage,
+                },
+                422,
             )
 
 
@@ -115,13 +120,9 @@ class DownloadAndDeleteImage(Resource):
             data_byte = image.dataImg.read().decode("ISO-8859-1")
             return make_response(
                 {
-                    "status": "success",
-                    "code": "200",
-                    "data": {
-                        "img_name": image.nameImg + image.extImg,
-                        "img_content": data_byte,
-                        "quotient": image.quotientImg,
-                    },
+                    "img_name": image.nameImg + image.extImg,
+                    "img_content": data_byte,
+                    "quotient": image.quotientImg,
                 },
                 200,
             )
@@ -188,12 +189,16 @@ class DownloadImageAll(Resource):
                 data.append(content)
 
             return make_response(
-                {"status": "success", "code": "200", "data": [*data]}, 200
+                jsonify([*data]),
+                200,
             )
 
         # Because images can be None if there is no image on database, so instead of
         # return an error, we return an empty array
-        return make_response({"status": "success", "code": "200", "data": []}, 200)
+        return make_response(
+            jsonify([]),
+            200,
+        )
 
 
 @ns_users.route(
@@ -223,11 +228,7 @@ class EditImagePermission(Resource):
             )
 
         return make_response(
-            {
-                "status": "success",
-                "code": "200",
-                "data": imageOnePermit,
-            },
+            jsonify(imageOnePermit),
             200,
         )
 
@@ -325,13 +326,7 @@ class ShareImage(Resource):
             )
 
         return make_response(
-            {
-                "status": "success",
-                "code": "200",
-                "data": {
-                    "permissions": image.permissions,
-                },
-            },
+            jsonify(image.permissions),
             200,
         )
 
