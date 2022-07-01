@@ -20,12 +20,7 @@ class ListAndUploadImage(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         images = getAllImages(curUserId)
         if images:
@@ -45,12 +40,7 @@ class ListAndUploadImage(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         # Because we pass file via files request, not from body
         form = ImageForm(CombinedMultiDict((request.files, request.form)))
@@ -111,12 +101,8 @@ class DownloadAndDeleteImage(Resource):
 
             # XOR ?
             if (not imagePermit) == (userId != curUserId):
-                return make_response(
-                    {
-                        "message": "User is not authorized",
-                    },
-                    401,
-                )
+                abort(401, description="User is not authorized")
+
             data_byte = image.dataImg.read().decode("ISO-8859-1")
             return make_response(
                 {
@@ -134,12 +120,7 @@ class DownloadAndDeleteImage(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         # fileExt = getExtension(request)
         image = getOneImage(curUserId, fileName)
@@ -158,12 +139,7 @@ class DownloadImageAll(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         images = getAllImages(curUserId)
 
@@ -200,12 +176,7 @@ class EditImagePermission(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
@@ -222,12 +193,7 @@ class EditImagePermission(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
@@ -248,12 +214,7 @@ class EditImagePermission(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
@@ -277,12 +238,7 @@ class ShareImage(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         image = getOneImage(curUserId, fileName)
         if not image:
@@ -298,12 +254,7 @@ class ShareImage(Resource):
         curUserId = str(current_user.id)
 
         if userId != curUserId:
-            return make_response(
-                {
-                    "message": "User is not authorized",
-                },
-                401,
-            )
+            abort(401, description="User is not authorized")
 
         image = getOneImage(curUserId, fileName)
         if not image:
