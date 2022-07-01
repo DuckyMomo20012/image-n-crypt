@@ -1,6 +1,6 @@
 import json
 
-from flask import jsonify, make_response
+from flask import abort, jsonify, make_response
 from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource
 from src.api.v1.users.service import getAllUsers, getUserById
@@ -52,12 +52,7 @@ class GetUserInformation(Resource):
                 200,
             )
 
-        return make_response(
-            {
-                "message": "User not found",
-            },
-            404,
-        )
+        abort(404, description="User not found")
 
 
 from .images.views import *

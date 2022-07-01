@@ -1,7 +1,7 @@
 from os import path
 
 from app import images as localImage
-from flask import jsonify, make_response, request
+from flask import abort, jsonify, make_response, request
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, fields
 from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
@@ -127,12 +127,7 @@ class DownloadAndDeleteImage(Resource):
                 200,
             )
 
-        return make_response(
-            {
-                "message": "Image not found",
-            },
-            404,
-        )
+        abort(404, description="Image not found")
 
     @jwt_required()
     def delete(self, userId, fileName):
@@ -153,12 +148,7 @@ class DownloadAndDeleteImage(Resource):
             image.delete()
             return make_response("", 204)
 
-        return make_response(
-            {
-                "message": "Image not found",
-            },
-            404,
-        )
+        abort(404, description="Image not found")
 
 
 @ns_users.route("/<string:userId>/images/download-all")
@@ -220,12 +210,7 @@ class EditImagePermission(Resource):
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
         if not imageOnePermit:
-            return make_response(
-                {
-                    "message": "Permission for User id not found",
-                },
-                404,
-            )
+            abort(404, description="Permission for User id not found")
 
         return make_response(
             jsonify(imageOnePermit),
@@ -247,20 +232,12 @@ class EditImagePermission(Resource):
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
         if not imageOnePermit:
-            return make_response(
-                {
-                    "message": "Permission for User id not found",
-                },
-                404,
-            )
+            abort(404, description="Permission for User id not found")
+
         image = getOneImage(curUserId, fileName)
         if not image:
-            return make_response(
-                {
-                    "message": "Image not found",
-                },
-                404,
-            )
+            abort(404, description="Image not found")
+
         sharedUserRole = request.form["role"]
         editOneImageRolePermission(userId, fileName, userPermissionId, sharedUserRole)
         image.reload()
@@ -281,21 +258,12 @@ class EditImagePermission(Resource):
         imageOnePermit = getOneImagePermission(userId, fileName, userPermissionId)
 
         if not imageOnePermit:
-            return make_response(
-                {
-                    "message": "Permission for User id not found",
-                },
-                404,
-            )
+            abort(404, description="Permission for User id not found")
 
         image = getOneImage(curUserId, fileName)
         if not image:
-            return make_response(
-                {
-                    "message": "Image not found",
-                },
-                404,
-            )
+            abort(404, description="Image not found")
+
         deleteOneImagePermission(userId, fileName, userPermissionId)
         # image.permissions.pop(index)
         image.reload()
@@ -318,12 +286,7 @@ class ShareImage(Resource):
 
         image = getOneImage(curUserId, fileName)
         if not image:
-            return make_response(
-                {
-                    "message": "Image not found",
-                },
-                404,
-            )
+            abort(404, description="Image not found")
 
         return make_response(
             jsonify(image.permissions),
@@ -344,12 +307,7 @@ class ShareImage(Resource):
 
         image = getOneImage(curUserId, fileName)
         if not image:
-            return make_response(
-                {
-                    "message": "Image not found",
-                },
-                404,
-            )
+            abort(404, description="Image not found")
 
         sharedUserId = request.form["user_id"]
         sharedUserRole = request.form["role"]
