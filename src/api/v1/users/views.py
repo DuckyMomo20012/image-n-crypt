@@ -41,7 +41,7 @@ class GetAllUserInformation(Resource):
 class GetUserInformation(Resource):
     @jwt_required()
     def get(self, userId):
-        user = json.loads(getUserById(userId).to_json())
+        user = getUserById(userId)
         if user:
             return make_response(
                 {
