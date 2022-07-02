@@ -53,6 +53,7 @@
 - [Getting Started](#toolbox-getting-started)
   - [Prerequisites](#bangbang-prerequisites)
   - [Installation](#gear-installation)
+  - [Running Tests](#test_tube-running-tests)
   - [Run Locally](#running-run-locally)
   <!-- - [Deployment](#triangular_flag_on_post-deployment) -->
 - [Usage](#eyes-usage)
@@ -208,6 +209,34 @@ Install image-n-crypt with Poetry
 poetry install
 cd image-n-crypt
 ```
+
+<!-- Running Tests -->
+
+### :test_tube: Running Tests
+
+You can test REST API endpoints using these ways:
+
+- [Hoppscoth](https://hoppscotch.io/): an open source API development ecosystem
+
+  ![hoppscotch.io](https://user-images.githubusercontent.com/64480713/177003377-aa1b901e-fa47-474d-bbdf-3d287192f915.png)
+
+  - You can import pre-defined REST API endpoints from file
+    `data/hoppscoth.json` to Hoppscotch.
+
+- **Local Swagger documentation**: a Swagger UI is generated from REST API
+  endpoints using Flask-RESTX.
+
+  ![swagger](https://user-images.githubusercontent.com/64480713/177001704-d6ca292f-02e3-41f5-97e4-8ff6064e0fa1.png)
+
+  - You can access this documentation: **http://127.0.0.1:5000/api/v1/**
+
+- **File `client/api.py`**: pre-defined functions to send request to server.
+
+- **Client console (Not recommended)**: poorly crafted client.
+
+  - You can run this client using file `client/main.py`.
+
+  - NOTE: But you can use this client to **decrypt** downloaded images!.
 
 <!-- Run Locally -->
 
