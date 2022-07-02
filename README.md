@@ -118,24 +118,27 @@
 
 - Registration.
 - Login.
-- Storing image: app client encrypt image with RSA and send request to server to store image.
+- Storing image: app client encrypts the image with RSA and sends the request to
+  the server to store the image.
   - Image encrypted is required to be **openable** and can't be recognized by attackers.
-- View image list.
-- Download image: client download encrypted images and decrypt it using user RSA private key.
+- View the image list.
+- Download image: client download encrypted images and decrypts it using the
+  user's RSA private key.
   - Download one image.
   - Download all images.
-- Share image with others: other users can download image.
-- After registration, account is created with these information:
+- Share the image with others: other users can download the image.
+- After registration, an account is created with this information:
   - username.
   - ID.
-  - RSA public key (provided by client app for user after registration).
-- Server connect with client by using REST api.
+  - RSA public key (provided by the client app for the user after registration).
+- Server connects with the client by using REST API.
 
 <!-- Env Variables -->
 
 ### :key: Environment Variables
 
-To run this project, you will need to add the following environment variables to your .env file
+To run this project, you will need to add the following environment variables to
+your .env file
 
 **App configs**
 
@@ -144,10 +147,15 @@ To run this project, you will need to add the following environment variables to
 `SESSION_COOKIE_SECURE`: Controls whether the cookie should be set with the
 HTTPS protocol. Default: `False`.
 
-`UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded images.
+`UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded
+images.
 
-NOTE: Change to "development" to enable hot reloading.
+`WTF_CSRF_ENABLED`: Controls whether CSRF protection is enabled. Default:
+`False` (Recommend).
+
 `FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
+
+> NOTE: Change to "development" to enable hot reloading.
 
 **JWT configs**
 
@@ -167,6 +175,7 @@ E.g:
 SECRET_KEY="my secret key"
 SESSION_COOKIE_SECURE=False
 UPLOADED_IMAGES_DEST="src/assets"
+WTF_CSRF_ENABLED=False
 # Change to "development" to enable hot reloading
 FLASK_ENV="production"
 
@@ -218,12 +227,12 @@ cd image-n-crypt
 
 - **Test REST API endpoints**: You can test endpoints using these ways:
 
-  - [Hoppscoth](https://hoppscotch.io/): an open source API development
+  - [Hoppscoth](https://hoppscotch.io/): an open-source API development
     ecosystem
 
     ![hoppscotch.io](https://user-images.githubusercontent.com/64480713/177003377-aa1b901e-fa47-474d-bbdf-3d287192f915.png)
 
-    - You can import pre-defined REST API endpoints from file
+    - You can import pre-defined REST API endpoints from the file
       `data/hoppscoth.json` to Hoppscotch.
 
   - **Local Swagger documentation**: a Swagger UI is generated from REST API
@@ -233,13 +242,14 @@ cd image-n-crypt
 
     - You can access this documentation: **http://127.0.0.1:5000/api/v1/**
 
-  - **File `client/api.py`**: pre-defined functions to send request to server.
+  - **File `client/api.py`**: pre-defined functions to send requests to the
+    server.
 
   - **Client console (Not recommended)**: poorly crafted client.
 
-    - You can run this client using file `client/main.py`.
+    - You can run this client using the file `client/main.py`.
 
-    - NOTE: But you can use this client to **decrypt** downloaded images!.
+    > NOTE: But you can use this client to **decrypt** downloaded images!.
 
 - **Sample data**:
 
@@ -324,9 +334,9 @@ To deploy this project run
 
 First, you need to register an account.
 
-To register account, you need to generate RSA key pair. You have to use function
-`generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to generate key
-pair.
+To register an account, you need to generate RSA key pair. You have to use the
+function `generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to
+generate key pair.
 
 This will create two files:
 
@@ -338,7 +348,7 @@ OR:
 - Using `register` from `client/api.py`.
 - Using client console.
 
-Then you can login using your newly created account.
+Then you can log in using your newly created account.
 
 After login, you will receive an `access_token`.
 
@@ -351,8 +361,22 @@ After login, you will receive an `access_token`.
 
 Use `access_token` to access protected endpoints:
 
+- **Hoppscotch**:
+
+  You have to paste your access token in the `Authorization` tab for each
+  request. E.g:
+
+  <details>
+  <summary>Screenshot</summary>
+
+  ![hoppscotch token example](https://user-images.githubusercontent.com/64480713/177004894-18f9093d-5748-4b1c-a7cc-3508e0a7cf19.png)
+
+  </details>
+
+  > NOTE: You have to choose **Authorization Type**: `Bearer`
+
 - **Swagger doc**: you MUST add your access token to access protected
-  endpoints. By clicking `Authorize` button:
+  endpoints. By clicking the `Authorize` button:
 
   <details>
   <summary>Screenshot</summary>
@@ -371,30 +395,16 @@ Use `access_token` to access protected endpoints:
 
   > NOTE: Must be in the format `Bearer {access_token}`.
 
-- **Hoppscotch**:
-
-  You have to paste your access token in the `Authorization` tab for each
-  requests. E.g:
-
-  <details>
-  <summary>Screenshot</summary>
-
-  ![hoppscotch token example](https://user-images.githubusercontent.com/64480713/177004894-18f9093d-5748-4b1c-a7cc-3508e0a7cf19.png)
-
-  </details>
-
-  > NOTE: You have to choose **Authorization Type**: `Bearer`
-
 - **File `client/api.py`**:
 
-  You have to call both function `login` and `getUserInformation`:
+  You have to call both functions `login` and `getUserInformation`:
 
   <details>
   <summary>Example code</summary>
 
   ```python
-  print(login(username="admin", password="admin"))
-  print(getUserInformation())
+  login(username="admin", password="admin")
+  getUserInformation()
   ```
 
   </details>
@@ -424,12 +434,13 @@ This section has moved to
 
 ## :compass: Roadmap
 
-- [x] Important: Remove entirely CSRF protection. ~~Keeps CSRF for Authentication~~
+- [x] Important: Remove entirely CSRF protection. ~~Keeps CSRF for
+      Authentication~~
 - [x] Set the expiration time for the token. NOTE: It works!.
 - [x] Add validator for only .PNG image file.
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
-- [ ] Support more image extensions, more file types.
+- [ ] Support more image extensions, and more file types.
 - [ ] Client support decrypt image service.
 - [ ] Handle file permissions (read/write)
 
@@ -453,13 +464,40 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
 ## :grey_question: FAQ
 
-- Question 1
+- Is this project still maintained?
 
-  - Answer 1
+  - Yes, but we will only update UI, docs, or dependencies. New features won't
+    be added frequently.
 
-- Question 2
+- Is this project ready for production?
 
-  - Answer 2
+  - No, this is a small project for practicing cryptographic systems or schemes.
+    This wasn't meant for production.
+  - RSA algorithm is **implemented from scratch**, which is **unsafe** for
+    production.
+
+- Client console error: `ModuleNotFoundError: No module named 'src'`:
+
+  - You are not exporting PYTHONPATH to the project directory.
+
+  - Run this command:
+
+    - Windows:
+
+      ```console
+      set PYTHONPATH=%cd%
+      ```
+
+    - Linux:
+
+      ```bash
+      export PYTHONPATH=$(pwd)
+      ```
+
+- Decrypt image took too long:
+
+  - Because we implement the RSA algorithm from scratch, so it is unsafe and has
+    slow performance. You should upload an image with a smaller size.
 
 <!-- License -->
 
@@ -481,12 +519,11 @@ Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.c
 
 Here are useful resources and libraries that we have used in our projects.
 
-- [Flask](https://flask.palletsprojects.com/): Flask is a lightweight WSGI web
+- [Flask](https://flask.palletsprojects.com/): a lightweight WSGI web
   application framework.
-- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/): Flask-RESTX is a
-  Flask extension that provides a consistent, simple, and powerful API
-  framework.
-- [Flask-JWT-Extended](): Flask-JWT-Extended adds support for using
-  JSON Web Tokens (JWT) to Flask for protecting routes.
+- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/): a Flask
+  extension that provides a consistent, simple, and powerful API framework.
+- [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/en/latest/):
+  adds support for using JSON Web Tokens (JWT) to Flask for protecting routes.
 - [Awesome Readme Template](https://github.com/Louis3797/awesome-readme-template):
   A detailed template to bootstrap your README file quickly.

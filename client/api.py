@@ -18,16 +18,14 @@ def register(username, password) -> Tuple[str, int]:
         "http://localhost:5000/api/v1/auth/register",
         data={"username": username, "password": password, "publicKey": f"{n} {e}"},
     )
-    # print("register_p", register_p.text)
+
     return register_p.text, register_p.status_code
 
 
-# NOTE: Only login GET request have "Set-Cookie" header
 def login(username, password) -> Tuple[str, int]:
     global access_token
     global userId
 
-    # NOTE: When login, cookie will be reset
     login_p = requests.post(
         "http://localhost:5000/api/v1/auth/login",
         data={"username": username, "password": password},
@@ -48,18 +46,17 @@ def listImage() -> Tuple[str, int]:
         f"http://localhost:5000/api/v1/users/{userId}/images",
         headers={"Authorization": f"Bearer {access_token}"},
     )
+
     return list_img_g.text, list_img_g.status_code
 
 
-# NOTE: When logout, cookie will be reset
-# NOTE: I have turned off csrf protection for logout route, so we don't have to
-# request a csrf key
 def logout() -> Tuple[str, int]:
     global access_token
     logout_p = requests.post(
         "http://localhost:5000/api/v1/auth/logout",
         headers={"Authorization": f"Bearer {access_token}"},
     )
+
     return logout_p.text, logout_p.status_code
 
 
@@ -94,6 +91,7 @@ def uploadImage(fileName) -> Tuple[str, int]:
                 "Authorization": f"Bearer {access_token}",
             },
         )
+
         return upload_img_p.text, upload_img_p.status_code
 
 
@@ -216,6 +214,7 @@ def getShareImageInfo(fileShare, sharedUserId) -> Tuple[str, int]:
             "Authorization": f"Bearer {access_token}",
         },
     )
+
     return permission_info_g.text, permission_info_g.status_code
 
 
@@ -239,8 +238,6 @@ def shareImage(fileShare, userPermission, role) -> Tuple[str, int]:
     global access_token
     global userId
 
-    # fileShare = "bicycle2_e.png"
-    # userPermission = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
     permission_info_p = requests.post(
@@ -250,6 +247,7 @@ def shareImage(fileShare, userPermission, role) -> Tuple[str, int]:
             "Authorization": f"Bearer {access_token}",
         },
     )
+
     return permission_info_p.text, permission_info_p.status_code
 
 
@@ -266,6 +264,7 @@ def editImagePermissions(fileShare, sharedUserId, role) -> Tuple[str, int]:
             "Authorization": f"Bearer {access_token}",
         },
     )
+
     return permission_info_p.text, permission_info_p.status_code
 
 
