@@ -83,6 +83,7 @@ class ListAndUploadImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Upload image")
+    @ns_users.response(200, "Successfully uploaded image")
     @ns_users.expect(uploadImageFormParser)
     def post(self, userId):
         curUserId = str(current_user.id)
@@ -133,10 +134,14 @@ class ListAndUploadImage(Resource):
 
 @ns_users.route("/<string:userId>/images/<string:fileName>")
 @ns_users.doc(security="apikey")
+@ns_users.param("fileName", "File name without extension")
 class DownloadAndDeleteImage(Resource):
     @jwt_required()
     @ns_users.doc(description="Download image")
     @ns_users.marshal_with(imageModel, description="Image file")
+    @ns_users.param(
+        "userId", "User ID or image owner user ID (if downloading shared image)"
+    )
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
 
@@ -225,6 +230,7 @@ class DownloadImageAll(Resource):
     "/<string:userId>/images/<string:fileName>/permissions/<string:userPermissionId>"
 )
 @ns_users.doc(security="apikey")
+@ns_users.param("fileName", "File name without extension")
 class EditImagePermission(Resource):
     @jwt_required()
     @ns_users.doc(description="Get image permissions of one user")
@@ -301,6 +307,7 @@ class EditImagePermission(Resource):
 
 @ns_users.route("/<string:userId>/images/<string:fileName>/permissions")
 @ns_users.doc(security="apikey")
+@ns_users.param("fileName", "File name without extension")
 class ShareImage(Resource):
     @jwt_required()
     @ns_users.doc(description="List of image permissions")
