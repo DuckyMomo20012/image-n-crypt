@@ -1,18 +1,30 @@
 import json
 
-from flask import abort, jsonify, make_response
+from flask import abort
 from flask_jwt_extended import jwt_required
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, fields
 from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
 ns_users = Namespace("users", description="User related operations")
 
+userModel = ns_users.model(
+    "User",
+    {
+        "public_key": fields.String,
+        "user_id": fields.String,
+        "user_name": fields.String,
+    },
+)
 
+
+# NOTE: Can't use "make_response" with marshal_with
+# NOTE: Custom dict don't need "jsonify"
 @ns_users.route("/")
 @ns_users.doc(security="apikey")
 class GetAllUserInformation(Resource):
     @jwt_required()
+    @ns_users.marshal_list_with(userModel, description="All user information")
     def get(self):
         users = getAllUsers()
         if users:
@@ -27,13 +39,13 @@ class GetAllUserInformation(Resource):
                 }
                 data.append(content)
 
-            return make_response(
-                jsonify([*data]),
+            return (
+                [*data],
                 200,
             )
 
-        return make_response(
-            jsonify([]),
+        return (
+            [],
             200,
         )
 
@@ -42,10 +54,11 @@ class GetAllUserInformation(Resource):
 @ns_users.doc(security="apikey")
 class GetUserInformation(Resource):
     @jwt_required()
+    @ns_users.marshal_with(userModel, description="User information")
     def get(self, userId):
         user = json.loads(getUserById(userId).to_json())
         if user:
-            return make_response(
+            return (
                 {
                     "public_key": user["publicKey"],
                     "user_id": user["_id"]["$oid"],
