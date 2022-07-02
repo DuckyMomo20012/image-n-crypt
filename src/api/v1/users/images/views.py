@@ -191,7 +191,7 @@ class DownloadImageAll(Resource):
 @ns_users.doc(security="apikey")
 class EditImagePermission(Resource):
     @jwt_required()
-    # @ns_users.marshal_with(permissionModel, description="Permissions of image")
+    @ns_users.marshal_with(permissionModel, description="Permissions of image")
     def get(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -204,7 +204,7 @@ class EditImagePermission(Resource):
             abort(404, description="Permission for User id not found")
 
         return (
-            jsonify(imageOnePermit),
+            json.loads(imageOnePermit.to_json()),
             200,
         )
 
@@ -255,6 +255,9 @@ class EditImagePermission(Resource):
 @ns_users.doc(security="apikey")
 class ShareImage(Resource):
     @jwt_required()
+    @ns_users.marshal_list_with(
+        permissionModel, description="List of image permissions"
+    )
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
 
