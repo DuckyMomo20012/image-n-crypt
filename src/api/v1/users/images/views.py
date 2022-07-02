@@ -1,22 +1,23 @@
 import json
 from os import path
 
-from app import images as localImage
 from flask import abort, request
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, fields
+from werkzeug.datastructures import CombinedMultiDict, FileStorage
+from werkzeug.utils import secure_filename
+
+from app import images as localImage
 from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
 from src.api.v1.users.images.service import *
 from src.api.v1.users.views import ns_users
 from src.utils import flatten, getRandomFileName
-from werkzeug.datastructures import CombinedMultiDict, FileStorage
-from werkzeug.utils import secure_filename
 
 # This is for documentation only
 responseListImageModel = ns_users.model(
     "ResponseListImage",
     {
-        "image_name": fields.String(description="Image name"),
+        "img_name": fields.String(description="Image name"),
     },
 )
 
@@ -70,7 +71,12 @@ class ListAndUploadImage(Resource):
 
         images = getAllImages(curUserId)
         if images:
-            imageList = [(img.nameImg + img.extImg) for img in images]
+            imageList = [
+                {
+                    "img_name": (img.nameImg + img.extImg),
+                }
+                for img in images
+            ]
             return (
                 imageList,
                 200,
