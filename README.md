@@ -1,18 +1,117 @@
-# Flask server for storing encrypted images
+<div align="center">
 
-A safety file storage (basic)
+  <h1>Image-N-crypt</h1>
 
-## Tech stacks:
+  <p>
+    Flask server for storing encrypted images
+  </p>
 
-<p align="center">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="python" height="48" width="48" />
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" alt="flask" height="48" width="48" />
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" alt="mongodb" height="48" width="48" />
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="docker" height="48" width="48" />
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg" alt="jenkins" height="48" width="48" />
+<!-- Badges -->
+<p>
+  <a href="https://github.com/DuckyMomo20012/image-n-crypt/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/DuckyMomo20012/image-n-crypt" alt="contributors" />
+  </a>
+  <a href="">
+    <img src="https://img.shields.io/github/last-commit/DuckyMomo20012/image-n-crypt" alt="last update" />
+  </a>
+  <a href="https://github.com/DuckyMomo20012/image-n-crypt/network/members">
+    <img src="https://img.shields.io/github/forks/DuckyMomo20012/image-n-crypt" alt="forks" />
+  </a>
+  <a href="https://github.com/DuckyMomo20012/image-n-crypt/stargazers">
+    <img src="https://img.shields.io/github/stars/DuckyMomo20012/image-n-crypt" alt="stars" />
+  </a>
+  <a href="https://github.com/DuckyMomo20012/image-n-crypt/issues/">
+    <img src="https://img.shields.io/github/issues/DuckyMomo20012/image-n-crypt" alt="open issues" />
+  </a>
+  <a href="https://github.com/DuckyMomo20012/image-n-crypt/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/DuckyMomo20012/image-n-crypt.svg" alt="license" />
+  </a>
 </p>
 
-## Features:
+<h4>
+    <a href="https://github.com/DuckyMomo20012/image-n-crypt/">View Demo</a>
+  <span> · </span>
+    <a href="https://github.com/DuckyMomo20012/image-n-crypt">Documentation</a>
+  <span> · </span>
+    <a href="https://github.com/DuckyMomo20012/image-n-crypt/issues/">Report Bug</a>
+  <span> · </span>
+    <a href="https://github.com/DuckyMomo20012/image-n-crypt/issues/">Request Feature</a>
+  </h4>
+</div>
+
+<br />
+
+<!-- Table of Contents -->
+
+# :notebook_with_decorative_cover: Table of Contents
+
+- [About the Project](#star2-about-the-project)
+  - [Screenshots](#camera-screenshots)
+  - [Tech Stack](#space_invader-tech-stack)
+  - [Features](#dart-features)
+  - [Environment Variables](#key-environment-variables)
+- [Getting Started](#toolbox-getting-started)
+  - [Prerequisites](#bangbang-prerequisites)
+  - [Installation](#gear-installation)
+  - [Run Locally](#running-run-locally)
+  <!-- - [Deployment](#triangular_flag_on_post-deployment) -->
+- [Usage](#eyes-usage)
+- [Roadmap](#compass-roadmap)
+- [Contributing](#wave-contributing)
+  - [Code of Conduct](#scroll-code-of-conduct)
+- [FAQ](#grey_question-faq)
+- [License](#warning-license)
+- [Contact](#handshake-contact)
+- [Acknowledgements](#gem-acknowledgements)
+
+<!-- About the Project -->
+
+## :star2: About the Project
+
+<!-- Screenshots -->
+
+### :camera: Screenshots
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/64480713/177001704-d6ca292f-02e3-41f5-97e4-8ff6064e0fa1.png" alt="screenshot" />
+</div>
+
+<!-- TechStack -->
+
+### :space_invader: Tech Stack
+
+<details>
+  <summary>Client</summary>
+  <ul>
+    <li><a href="https://www.python.org/">Python</a></li>
+  </ul>
+</details>
+
+<details>
+  <summary>Server</summary>
+  <ul>
+    <li><a href="https://flask.palletsprojects.com/en/latest/">Flask</a></li>
+  </ul>
+</details>
+
+<details>
+<summary>Database</summary>
+  <ul>
+    <li><a href="https://www.mongodb.com/">MongoDB</a></li>
+  </ul>
+</details>
+
+<details>
+<summary>DevOps</summary>
+  <ul>
+    <li><a href="https://www.docker.com/">Docker</a></li>
+    <li><a href="https://www.jenkins.io/">Jenkins</a></li>
+  </ul>
+</details>
+
+<!-- Features -->
+
+### :dart: Features
 
 - Registration.
 - Login.
@@ -29,104 +128,213 @@ A safety file storage (basic)
   - RSA public key (provided by client app for user after registration).
 - Server connect with client by using REST api.
 
-## 1. Installation:
+<!-- Env Variables -->
 
-### 1.1. Install environment:
+### :key: Environment Variables
 
-```console
-python -m venv .venv
+To run this project, you will need to add the following environment variables to your .env file
+
+**App configs**
+
+`SECRET_KEY`: Secret key for Flask application
+
+`SESSION_COOKIE_SECURE`: Controls whether the cookie should be set with the
+HTTPS protocol. Default: `False`.
+
+`UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded images.
+
+NOTE: Change to "development" to enable hot reloading.
+`FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
+
+**JWT configs**
+
+`JWT_ACCESS_TOKEN_EXPIRES`: Time in seconds for access token expiration.
+Default: `3600` (1 hour).
+
+`JWT_SECRET_KEY`: Secret key for JWT.
+
+**MongoDB configs**
+
+`MONGODB_HOST`: An URI to connect to your database
+
+E.g:
+
+```
+# App configs
+SECRET_KEY="my secret key"
+SESSION_COOKIE_SECURE=False
+UPLOADED_IMAGES_DEST="src/assets"
+# Change to "development" to enable hot reloading
+FLASK_ENV="production"
+
+# JWT configs
+JWT_ACCESS_TOKEN_EXPIRES=3600 # 1 hour
+JWT_SECRET_KEY="my super secret key"
+
+# MongoDB configs
+# HOST not URI
+MONGODB_HOST="mongodb+srv://{username}:{password}@crypto-image.u1r0p.mongodb.net/test"
 ```
 
-### 1.2. Activate environment:
+You can also checkout file `.env.example` to see all required environment
+variables.
 
-```console
-.venv\Scripts\activate
-```
+<!-- Getting Started -->
 
-### 1.3. Install libs:
+## :toolbox: Getting Started
 
-```console
-pip install -r requirements.txt
-```
+<!-- Prerequisites -->
 
-### 1.4. Export PYTHONPATH (Important):
+### :bangbang: Prerequisites
 
-Change directory to folder `flask-server`:
+This project uses [Poetry](https://python-poetry.org/) as package manager
 
-Windows:
-
-```console
-set PYTHONPATH=%cd%
-```
-
-Linux:
+Linux, macOS, Windows (WSL)
 
 ```bash
-export PYTHONPATH=$(pwd)
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-## 2. How to use:
+Read more about installation on
+[Poetry documentation](https://python-poetry.org/docs/master/#installation).
 
-- You can create MongoDB using sample dataset from folder `data`.
-- Password and RSA private key file for sample users:
+<!-- Installation -->
 
-```
-admin:
-    password: admin
-    private key: rsa_admin.txt
-admin2:
-    password: admin
-    private key: rsa_admin2.txt
-admin2:
-    password: admin
-    private key: rsa_admin3.txt
+### :gear: Installation
+
+Install image-n-crypt with Poetry
+
+```bash
+poetry install
+cd image-n-crypt
 ```
 
-### 2.1. Rename config.py & change DB URI (Important):
+<!-- Run Locally -->
 
-- Rename `config.example.py` to `config.py`
-- Change `MONGODB_HOST` to your MongoDB URI. E.g:
-  `mongodb+srv://<username>:<password>@crypto-image.u1r0p.mongodb.net/CryptoImage`
+### :running: Run Locally
 
-### 2.1. Start server:
+Clone the project
 
-```console
+```bash
+git clone https://github.com/DuckyMomo20012/image-n-crypt.git
+```
+
+Go to the project directory
+
+```bash
+cd image-n-crypt
+```
+
+Install dependencies
+
+```bash
+poetry install
+```
+
+Activate virtual environment
+
+```bash
+poetry shell
+```
+
+Start the program
+
+```bash
+poe dev
+```
+
+OR
+
+```bash
 flask run
 ```
 
-### 2.2. Start client:
+<!-- Deployment -->
 
-You can use file ["**api.py**"](./client/api.py) for custom requests:
+<!-- ### :triangular_flag_on_post: Deployment
 
-```console
-cd client & python api.py
-```
+To deploy this project run
 
-or file ["**main.py**"](./client/main.py) - poorly crafted client console.
+```bash
+  yarn deploy
+``` -->
 
-```console
-cd client & python main.py
-```
+<!-- Usage -->
 
-> **⚠️ NOTE:** If you got the error: "ModuleNotFoundError: No module named
-> 'src'" or something equivalent, then you have to set the PYTHONPATH.
+## :eyes: Usage
 
-## 3. REST API:
+Use this space to tell a little more about your project and how it can be used.
+Show additional screenshots, code samples, demos or link to other resources.
 
-This section has moved to [Wiki](https://github.com/DuckyMomo20012/flask-server/wiki), [REST API endpoints](https://github.com/DuckyMomo20012/flask-server/wiki/REST-API-endpoints) page.
+TODO
 
-## 4. RSA encryption algorithm:
+<!-- Roadmap -->
 
-This section has moved to
-[Wiki](https://github.com/DuckyMomo20012/flask-server/wiki), [RSA encryption algorithm](https://github.com/DuckyMomo20012/flask-server/wiki/RSA-encryption-algorithm) page.
+## :compass: Roadmap
 
-## 5. TODO:
-
-- [x] Important: Remove entirely CSRF protection. Keeps CSRF for Authentication
-- [x] Set the expiration time for the token (NOTE: Added but don't know if it works)
+- [x] Important: Remove entirely CSRF protection. ~~Keeps CSRF for Authentication~~
+- [x] Set the expiration time for the token. NOTE: It works!.
 - [x] Add validator for only .PNG image file.
 - [ ] Allow user to get back revoked token.
 - [ ] Handle expired token error.
 - [ ] Support more image extensions, more file types.
 - [ ] Client support decrypt image service.
 - [ ] Handle file permissions (read/write)
+
+<!-- Contributing -->
+
+## :wave: Contributing
+
+<a href="https://github.com/DuckyMomo20012/image-n-crypt/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=DuckyMomo20012/image-n-crypt" />
+</a>
+
+Contributions are always welcome!
+
+<!-- Code of Conduct -->
+
+### :scroll: Code of Conduct
+
+Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/CODE_OF_CONDUCT.md)
+
+<!-- FAQ -->
+
+## :grey_question: FAQ
+
+- Question 1
+
+  - Answer 1
+
+- Question 2
+
+  - Answer 2
+
+<!-- License -->
+
+## :warning: License
+
+Distributed under MIT license. See [LICENSE](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/LICENSE) for more information.
+
+<!-- Contact -->
+
+## :handshake: Contact
+
+Duong Vinh - [@duckymomo20012](https://twitter.com/duckymomo20012) - tienvinh.duong4@gmail.com
+
+Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.com/DuckyMomo20012/image-n-crypt)
+
+<!-- Acknowledgments -->
+
+## :gem: Acknowledgements
+
+Use this section to mention useful resources and libraries that you have used in your projects.
+
+- [Flask](https://flask.palletsprojects.com/): Flask is a lightweight WSGI web
+  application framework.
+- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/): Flask-RESTX is a
+  Flask extension that provides a consistent, simple, and powerful API
+  framework.
+- [Flask-JWT-Extended](): Flask-JWT-Extended adds support for using
+  JSON Web Tokens (JWT) to Flask for protecting routes.
+- [Awesome Readme Template](https://github.com/Louis3797/awesome-readme-template):
+  A detailed template to bootstrap your README file quickly.
