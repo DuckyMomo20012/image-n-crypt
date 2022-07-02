@@ -2,25 +2,19 @@ import json
 
 from flask import abort
 from flask_jwt_extended import jwt_required
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource
+
 from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
-ns_users = Namespace("users", description="User related operations")
+ns_users: Namespace = Namespace("users", description="User related operations")
 
-userModel = ns_users.model(
-    "User",
-    {
-        "public_key": fields.String(description="Public key of user"),
-        "user_id": fields.String(description="User id"),
-        "user_name": fields.String(description="User name"),
-    },
-)
+from src.api.v1.users.doc import userModel  # noqa
 
 
 # NOTE: Can't use "make_response" with marshal_with
 # NOTE: Custom dict don't need "jsonify"
-@ns_users.route("/")
+@ns_users.route("")
 @ns_users.doc(security="apikey", description="List all user information")
 class GetAllUserInformation(Resource):
     @jwt_required()
@@ -70,4 +64,9 @@ class GetUserInformation(Resource):
         abort(404, description="User not found")
 
 
-from .images.views import *
+from .images.views import (  # noqa
+    DownloadImageAll,
+    EditImagePermission,
+    ListAndUploadImage,
+    ShareImage,
+)

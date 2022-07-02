@@ -1,6 +1,6 @@
 import mongoengine as me
-from flask_wtf import FlaskForm
 import wtforms as wf
+from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 
 

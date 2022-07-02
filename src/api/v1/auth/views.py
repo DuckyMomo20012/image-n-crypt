@@ -1,50 +1,28 @@
 import json
 from datetime import datetime, timezone
 
-from app import csrf, jwt
 from flask import abort, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
-from flask_restx import Namespace, Resource, fields
-from flask_wtf.csrf import generate_csrf
+from flask_restx import Namespace, Resource
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from app import jwt
 from src.api.v1.auth.model import LoginForm, RegisterForm, TokenBlocklist
 from src.api.v1.auth.service import getTokenBlocklistByJTI
 from src.api.v1.users.model import User
 from src.api.v1.users.service import getUserById, getUserByUserName
 from src.utils import flatten
-from werkzeug.security import check_password_hash, generate_password_hash
 
 # Namespace will prepend all routes with /auth, E.g: /auth/login,
 # /auth/register, /auth/logout
 # You can name it like auth_api or auth_namespace
-ns_auth = Namespace("auth", description="Authentication related operations")
+ns_auth: Namespace = Namespace("auth", description="Authentication related operations")
 
-# This is for documentation only
-CSRFModel = ns_auth.model(
-    "CSRF",
-    {
-        "csrf_token": fields.String(description="CSRF token"),
-    },
+from src.api.v1.auth.doc import (  # noqa
+    loginFormParser,
+    registerFormParser,
+    responseLoginModel,
 )
-
-responseLoginModel = ns_auth.model(
-    "ResponseLogin",
-    {
-        "user_id": fields.String(description="User id"),
-        "access_token": fields.String(description="JWT access token"),
-    },
-)
-
-CSRFParser = ns_auth.parser()
-CSRFParser.add_argument("X-CSRFToken", location="headers", required=True)
-
-registerFormParser = ns_auth.parser()
-registerFormParser.add_argument("username", location="form", required=True)
-registerFormParser.add_argument("password", location="form", required=True)
-registerFormParser.add_argument("publicKey", location="form", required=True)
-
-loginFormParser = ns_auth.parser()
-loginFormParser.add_argument("username", location="form", required=True)
-loginFormParser.add_argument("password", location="form", required=True)
 
 
 @jwt.user_identity_loader
@@ -63,9 +41,10 @@ def user_identity_lookup(user):
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
-    # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
-    # '88d6273b-be35-446d-af03-8efc417937d2', 'type': 'access', 'sub': {'id':
-    # '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386, 'exp': 1641893286}
+    # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat':
+    # 1641892386, 'jti': '88d6273b-be35-446d-af03-8efc417937d2', 'type':
+    # 'access', 'sub': {'id': '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386,
+    # 'exp': 1641893286}
 
     # This function extract "id" claim from JWT token, then we can query "id" and return
     # current user
@@ -111,21 +90,18 @@ def invalid_token_handler(reason):
 
 
 @ns_auth.route("/register")
+@ns_auth.param(
+    "publicKey",
+    (
+        "Generated public key from function `generateAndWriteKeyToFile` in"
+        " `helpers.crypto.crypto.py`.\nE.g: `27977 9431`"
+    ),
+    _in="formData",
+)
 class Register(Resource):
-    @ns_auth.doc(description="Get the CSRF token")
-    @ns_auth.marshal_with(CSRFModel)
-    def get(self):
-        # Don't have to call jsonify since we return a dict
-        return (
-            {
-                "csrf_token": generate_csrf(),
-            },
-            200,
-        )
-
     @ns_auth.doc(description="Register a new user")
     @ns_auth.response(201, "Successfully registered")
-    @ns_auth.expect(CSRFParser, registerFormParser)
+    @ns_auth.expect(registerFormParser)
     def post(self):
         # pass request data to form
         form = RegisterForm()
@@ -160,19 +136,9 @@ class Register(Resource):
 
 @ns_auth.route("/login")
 class Login(Resource):
-    @ns_auth.doc(description="Get the CSRF token")
-    @ns_auth.marshal_with(CSRFModel)
-    def get(self):
-        return (
-            {
-                "csrf_token": generate_csrf(),
-            },
-            200,
-        )
-
     @ns_auth.doc(description="Login")
     @ns_auth.response(200, "Successfully logged in", model=responseLoginModel)
-    @ns_auth.expect(CSRFParser, loginFormParser)
+    @ns_auth.expect(loginFormParser)
     def post(self):
         # pass request data to form
         form = LoginForm()
@@ -213,7 +179,6 @@ class Login(Resource):
 @ns_auth.route("/logout")
 @ns_auth.doc(security="apikey")
 class Logout(Resource):
-    @csrf.exempt
     @jwt_required()
     @ns_auth.doc(description="Logout")
     def post(self):

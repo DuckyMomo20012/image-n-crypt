@@ -2,8 +2,7 @@ from environs import Env
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_mongoengine import MongoEngine
-from flask_uploads import IMAGES, UploadSet, configure_uploads
-from flask_wtf.csrf import CSRFProtect
+from flask_uploads import UploadSet, configure_uploads
 
 env = Env()
 # Read .env into os.environ
@@ -29,18 +28,21 @@ app.config.update(
 # images = UploadSet("images", IMAGES)
 # Currently, we only support png
 images = UploadSet("images", ("png"))
-configure_uploads(app, images)
+configure_uploads(app, [images])
 
 # Auth using JWT
 jwt = JWTManager(app)
-
-# CSRF protection
-csrf = CSRFProtect(app)
 
 # DB
 db = MongoEngine(app)
 
 # Import both blueprints and jwt functions
-from src.api import *
+from src.api import (  # noqa
+    check_if_token_is_revoked,
+    revoked_token_handler,
+    user_identity_lookup,
+    user_lookup_callback,
+    v1_blueprint,
+)
 
 app.register_blueprint(v1_blueprint, url_prefix="/api/v1")

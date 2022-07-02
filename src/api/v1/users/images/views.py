@@ -1,56 +1,31 @@
 import json
 from os import path
 
-from app import images as localImage
 from flask import abort, request
 from flask_jwt_extended import current_user, jwt_required
-from flask_restx import Resource, fields
-from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
-from src.api.v1.users.images.service import *
-from src.api.v1.users.views import ns_users
-from src.utils import flatten, getRandomFileName
-from werkzeug.datastructures import CombinedMultiDict, FileStorage
+from flask_restx import Resource
+from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
 
-# This is for documentation only
-responseListImageModel = ns_users.model(
-    "ResponseListImage",
-    {
-        "image_name": fields.String(description="Image name"),
-    },
+from app import images as localImage
+from src.api.v1.users.images.doc import (
+    editPermissionFormParser,
+    imageModel,
+    permissionModel,
+    responseListImageModel,
+    shareImageFormParser,
+    uploadImageFormParser,
 )
-
-imageModel = ns_users.model(
-    "Image",
-    {
-        "img_content": fields.String(description="Image encrypted content"),
-        "img_name": fields.String(description="Image name"),
-        "quotient": fields.String(description="Quotient for encrypted content"),
-    },
+from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
+from src.api.v1.users.images.service import (
+    deleteOneImagePermission,
+    editOneImageRolePermission,
+    getAllImages,
+    getOneImage,
+    getOneImagePermission,
 )
-
-
-permissionModel = ns_users.model(
-    "Permission",
-    {
-        "userId": fields.String(description="User id"),
-        "role": fields.String(description="User role for this image"),
-    },
-)
-
-uploadImageFormParser = ns_users.parser()
-uploadImageFormParser.add_argument(
-    "imageFile", location="files", type=FileStorage, required=True
-)
-uploadImageFormParser.add_argument("quotient", location="form", required=True)
-
-
-shareImageFormParser = ns_users.parser()
-shareImageFormParser.add_argument("user_id", location="form", required=True)
-shareImageFormParser.add_argument("role", location="form", required=True)
-
-editPermissionFormParser = shareImageFormParser.copy()
-editPermissionFormParser.remove_argument("user_id")
+from src.api.v1.users.views import ns_users
+from src.utils import flatten, getRandomFileName
 
 
 @ns_users.route("/<string:userId>/images")
@@ -70,7 +45,12 @@ class ListAndUploadImage(Resource):
 
         images = getAllImages(curUserId)
         if images:
-            imageList = [(img.nameImg + img.extImg) for img in images]
+            imageList = [
+                {
+                    "img_name": (img.nameImg + img.extImg),
+                }
+                for img in images
+            ]
             return (
                 imageList,
                 200,
@@ -83,7 +63,20 @@ class ListAndUploadImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Upload image")
-    @ns_users.response(200, "Successfully uploaded image")
+    @ns_users.param(
+        "imageFile",
+        ("Accept only PNG images. Image should have small size."),
+        _in="formData",
+    )
+    @ns_users.param(
+        "quotient",
+        (
+            "Generated quotient from function `encrypt` in"
+            " `helpers.crypto.crypto.py`.\nE.g: `98 98 98 98 77 2 91 91...`"
+        ),
+        _in="formData",
+    )
+    @ns_users.response(201, "Successfully uploaded image")
     @ns_users.expect(uploadImageFormParser)
     def post(self, userId):
         curUserId = str(current_user.id)
@@ -121,10 +114,8 @@ class ListAndUploadImage(Resource):
             # Save on Mongo
             image.save()
             return (
-                {
-                    "img_name": image.nameImg + image.extImg,
-                },
-                200,
+                "",
+                201,
             )
 
         if form.errors:
