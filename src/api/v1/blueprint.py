@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask_restx import Api
+
 from src.api.v1.auth.views import ns_auth
 from src.api.v1.users.views import ns_users
 

@@ -3,6 +3,7 @@ import json
 from flask import abort
 from flask_jwt_extended import jwt_required
 from flask_restx import Namespace, Resource, fields
+
 from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace

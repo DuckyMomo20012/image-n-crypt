@@ -1,5 +1,6 @@
-import random
 import os
+import random
+
 import cv2
 
 BIT_NUMBER = 10

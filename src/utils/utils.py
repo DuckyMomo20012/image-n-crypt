@@ -1,6 +1,7 @@
-from os import path
 from datetime import datetime
 from mimetypes import guess_extension
+from os import path
+
 
 def getRandomFileName(fileName):
 	return f"{fileName}_%s" % (datetime.now().strftime("%Y%m%d%H%M%S"))
