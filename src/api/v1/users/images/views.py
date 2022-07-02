@@ -9,9 +9,10 @@ from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
 from src.api.v1.users.images.service import *
 from src.api.v1.users.views import ns_users
 from src.utils import flatten, getRandomFileName
-from werkzeug.datastructures import CombinedMultiDict
+from werkzeug.datastructures import CombinedMultiDict, FileStorage
 from werkzeug.utils import secure_filename
 
+# This is for documentation only
 imageModel = ns_users.model(
     "Image",
     {
@@ -28,6 +29,20 @@ permissionModel = ns_users.model(
         "role": fields.String,
     },
 )
+
+uploadImageFormParser = ns_users.parser()
+uploadImageFormParser.add_argument(
+    "imageFile", location="files", type=FileStorage, required=True
+)
+uploadImageFormParser.add_argument("quotient", location="form", required=True)
+
+
+shareImageFormParser = ns_users.parser()
+shareImageFormParser.add_argument("user_id", location="form", required=True)
+shareImageFormParser.add_argument("role", location="form", required=True)
+
+editPermissionFormParser = shareImageFormParser.copy()
+editPermissionFormParser.remove_argument("user_id")
 
 
 @ns_users.route("/<string:userId>/images")
@@ -57,6 +72,7 @@ class ListAndUploadImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Upload image")
+    @ns_users.expect(uploadImageFormParser)
     def post(self, userId):
         curUserId = str(current_user.id)
 
@@ -219,6 +235,7 @@ class EditImagePermission(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Edit image permissions of one user")
+    @ns_users.expect(editPermissionFormParser)
     def put(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -293,6 +310,7 @@ class ShareImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Share image with other user")
+    @ns_users.expect(shareImageFormParser)
     def post(self, userId, fileName):
         curUserId = str(current_user.id)
 

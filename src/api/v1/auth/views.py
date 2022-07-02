@@ -38,13 +38,13 @@ CSRFParser = ns_auth.parser()
 CSRFParser.add_argument("X-CSRFToken", location="headers")
 
 registerFormParser = ns_auth.parser()
-registerFormParser.add_argument("username", location="form")
-registerFormParser.add_argument("password", location="form")
-registerFormParser.add_argument("publicKey", location="form")
+registerFormParser.add_argument("username", location="form", required=True)
+registerFormParser.add_argument("password", location="form", required=True)
+registerFormParser.add_argument("publicKey", location="form", required=True)
 
 loginFormParser = ns_auth.parser()
-loginFormParser.add_argument("username", location="form")
-loginFormParser.add_argument("password", location="form")
+loginFormParser.add_argument("username", location="form", required=True)
+loginFormParser.add_argument("password", location="form", required=True)
 
 
 @jwt.user_identity_loader
