@@ -4,10 +4,9 @@ from datetime import datetime, timezone
 from flask import abort, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from flask_restx import Namespace, Resource, fields
-from flask_wtf.csrf import generate_csrf
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import csrf, jwt
+from app import jwt
 from src.api.v1.auth.model import LoginForm, RegisterForm, TokenBlocklist
 from src.api.v1.auth.service import getTokenBlocklistByJTI
 from src.api.v1.users.model import User
