@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from app import csrf, jwt
 from flask import abort, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
-from flask_restx import Namespace, Resource
+from flask_restx import Namespace, Resource, fields
 from flask_wtf.csrf import generate_csrf
 from src.api.v1.auth.model import LoginForm, RegisterForm, TokenBlocklist
 from src.api.v1.auth.service import getTokenBlocklistByJTI
@@ -17,6 +17,34 @@ from werkzeug.security import check_password_hash, generate_password_hash
 # /auth/register, /auth/logout
 # You can name it like auth_api or auth_namespace
 ns_auth = Namespace("auth", description="Authentication related operations")
+
+# This is for documentation only
+CSRFModel = ns_auth.model(
+    "CSRF",
+    {
+        "csrf_token": fields.String(description="CSRF token"),
+    },
+)
+
+responseLoginModel = ns_auth.model(
+    "ResponseLogin",
+    {
+        "user_id": fields.String,
+        "access_token": fields.String,
+    },
+)
+
+CSRFParser = ns_auth.parser()
+CSRFParser.add_argument("X-CSRFToken", location="headers")
+
+registerFormParser = ns_auth.parser()
+registerFormParser.add_argument("username", location="form")
+registerFormParser.add_argument("password", location="form")
+registerFormParser.add_argument("publicKey", location="form")
+
+loginFormParser = ns_auth.parser()
+loginFormParser.add_argument("username", location="form")
+loginFormParser.add_argument("password", location="form")
 
 
 @jwt.user_identity_loader
@@ -85,6 +113,7 @@ def invalid_token_handler(reason):
 @ns_auth.route("/register")
 class Register(Resource):
     @ns_auth.doc(description="Get the CSRF token")
+    @ns_auth.marshal_with(CSRFModel)
     def get(self):
         # Don't have to call jsonify since we return a dict
         return (
@@ -95,6 +124,8 @@ class Register(Resource):
         )
 
     @ns_auth.doc(description="Register a new user")
+    @ns_auth.response(201, "Successfully registered")
+    @ns_auth.expect(CSRFParser, registerFormParser)
     def post(self):
         # pass request data to form
         form = RegisterForm()
@@ -130,6 +161,7 @@ class Register(Resource):
 @ns_auth.route("/login")
 class Login(Resource):
     @ns_auth.doc(description="Get the CSRF token")
+    @ns_auth.marshal_with(CSRFModel)
     def get(self):
         return (
             {
@@ -139,6 +171,8 @@ class Login(Resource):
         )
 
     @ns_auth.doc(description="Login")
+    @ns_auth.response(200, "Successfully logged in", model=responseLoginModel)
+    @ns_auth.expect(CSRFParser, loginFormParser)
     def post(self):
         # pass request data to form
         form = LoginForm()
