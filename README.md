@@ -57,6 +57,8 @@
   - [Run Locally](#running-run-locally)
   <!-- - [Deployment](#triangular_flag_on_post-deployment) -->
 - [Usage](#eyes-usage)
+- [REST API Documentation](#book-rest-api-documentation)
+- [RSA Encryption Algorithm](#crystalball-rsa-encryption-algorithm)
 - [Roadmap](#compass-roadmap)
 - [Contributing](#wave-contributing)
   - [Code of Conduct](#scroll-code-of-conduct)
@@ -399,6 +401,25 @@ Use `access_token` to access protected endpoints:
 
 > NOTE: Access token will be expired after 1 hour.
 
+<!-- REST API Documentation -->
+
+## :book: REST API Documentation
+
+You can use local Swagger documentation to see details about endpoints.
+
+OR:
+
+See it on [Wiki](https://github.com/DuckyMomo20012/image-n-crypt/wiki), [REST API
+endpoints](https://github.com/DuckyMomo20012/image-n-crypt/wiki/REST-API-endpoints)
+page.
+
+<!-- RSA Encryption Algorithm -->
+
+## :crystal_ball: RSA Encryption Algorithm:
+
+This section has moved to
+[Wiki](https://github.com/DuckyMomo20012/image-n-crypt/wiki), [RSA encryption algorithm](https://github.com/DuckyMomo20012/image-n-crypt/wiki/RSA-encryption-algorithm) page.
+
 <!-- Roadmap -->
 
 ## :compass: Roadmap
@@ -458,7 +479,7 @@ Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.c
 
 ## :gem: Acknowledgements
 
-Use this section to mention useful resources and libraries that you have used in your projects.
+Here are useful resources and libraries that we have used in our projects.
 
 - [Flask](https://flask.palletsprojects.com/): Flask is a lightweight WSGI web
   application framework.
