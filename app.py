@@ -1,10 +1,9 @@
-from flask import Flask
-from flask_mongoengine import MongoEngine
-
-from flask_jwt_extended import JWTManager
-from flask_wtf.csrf import CSRFProtect
-from flask_uploads import UploadSet, IMAGES, configure_uploads
 from environs import Env
+from flask import Flask
+from flask_jwt_extended import JWTManager
+from flask_mongoengine import MongoEngine
+from flask_uploads import IMAGES, UploadSet, configure_uploads
+from flask_wtf.csrf import CSRFProtect
 
 env = Env()
 # Read .env into os.environ

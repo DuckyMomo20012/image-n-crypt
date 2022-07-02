@@ -56,7 +56,7 @@ Change directory to folder `flask-server`:
 Windows:
 
 ```console
-set PYTHONPATH=C:/Users/Alice/Desktop/flask-server/
+set PYTHONPATH=%cd%
 ```
 
 Linux:

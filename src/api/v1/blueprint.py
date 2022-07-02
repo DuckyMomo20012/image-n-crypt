@@ -1,18 +1,35 @@
 from flask import Blueprint
 from flask_restx import Api
-from src.api.v1.auth.views import ns_auth as auth_api
-from src.api.v1.users.views import ns_users as users_api
-
+from src.api.v1.auth.views import ns_auth
+from src.api.v1.users.views import ns_users
 
 # JWT views need to be imported for app.py to work
 from .auth.views import (
-    user_identity_lookup,
-    user_lookup_callback,
     check_if_token_is_revoked,
     revoked_token_handler,
+    user_identity_lookup,
+    user_lookup_callback,
 )
 
+authorizations = {
+    "apikey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+    },
+}
+
 blueprint = Blueprint("v1", __name__)
-api = Api(blueprint, version="1.0", title="API", description="API for the application")
-api.add_namespace(auth_api)
-api.add_namespace(users_api)
+api = Api(
+    blueprint,
+    version="1.0",
+    title="Image-N-crypt",
+    description="API documentation for Image-N-crypt server",
+    contact="tienvinh.duong4@gmail.com",
+    license="MIT",
+    license_url="https://github.com/DuckyMomo20012/image-n-crypt/blob/main/LICENSE",
+    default_mediatype="application/json",
+    authorizations=authorizations,
+)
+api.add_namespace(ns_auth)
+api.add_namespace(ns_users)

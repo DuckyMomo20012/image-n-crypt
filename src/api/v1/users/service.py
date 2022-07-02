@@ -7,7 +7,7 @@ def getUserByUserName(username):
 
 def getUserById(id):
     # Find one
-    return User.objects.get(id=id)
+    return User.objects(id=id).first()
 
 
 def getAllUsers():

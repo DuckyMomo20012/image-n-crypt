@@ -1,16 +1,30 @@
-from flask import make_response
-from flask_jwt_extended import jwt_required
-from src.api.v1.users.service import getUserById, getAllUsers
 import json
-from flask_restx import Resource, Namespace
+
+from flask import abort
+from flask_jwt_extended import jwt_required
+from flask_restx import Namespace, Resource, fields
+from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
 ns_users = Namespace("users", description="User related operations")
 
+userModel = ns_users.model(
+    "User",
+    {
+        "public_key": fields.String(description="Public key of user"),
+        "user_id": fields.String(description="User id"),
+        "user_name": fields.String(description="User name"),
+    },
+)
 
+
+# NOTE: Can't use "make_response" with marshal_with
+# NOTE: Custom dict don't need "jsonify"
 @ns_users.route("/")
+@ns_users.doc(security="apikey", description="List all user information")
 class GetAllUserInformation(Resource):
     @jwt_required()
+    @ns_users.marshal_list_with(userModel, description="All user information")
     def get(self):
         users = getAllUsers()
         if users:
@@ -19,46 +33,41 @@ class GetAllUserInformation(Resource):
             for user in users:
                 userData = json.loads(user.to_json())
                 content = {
+                    "public_key": userData["publicKey"],
                     "user_id": userData["_id"]["$oid"],
                     "user_name": userData["username"],
-                    "public_key": userData["publicKey"],
                 }
                 data.append(content)
 
-            return make_response(
-                {
-                    "status": "success",
-                    "code": "200",
-                    "data": [*data],
-                },
+            return (
+                [*data],
                 200,
             )
 
-        return make_response({"status": "success", "code": "200", "data": []}, 200)
+        return (
+            [],
+            200,
+        )
 
 
 @ns_users.route("/<string:userId>")
+@ns_users.doc(security="apikey", description="Get user information")
 class GetUserInformation(Resource):
     @jwt_required()
+    @ns_users.marshal_with(userModel, description="User information")
     def get(self, userId):
         user = json.loads(getUserById(userId).to_json())
         if user:
-            return make_response(
+            return (
                 {
-                    "status": "success",
-                    "code": "200",
-                    "data": {
-                        "user_id": user["_id"]["$oid"],
-                        "user_name": user["username"],
-                        "public_key": user["publicKey"],
-                    },
+                    "public_key": user["publicKey"],
+                    "user_id": user["_id"]["$oid"],
+                    "user_name": user["username"],
                 },
                 200,
             )
 
-        return make_response(
-            {"status": "error", "code": "404", "message": "User not found"}, 404
-        )
+        abort(404, description="User not found")
 
 
 from .images.views import *
