@@ -31,7 +31,12 @@ imageModel = ns_users.model(
     "Image",
     {
         "img_content": fields.String(
-            description="Image encrypted content",
+            description=(
+                "Image encrypted content. Can be decrypted using"
+                " function `decrypt` in `helpers.crypto.crypto.py`, requires user's"
+                " private key. Private key MUST be generated from"
+                " `generateAndWriteKeyToFile` function."
+            ),
             example="PNG\r\n\u001a\n\u0000...",
         ),
         "img_name": fields.String(description="Image name", example="bicycle.png"),
