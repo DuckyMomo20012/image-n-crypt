@@ -19,6 +19,11 @@ Pillow = "^9.1.1"
 requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
+poethepoet = "^0.14.0"
+black = "^22.6.0"
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+mypy = "^0.961"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

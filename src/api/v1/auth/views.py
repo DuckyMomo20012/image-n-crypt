@@ -35,7 +35,7 @@ responseLoginModel = ns_auth.model(
 )
 
 CSRFParser = ns_auth.parser()
-CSRFParser.add_argument("X-CSRFToken", location="headers")
+CSRFParser.add_argument("X-CSRFToken", location="headers", required=True)
 
 registerFormParser = ns_auth.parser()
 registerFormParser.add_argument("username", location="form", required=True)
@@ -211,6 +211,7 @@ class Login(Resource):
 
 
 @ns_auth.route("/logout")
+@ns_auth.doc(security="apikey")
 class Logout(Resource):
     @csrf.exempt
     @jwt_required()
