@@ -3,7 +3,6 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_mongoengine import MongoEngine
 from flask_uploads import UploadSet, configure_uploads
-from flask_wtf.csrf import CSRFProtect
 
 env = Env()
 # Read .env into os.environ
@@ -33,9 +32,6 @@ configure_uploads(app, [images])
 
 # Auth using JWT
 jwt = JWTManager(app)
-
-# CSRF protection
-csrf = CSRFProtect(app)
 
 # DB
 db = MongoEngine(app)
