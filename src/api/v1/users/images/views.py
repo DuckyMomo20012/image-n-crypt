@@ -116,7 +116,7 @@ class ListAndUploadImage(Resource):
         ),
         _in="formData",
     )
-    @ns_users.response(200, "Successfully uploaded image")
+    @ns_users.response(201, "Successfully uploaded image")
     @ns_users.expect(uploadImageFormParser)
     def post(self, userId):
         curUserId = str(current_user.id)
@@ -154,10 +154,8 @@ class ListAndUploadImage(Resource):
             # Save on Mongo
             image.save()
             return (
-                {
-                    "img_name": image.nameImg + image.extImg,
-                },
-                200,
+                "",
+                201,
             )
 
         if form.errors:
