@@ -13,6 +13,13 @@ from werkzeug.datastructures import CombinedMultiDict, FileStorage
 from werkzeug.utils import secure_filename
 
 # This is for documentation only
+imageInfoModel = ns_users.model(
+    "ImageInfo",
+    {
+        "image_name": fields.String,
+    },
+)
+
 imageModel = ns_users.model(
     "Image",
     {
@@ -21,6 +28,7 @@ imageModel = ns_users.model(
         "quotient": fields.String,
     },
 )
+
 
 permissionModel = ns_users.model(
     "Permission",
@@ -50,6 +58,7 @@ editPermissionFormParser.remove_argument("user_id")
 class ListAndUploadImage(Resource):
     @jwt_required()
     @ns_users.doc(description="List all images")
+    @ns_users.marshal_list_with(imageInfoModel, description="List of image file names")
     def get(self, userId):
         # current_user is User document returned from user_lookup_loader
         curUserId = str(current_user.id)
@@ -152,6 +161,7 @@ class DownloadAndDeleteImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Delete image")
+    @ns_users.response(204, "Successfully deleted image")
     def delete(self, userId, fileName):
         curUserId = str(current_user.id)
 
@@ -235,6 +245,7 @@ class EditImagePermission(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Edit image permissions of one user")
+    @ns_users.response(204, "Successfully edited image permissions")
     @ns_users.expect(editPermissionFormParser)
     def put(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
@@ -261,6 +272,7 @@ class EditImagePermission(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Delete image permissions of one user")
+    @ns_users.response(204, "Successfully deleted image permissions")
     def delete(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -310,6 +322,7 @@ class ShareImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Share image with other user")
+    @ns_users.response(204, "Successfully shared image")
     @ns_users.expect(shareImageFormParser)
     def post(self, userId, fileName):
         curUserId = str(current_user.id)
