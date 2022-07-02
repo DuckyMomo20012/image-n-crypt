@@ -1,13 +1,14 @@
 import json
 from os import path
 
-import requests
+import requests  # type: ignore
 
 from src.helpers import crypto as Crypto
 
 # RETURN a string for handleRes in helper.py handling
 
 # 1. REGISTER:
+
 
 # NOTE: Each form has its own cookie, so when we send a GET request to request a
 # form to submit, we have to set cookie for POST request
@@ -40,7 +41,8 @@ def register(username, password):
 # POST - Success: "", 201 - Created
 # POST - Error: {"status": "error","code": "409","message": "Username already
 # exists",},
-# POST - Error: {"status": "error", "code": "422", "message": "Password is required, Public key is required"}
+# POST - Error: {"status": "error", "code": "422", "message": "Password is
+# required, Public key is required"}
 
 
 # 2. LOGIN:
@@ -82,7 +84,8 @@ def login(username, password):
 
 # GET - Success: {"csrf_token": "eyJ0eXAi..."}
 # POST - Success: {"access_token": "eyJ0eXAi...", "user_id": "61dea576762674330a3f17dc"}
-# POST - Error: {"status": "error","code": "422","message": "Username or password is invalid",}
+# POST - Error: {"status": "error","code": "422","message": "Username or
+# password is invalid",}
 # POST - Error: {"status": "error", "code": "422", "message": "Password is required"}
 
 # 3. LIST IMAGE:
@@ -101,7 +104,8 @@ def listImage():
     return list_img_g.text
 
 
-# GET - Success: {"status": "success", "code": "200", "data": ["traffic-sign.png","bicycle.png"]}
+# GET - Success: {"status": "success", "code": "200", "data":
+# ["traffic-sign.png","bicycle.png"]}
 # GET - Success: {"status": "success", "code": "200", "data": []}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
@@ -175,7 +179,8 @@ def uploadImage(fileName):
 # authorized"}
 # POST - Error: {"status": "error", "code": "401", "message": "Token has been revoked"}
 # POST - Success:
-# {"status": "success", "code": "200", "data": {"img_name": "bicycle.png_20220109213826"}}
+# {"status": "success", "code": "200", "data": {"img_name":
+# "bicycle.png_20220109213826"}}
 # POST - Error: {"status": "error", "code": "422", "message": "PNG images only!,
 # Image file is required, Quotient data is required"}
 
@@ -291,7 +296,8 @@ def deleteImage(deleteFile):
 
 
 # DELETE - Success: "", 204 - No Content
-# DELETE - Error: {"status": "error", "code": "401", "message": "User is not authorized"}
+# DELETE - Error: {"status": "error", "code": "401", "message": "User is not
+# authorized"}
 # DELETE - Error: {"status": "error", "code": "404", "message": "Image not
 # found"}
 # DELETE - Error: {"status": "error", "code": "401", "message": "Token has been
@@ -339,14 +345,13 @@ def getAllUserInformation():
     # global cookie
     global access_token
     user_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users",
+        "http://localhost:5000/api/v1/users",
         headers={
             # "Cookie": cookie,
             "Authorization": f"Bearer {access_token}",
         },
     )
 
-    user_info_g_data = json.loads(user_info_g.text)
     # print("public_key_g_data", user_info_g_data)
     return user_info_g.text
 
@@ -368,12 +373,11 @@ def getShareImageInfo(fileShare, sharedUserId):
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
     permission_info_g = requests.get(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",  # noqa
         headers={
             "Authorization": f"Bearer {access_token}",
         },
     )
-    permission_info_g_data = json.loads(permission_info_g.text)
     # print("permission_info_g_data", permission_info_g_data)
     return permission_info_g.text
 
@@ -392,7 +396,7 @@ def getShareImageAllInfo(fileShare):
     global userId
 
     # fileShare = "bicycle2_e.png"
-    userPermission = "61dd6f75cb9aa4cea4a70f0c"
+    # userPermission = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(fileShare)
 
     permission_info_g = requests.get(
@@ -413,8 +417,8 @@ def getShareImageAllInfo(fileShare):
     )
 
 
-# GET - Success: {"status": "success", "code": "200", "data": {"permissions": [{"userId":
-# "61de598f170caaeac86ce44d", "role": "write"}],}
+# GET - Success: {"status": "success", "code": "200", "data": {"permissions":
+# [{"userId": "61de598f170caaeac86ce44d", "role": "write"}],}
 # GET - Success: {"status": "success", "code": "200", "data": {"permissions": [],}
 # GET - Error: {"status": "error", "code": "401", "message": "User is not
 # authorized"}
@@ -436,8 +440,6 @@ def shareImage(fileShare, userPermission, role):
             "Authorization": f"Bearer {access_token}",
         },
     )
-    if permission_info_p.text:
-        permission_info_p_data = json.loads(permission_info_p.text)
     return permission_info_p.text
     # print("permission_info_g_data", permission_info_p_data)
 
@@ -459,7 +461,7 @@ def editImagePermissions(fileShare, sharedUserId, role):
     name, ext = path.splitext(fileShare)
 
     permission_info_p = requests.put(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",  # noqa
         data={"role": role},
         headers={
             "Authorization": f"Bearer {access_token}",
@@ -486,7 +488,7 @@ def deleteImagePermissions(fileShare, sharedUserId):
     name, ext = path.splitext(fileShare)
 
     permission_info_d = requests.delete(
-        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",
+        f"http://localhost:5000/api/v1/users/{userId}/images/{name}/permissions/{sharedUserId}",  # noqa
         headers={
             "Authorization": f"Bearer {access_token}",
         },
@@ -511,7 +513,6 @@ def getShareImage(downloadFile, sharedUserId):
     # downloadFile = "bicycle2_e.png"
     # sharedUserId = "61dd6f75cb9aa4cea4a70f0c"
     name, ext = path.splitext(downloadFile)
-    downloadFile_d = "bicycle_d.png"
     download_img_g = requests.get(
         f"http://localhost:5000/api/v1/users/{sharedUserId}/images/{name}",
         # headers={"Cookie": cookie},
@@ -541,6 +542,26 @@ def getShareImage(downloadFile, sharedUserId):
 # GET - Error: {"status": "error", "code": "401", "message": "Token has been
 # revoked"}
 # GET - Error: {"status": "error", "code": "404", "message": "Image not found"}
+
+
+__all__ = [
+    "register",
+    "login",
+    "listImage",
+    "logout",
+    "uploadImage",
+    "downloadImage",
+    "downloadImageAll",
+    "deleteImage",
+    "getUserInformation",
+    "getAllUserInformation",
+    "getShareImageInfo",
+    "getShareImageAllInfo",
+    "shareImage",
+    "editImagePermissions",
+    "deleteImagePermissions",
+    "getShareImage",
+]
 
 if __name__ == "__main__":
     # cookie = ""

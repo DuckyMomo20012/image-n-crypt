@@ -1,11 +1,10 @@
 import os
 import random
+from datetime import datetime
 
 import cv2
 
 BIT_NUMBER = 10
-
-from datetime import datetime
 
 
 def getRandomFileName(fileName):
@@ -91,7 +90,7 @@ def calculate_phi_n(p, q):
 # Use Miller Rabin to check prime
 def generatePrime(bit):
     p = random.getrandbits(bit)
-    while isProbablePrime(p) != True or p == 1:
+    while isProbablePrime(p) is not True or p == 1:
         p = random.getrandbits(bit)
         if p % 2 == 0:
             p = p | 1
@@ -187,12 +186,12 @@ def encrypt(
     f = open(quotientSaveDst, "w")
     for i in range(3):
         for j in range(img.shape[0]):
-            for l in range(img.shape[1]):
-                pixel = img[j, l, i]
+            for k in range(img.shape[1]):
+                pixel = img[j, k, i]
                 remainder1 = powermod(pixel, e, n)
                 remainder2 = powermod(remainder1, 1, 256)
                 quotient = int(remainder1 / 256)
-                img[j, l, i] = remainder2
+                img[j, k, i] = remainder2
                 f.write(str(quotient) + " ")
     f.close()
     cv2.imwrite(imgEncryptedSaveDst, img)
@@ -227,10 +226,10 @@ def decrypt(
     index = 0
     for i in range(3):
         for j in range(img.shape[0]):
-            for l in range(img.shape[1]):
-                pixel = img[j, l, i]
+            for k in range(img.shape[1]):
+                pixel = img[j, k, i]
                 c = pixel + int(list_quotient[index]) * 256
-                img[j, l, i] = powermod(c, d, n)
+                img[j, k, i] = powermod(c, d, n)
                 index = index + 1
     cv2.imwrite(imgDecryptedSaveDst, img)
     return img

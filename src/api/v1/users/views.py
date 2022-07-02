@@ -7,7 +7,7 @@ from flask_restx import Namespace, Resource, fields
 from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
-ns_users = Namespace("users", description="User related operations")
+ns_users: Namespace = Namespace("users", description="User related operations")
 
 userModel = ns_users.model(
     "User",
@@ -71,4 +71,9 @@ class GetUserInformation(Resource):
         abort(404, description="User not found")
 
 
-from .images.views import *
+from .images.views import (  # noqa
+    DownloadImageAll,
+    EditImagePermission,
+    ListAndUploadImage,
+    ShareImage,
+)

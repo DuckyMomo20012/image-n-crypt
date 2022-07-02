@@ -29,7 +29,7 @@ app.config.update(
 # images = UploadSet("images", IMAGES)
 # Currently, we only support png
 images = UploadSet("images", ("png"))
-configure_uploads(app, images)
+configure_uploads(app, [images])
 
 # Auth using JWT
 jwt = JWTManager(app)
@@ -41,6 +41,12 @@ csrf = CSRFProtect(app)
 db = MongoEngine(app)
 
 # Import both blueprints and jwt functions
-from src.api import *
+from src.api import (  # noqa
+    check_if_token_is_revoked,
+    revoked_token_handler,
+    user_identity_lookup,
+    user_lookup_callback,
+    v1_blueprint,
+)
 
 app.register_blueprint(v1_blueprint, url_prefix="/api/v1")

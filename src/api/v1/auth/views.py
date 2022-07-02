@@ -16,7 +16,7 @@ from src.utils import flatten
 # Namespace will prepend all routes with /auth, E.g: /auth/login,
 # /auth/register, /auth/logout
 # You can name it like auth_api or auth_namespace
-ns_auth = Namespace("auth", description="Authentication related operations")
+ns_auth: Namespace = Namespace("auth", description="Authentication related operations")
 
 # This is for documentation only
 responseLoginModel = ns_auth.model(
@@ -53,9 +53,10 @@ def user_identity_lookup(user):
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
-    # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat': 1641892386, 'jti':
-    # '88d6273b-be35-446d-af03-8efc417937d2', 'type': 'access', 'sub': {'id':
-    # '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386, 'exp': 1641893286}
+    # jwt_data = {'typ': 'JWT', 'alg': 'HS256'} {'fresh': False, 'iat':
+    # 1641892386, 'jti': '88d6273b-be35-446d-af03-8efc417937d2', 'type':
+    # 'access', 'sub': {'id': '61dd3db8507cf07e5da19fe6'}, 'nbf': 1641892386,
+    # 'exp': 1641893286}
 
     # This function extract "id" claim from JWT token, then we can query "id" and return
     # current user

@@ -1,3 +1,5 @@
+from flask import Blueprint
+
 from src.api.v1.blueprint import (
     blueprint,
     check_if_token_is_revoked,
@@ -6,7 +8,7 @@ from src.api.v1.blueprint import (
     user_lookup_callback,
 )
 
-v1_blueprint = blueprint
+v1_blueprint: Blueprint = blueprint
 
 __all__ = [
     "v1_blueprint",

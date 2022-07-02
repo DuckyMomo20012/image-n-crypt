@@ -1,7 +1,22 @@
 import sys
 
-from client.api import *
-from client.helpers import *
+from client.api import (
+    deleteImage,
+    deleteImagePermissions,
+    downloadImage,
+    downloadImageAll,
+    editImagePermissions,
+    getShareImage,
+    getShareImageAllInfo,
+    getUserInformation,
+    listImage,
+    login,
+    logout,
+    register,
+    shareImage,
+    uploadImage,
+)
+from client.helpers import getInput, handleRes
 
 
 def mainMenu():

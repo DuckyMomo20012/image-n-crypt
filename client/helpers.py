@@ -16,7 +16,7 @@ def handleRes(ob, msg="", extract=None):
     ob = json.loads(ob)
     if "status" in ob.keys():
         if ob["status"] == "error":
-            return f"Error: %s" % ob.get("message")
+            return "Error: %s" % ob.get("message")
 
     if "data" in ob.keys():
         if type(ob.get("data")) == list:

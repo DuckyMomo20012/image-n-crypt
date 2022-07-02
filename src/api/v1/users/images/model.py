@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms.validators import DataRequired
 
-import app
+from app import images
 
 
 class ImageForm(FlaskForm):
@@ -12,7 +12,7 @@ class ImageForm(FlaskForm):
         label="image",
         validators=[
             FileRequired("Image file is required"),
-            FileAllowed(app.images, "PNG images only!"),
+            FileAllowed(images, "PNG images only!"),
         ],
     )
     quotient = wf.StringField(
