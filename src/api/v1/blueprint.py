@@ -12,6 +12,13 @@ from .auth.views import (
     user_lookup_callback,
 )
 
+__all__ = [
+    "check_if_token_is_revoked",
+    "revoked_token_handler",
+    "user_identity_lookup",
+    "user_lookup_callback",
+]
+
 authorizations = {
     "apikey": {
         "type": "apiKey",
