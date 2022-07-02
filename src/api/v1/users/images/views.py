@@ -34,6 +34,7 @@ permissionModel = ns_users.model(
 @ns_users.doc(security="apikey")
 class ListAndUploadImage(Resource):
     @jwt_required()
+    @ns_users.doc(description="List all images")
     def get(self, userId):
         # current_user is User document returned from user_lookup_loader
         curUserId = str(current_user.id)
@@ -55,6 +56,7 @@ class ListAndUploadImage(Resource):
         )
 
     @jwt_required()
+    @ns_users.doc(description="Upload image")
     def post(self, userId):
         curUserId = str(current_user.id)
 
@@ -106,6 +108,7 @@ class ListAndUploadImage(Resource):
 @ns_users.doc(security="apikey")
 class DownloadAndDeleteImage(Resource):
     @jwt_required()
+    @ns_users.doc(description="Download image")
     @ns_users.marshal_with(imageModel, description="Image file")
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
@@ -132,6 +135,7 @@ class DownloadAndDeleteImage(Resource):
         abort(404, description="Image not found")
 
     @jwt_required()
+    @ns_users.doc(description="Delete image")
     def delete(self, userId, fileName):
         curUserId = str(current_user.id)
 
@@ -155,6 +159,7 @@ class DownloadAndDeleteImage(Resource):
 @ns_users.doc(security="apikey")
 class DownloadImageAll(Resource):
     @jwt_required()
+    @ns_users.doc(description="Download all images")
     @ns_users.marshal_list_with(imageModel, description="List of image files")
     def get(self, userId):
         curUserId = str(current_user.id)
@@ -194,6 +199,7 @@ class DownloadImageAll(Resource):
 @ns_users.doc(security="apikey")
 class EditImagePermission(Resource):
     @jwt_required()
+    @ns_users.doc(description="Get image permissions of one user")
     @ns_users.marshal_with(permissionModel, description="Permissions of image")
     def get(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
@@ -212,6 +218,7 @@ class EditImagePermission(Resource):
         )
 
     @jwt_required()
+    @ns_users.doc(description="Edit image permissions of one user")
     def put(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -236,6 +243,7 @@ class EditImagePermission(Resource):
         )
 
     @jwt_required()
+    @ns_users.doc(description="Delete image permissions of one user")
     def delete(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -264,8 +272,9 @@ class EditImagePermission(Resource):
 @ns_users.doc(security="apikey")
 class ShareImage(Resource):
     @jwt_required()
+    @ns_users.doc(description="List of image permissions")
     @ns_users.marshal_list_with(
-        permissionModel, description="List of image permissions"
+        permissionModel, description="List all image permissions"
     )
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
@@ -283,6 +292,7 @@ class ShareImage(Resource):
         )
 
     @jwt_required()
+    @ns_users.doc(description="Share image with other user")
     def post(self, userId, fileName):
         curUserId = str(current_user.id)
 

@@ -84,7 +84,7 @@ def invalid_token_handler(reason):
 
 @ns_auth.route("/register")
 class Register(Resource):
-    @ns_auth.response(200, "Success")
+    @ns_auth.doc(description="Get the CSRF token")
     def get(self):
         # Don't have to call jsonify since we return a dict
         return (
@@ -94,6 +94,7 @@ class Register(Resource):
             200,
         )
 
+    @ns_auth.doc(description="Register a new user")
     def post(self):
         # pass request data to form
         form = RegisterForm()
@@ -128,7 +129,7 @@ class Register(Resource):
 
 @ns_auth.route("/login")
 class Login(Resource):
-    @ns_auth.response(200, "Success")
+    @ns_auth.doc(description="Get the CSRF token")
     def get(self):
         return (
             {
@@ -137,6 +138,7 @@ class Login(Resource):
             200,
         )
 
+    @ns_auth.doc(description="Login")
     def post(self):
         # pass request data to form
         form = LoginForm()
@@ -178,6 +180,7 @@ class Login(Resource):
 class Logout(Resource):
     @csrf.exempt
     @jwt_required()
+    @ns_auth.doc(description="Logout")
     def post(self):
         jti = get_jwt()["jti"]
         now = datetime.now(timezone.utc)

@@ -21,7 +21,7 @@ userModel = ns_users.model(
 # NOTE: Can't use "make_response" with marshal_with
 # NOTE: Custom dict don't need "jsonify"
 @ns_users.route("/")
-@ns_users.doc(security="apikey")
+@ns_users.doc(security="apikey", description="List all user information")
 class GetAllUserInformation(Resource):
     @jwt_required()
     @ns_users.marshal_list_with(userModel, description="All user information")
@@ -51,7 +51,7 @@ class GetAllUserInformation(Resource):
 
 
 @ns_users.route("/<string:userId>")
-@ns_users.doc(security="apikey")
+@ns_users.doc(security="apikey", description="Get user information")
 class GetUserInformation(Resource):
     @jwt_required()
     @ns_users.marshal_with(userModel, description="User information")
