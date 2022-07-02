@@ -13,19 +13,19 @@ from werkzeug.datastructures import CombinedMultiDict, FileStorage
 from werkzeug.utils import secure_filename
 
 # This is for documentation only
-imageInfoModel = ns_users.model(
-    "ImageInfo",
+responseListImageModel = ns_users.model(
+    "ResponseListImage",
     {
-        "image_name": fields.String,
+        "image_name": fields.String(description="Image name"),
     },
 )
 
 imageModel = ns_users.model(
     "Image",
     {
-        "img_content": fields.String,
-        "img_name": fields.String,
-        "quotient": fields.String,
+        "img_content": fields.String(description="Image encrypted content"),
+        "img_name": fields.String(description="Image name"),
+        "quotient": fields.String(description="Quotient for encrypted content"),
     },
 )
 
@@ -33,8 +33,8 @@ imageModel = ns_users.model(
 permissionModel = ns_users.model(
     "Permission",
     {
-        "userId": fields.String,
-        "role": fields.String,
+        "userId": fields.String(description="User id"),
+        "role": fields.String(description="User role for this image"),
     },
 )
 
@@ -58,7 +58,9 @@ editPermissionFormParser.remove_argument("user_id")
 class ListAndUploadImage(Resource):
     @jwt_required()
     @ns_users.doc(description="List all images")
-    @ns_users.marshal_list_with(imageInfoModel, description="List of image file names")
+    @ns_users.marshal_list_with(
+        responseListImageModel, description="List of image file names"
+    )
     def get(self, userId):
         # current_user is User document returned from user_lookup_loader
         curUserId = str(current_user.id)

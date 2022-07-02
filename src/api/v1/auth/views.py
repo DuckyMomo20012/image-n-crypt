@@ -29,8 +29,8 @@ CSRFModel = ns_auth.model(
 responseLoginModel = ns_auth.model(
     "ResponseLogin",
     {
-        "user_id": fields.String,
-        "access_token": fields.String,
+        "user_id": fields.String(description="User id"),
+        "access_token": fields.String(description="JWT access token"),
     },
 )
 

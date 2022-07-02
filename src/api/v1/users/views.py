@@ -11,9 +11,9 @@ ns_users = Namespace("users", description="User related operations")
 userModel = ns_users.model(
     "User",
     {
-        "public_key": fields.String,
-        "user_id": fields.String,
-        "user_name": fields.String,
+        "public_key": fields.String(description="Public key of user"),
+        "user_id": fields.String(description="User id"),
+        "user_name": fields.String(description="User name"),
     },
 )
 
