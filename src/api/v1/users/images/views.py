@@ -1,3 +1,4 @@
+import json
 from os import path
 
 from app import images as localImage
@@ -10,6 +11,23 @@ from src.api.v1.users.views import ns_users
 from src.utils import flatten, getRandomFileName
 from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
+
+imageModel = ns_users.model(
+    "Image",
+    {
+        "img_content": fields.String,
+        "img_name": fields.String,
+        "quotient": fields.String,
+    },
+)
+
+permissionModel = ns_users.model(
+    "Permission",
+    {
+        "userId": fields.String,
+        "role": fields.String,
+    },
+)
 
 
 @ns_users.route("/<string:userId>/images")
@@ -26,13 +44,13 @@ class ListAndUploadImage(Resource):
         images = getAllImages(curUserId)
         if images:
             imageList = [(img.nameImg + img.extImg) for img in images]
-            return make_response(
-                jsonify(imageList),
+            return (
+                imageList,
                 200,
             )
 
-        return make_response(
-            jsonify([]),
+        return (
+            [],
             200,
         )
 
@@ -72,7 +90,7 @@ class ListAndUploadImage(Resource):
             localImage.save(request.files["imageFile"])
             # Save on Mongo
             image.save()
-            return make_response(
+            return (
                 {
                     "img_name": image.nameImg + image.extImg,
                 },
@@ -88,6 +106,7 @@ class ListAndUploadImage(Resource):
 @ns_users.doc(security="apikey")
 class DownloadAndDeleteImage(Resource):
     @jwt_required()
+    @ns_users.marshal_with(imageModel, description="Image file")
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
 
@@ -101,7 +120,7 @@ class DownloadAndDeleteImage(Resource):
                 abort(401, description="User is not authorized")
 
             data_byte = image.dataImg.read().decode("ISO-8859-1")
-            return make_response(
+            return (
                 {
                     "img_name": image.nameImg + image.extImg,
                     "img_content": data_byte,
@@ -124,7 +143,7 @@ class DownloadAndDeleteImage(Resource):
 
         if image:
             image.delete()
-            return make_response("", 204)
+            return ("", 204)
 
         abort(404, description="Image not found")
 
@@ -133,6 +152,7 @@ class DownloadAndDeleteImage(Resource):
 @ns_users.doc(security="apikey")
 class DownloadImageAll(Resource):
     @jwt_required()
+    @ns_users.marshal_list_with(imageModel, description="List of image files")
     def get(self, userId):
         curUserId = str(current_user.id)
 
@@ -152,15 +172,15 @@ class DownloadImageAll(Resource):
                 }
                 data.append(content)
 
-            return make_response(
-                jsonify([*data]),
+            return (
+                [*data],
                 200,
             )
 
         # Because images can be None if there is no image on database, so instead of
         # return an error, we return an empty array
-        return make_response(
-            jsonify([]),
+        return (
+            [],
             200,
         )
 
@@ -171,6 +191,7 @@ class DownloadImageAll(Resource):
 @ns_users.doc(security="apikey")
 class EditImagePermission(Resource):
     @jwt_required()
+    # @ns_users.marshal_with(permissionModel, description="Permissions of image")
     def get(self, userId, fileName, userPermissionId):
         curUserId = str(current_user.id)
 
@@ -182,7 +203,7 @@ class EditImagePermission(Resource):
         if not imageOnePermit:
             abort(404, description="Permission for User id not found")
 
-        return make_response(
+        return (
             jsonify(imageOnePermit),
             200,
         )
@@ -206,7 +227,7 @@ class EditImagePermission(Resource):
         sharedUserRole = request.form["role"]
         editOneImageRolePermission(userId, fileName, userPermissionId, sharedUserRole)
         image.reload()
-        return make_response("", 204)
+        return ("", 204)
 
     @jwt_required()
     def delete(self, userId, fileName, userPermissionId):
@@ -227,7 +248,7 @@ class EditImagePermission(Resource):
         deleteOneImagePermission(userId, fileName, userPermissionId)
         # image.permissions.pop(index)
         image.reload()
-        return make_response("", 204)
+        return ("", 204)
 
 
 @ns_users.route("/<string:userId>/images/<string:fileName>/permissions")
@@ -244,8 +265,8 @@ class ShareImage(Resource):
         if not image:
             abort(404, description="Image not found")
 
-        return make_response(
-            jsonify(image.permissions),
+        return (
+            json.loads(image.to_json())["permissions"],
             200,
         )
 
