@@ -1,4 +1,5 @@
 import json
+from typing import Tuple, Union
 
 
 def getInput(*args):
@@ -8,52 +9,27 @@ def getInput(*args):
     return ans
 
 
-def handleRes(ob, msg="", extract=None):
-    # print("ob", ob)
-    # print(type(ob))
-    if not ob:
+def handleRes(res: Tuple[str, int], msg="") -> str:
+    if not res:
         return msg
-    ob = json.loads(ob)
-    if "status" in ob.keys():
-        if ob["status"] == "error":
-            return "Error: %s" % ob.get("message")
 
-    if "data" in ob.keys():
-        if type(ob.get("data")) == list:
-            if len(ob.get("data")) == 0:
+    data, status = res
+    dataObj: Union[dict, list] = json.loads(data)
+    if status is not None:
+
+        # We got status code 4xx
+        if status // 100 == 4 and isinstance(dataObj, dict):
+            return "Error: %s" % dataObj.get("message", "")
+
+    if data is not None:
+        if isinstance(dataObj, list):
+            if len(dataObj) == 0:
                 return msg + "No data"
+
             result = msg
-            for item in ob.get("data"):
-                if extract:
-                    result += " " + json.dumps(item[extract])
-                else:
-                    result += " " + json.dumps(item)
+
+            result += json.dumps(dataObj)
+
             return result
-        if type(ob.get("data")) == dict:
-            return msg + json.dumps(ob.get("data"))
-        return msg + ob.get("data")
 
-
-if __name__ == "__main__":
-    # ans = getInput("username", "password")
-    # print(ans)
-    handleRes(
-        {
-            "status": "success",
-            "code": "200",
-            "data": [
-                {
-                    "img_name": "bicycle.png",
-                    "img_content": "\u00ff...",
-                    "quotient": "22 22...",
-                },
-                {
-                    "img_name": "bicycle.png",
-                    "img_content": "\u00ff...",
-                    "quotient": "22 22...",
-                },
-            ],
-        },
-        "Image list: ",
-        extract="img_name",
-    )
+        return msg + json.dumps(dataObj)
