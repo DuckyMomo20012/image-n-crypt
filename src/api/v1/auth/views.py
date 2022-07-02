@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 
 from app import csrf, jwt
-from flask import abort, make_response, request
+from flask import abort, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from flask_restx import Namespace, Resource
 from flask_wtf.csrf import generate_csrf
@@ -64,7 +64,7 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 
 @jwt.revoked_token_loader
 def revoked_token_handler(jwt_header, jwt_payload):
-    return make_response(
+    return (
         {
             "message": "Token has been revoked",
         },
@@ -74,7 +74,7 @@ def revoked_token_handler(jwt_header, jwt_payload):
 
 @jwt.invalid_token_loader
 def invalid_token_handler(reason):
-    return make_response(
+    return (
         {
             "message": f"{reason}",
         },
@@ -87,7 +87,7 @@ class Register(Resource):
     @ns_auth.response(200, "Success")
     def get(self):
         # Don't have to call jsonify since we return a dict
-        return make_response(
+        return (
             {
                 "csrf_token": generate_csrf(),
             },
@@ -116,7 +116,10 @@ class Register(Resource):
                 publicKey=publicKey,
             )
             user.save()
-            return make_response("", 201)
+            return (
+                "",
+                201,
+            )
 
         if form.errors:
             errorMessage = ", ".join(flatten(form.errors))
@@ -127,7 +130,12 @@ class Register(Resource):
 class Login(Resource):
     @ns_auth.response(200, "Success")
     def get(self):
-        return make_response({"csrf_token": generate_csrf()}, 200)
+        return (
+            {
+                "csrf_token": generate_csrf(),
+            },
+            200,
+        )
 
     def post(self):
         # pass request data to form
@@ -151,7 +159,7 @@ class Login(Resource):
                 # user_identity_loader, in that function we only
                 # use id to create JWT token
                 access_token = create_access_token(identity=user)
-                return make_response(
+                return (
                     {
                         "user_id": str(user.id),
                         "access_token": access_token,
@@ -177,7 +185,7 @@ class Logout(Resource):
         tokenBlock = TokenBlocklist(jti=jti, created_at=now)
         tokenBlock.save()
 
-        return make_response(
+        return (
             {
                 "message": "User logged out",
             },

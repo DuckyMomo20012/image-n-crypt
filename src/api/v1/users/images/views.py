@@ -2,7 +2,7 @@ import json
 from os import path
 
 from app import images as localImage
-from flask import abort, jsonify, make_response, request
+from flask import abort, request
 from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Resource, fields
 from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
@@ -143,7 +143,10 @@ class DownloadAndDeleteImage(Resource):
 
         if image:
             image.delete()
-            return ("", 204)
+            return (
+                "",
+                204,
+            )
 
         abort(404, description="Image not found")
 
@@ -227,7 +230,10 @@ class EditImagePermission(Resource):
         sharedUserRole = request.form["role"]
         editOneImageRolePermission(userId, fileName, userPermissionId, sharedUserRole)
         image.reload()
-        return ("", 204)
+        return (
+            "",
+            204,
+        )
 
     @jwt_required()
     def delete(self, userId, fileName, userPermissionId):
@@ -248,7 +254,10 @@ class EditImagePermission(Resource):
         deleteOneImagePermission(userId, fileName, userPermissionId)
         # image.permissions.pop(index)
         image.reload()
-        return ("", 204)
+        return (
+            "",
+            204,
+        )
 
 
 @ns_users.route("/<string:userId>/images/<string:fileName>/permissions")
@@ -294,4 +303,7 @@ class ShareImage(Resource):
         newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
         image.permissions.append(newPermission)
         image.save()
-        return make_response("", 201)
+        return (
+            "",
+            201,
+        )
