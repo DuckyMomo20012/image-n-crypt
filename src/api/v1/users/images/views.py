@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 
 
 @ns_users.route("/<string:userId>/images")
+@ns_users.doc(security="apikey")
 class ListAndUploadImage(Resource):
     @jwt_required()
     def get(self, userId):
@@ -84,6 +85,7 @@ class ListAndUploadImage(Resource):
 
 
 @ns_users.route("/<string:userId>/images/<string:fileName>")
+@ns_users.doc(security="apikey")
 class DownloadAndDeleteImage(Resource):
     @jwt_required()
     def get(self, userId, fileName):
@@ -128,6 +130,7 @@ class DownloadAndDeleteImage(Resource):
 
 
 @ns_users.route("/<string:userId>/images/download-all")
+@ns_users.doc(security="apikey")
 class DownloadImageAll(Resource):
     @jwt_required()
     def get(self, userId):
@@ -165,6 +168,7 @@ class DownloadImageAll(Resource):
 @ns_users.route(
     "/<string:userId>/images/<string:fileName>/permissions/<string:userPermissionId>"
 )
+@ns_users.doc(security="apikey")
 class EditImagePermission(Resource):
     @jwt_required()
     def get(self, userId, fileName, userPermissionId):
@@ -227,6 +231,7 @@ class EditImagePermission(Resource):
 
 
 @ns_users.route("/<string:userId>/images/<string:fileName>/permissions")
+@ns_users.doc(security="apikey")
 class ShareImage(Resource):
     @jwt_required()
     def get(self, userId, fileName):

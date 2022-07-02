@@ -10,6 +10,7 @@ ns_users = Namespace("users", description="User related operations")
 
 
 @ns_users.route("/")
+@ns_users.doc(security="apikey")
 class GetAllUserInformation(Resource):
     @jwt_required()
     def get(self):
@@ -20,9 +21,9 @@ class GetAllUserInformation(Resource):
             for user in users:
                 userData = json.loads(user.to_json())
                 content = {
+                    "public_key": userData["publicKey"],
                     "user_id": userData["_id"]["$oid"],
                     "user_name": userData["username"],
-                    "public_key": userData["publicKey"],
                 }
                 data.append(content)
 
@@ -38,6 +39,7 @@ class GetAllUserInformation(Resource):
 
 
 @ns_users.route("/<string:userId>")
+@ns_users.doc(security="apikey")
 class GetUserInformation(Resource):
     @jwt_required()
     def get(self, userId):
@@ -45,9 +47,9 @@ class GetUserInformation(Resource):
         if user:
             return make_response(
                 {
+                    "public_key": user["publicKey"],
                     "user_id": user["_id"]["$oid"],
                     "user_name": user["username"],
-                    "public_key": user["publicKey"],
                 },
                 200,
             )
