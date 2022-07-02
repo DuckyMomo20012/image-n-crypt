@@ -214,29 +214,53 @@ cd image-n-crypt
 
 ### :test_tube: Running Tests
 
-You can test REST API endpoints using these ways:
+- **Test REST API endpoints**: You can test endpoints using these ways:
 
-- [Hoppscoth](https://hoppscotch.io/): an open source API development ecosystem
+  - [Hoppscoth](https://hoppscotch.io/): an open source API development
+    ecosystem
 
-  ![hoppscotch.io](https://user-images.githubusercontent.com/64480713/177003377-aa1b901e-fa47-474d-bbdf-3d287192f915.png)
+    ![hoppscotch.io](https://user-images.githubusercontent.com/64480713/177003377-aa1b901e-fa47-474d-bbdf-3d287192f915.png)
 
-  - You can import pre-defined REST API endpoints from file
-    `data/hoppscoth.json` to Hoppscotch.
+    - You can import pre-defined REST API endpoints from file
+      `data/hoppscoth.json` to Hoppscotch.
 
-- **Local Swagger documentation**: a Swagger UI is generated from REST API
-  endpoints using Flask-RESTX.
+  - **Local Swagger documentation**: a Swagger UI is generated from REST API
+    endpoints using Flask-RESTX.
 
-  ![swagger](https://user-images.githubusercontent.com/64480713/177001704-d6ca292f-02e3-41f5-97e4-8ff6064e0fa1.png)
+    ![swagger](https://user-images.githubusercontent.com/64480713/177001704-d6ca292f-02e3-41f5-97e4-8ff6064e0fa1.png)
 
-  - You can access this documentation: **http://127.0.0.1:5000/api/v1/**
+    - You can access this documentation: **http://127.0.0.1:5000/api/v1/**
 
-- **File `client/api.py`**: pre-defined functions to send request to server.
+  - **File `client/api.py`**: pre-defined functions to send request to server.
 
-- **Client console (Not recommended)**: poorly crafted client.
+  - **Client console (Not recommended)**: poorly crafted client.
 
-  - You can run this client using file `client/main.py`.
+    - You can run this client using file `client/main.py`.
 
-  - NOTE: But you can use this client to **decrypt** downloaded images!.
+    - NOTE: But you can use this client to **decrypt** downloaded images!.
+
+- **Sample data**:
+
+  - You can import sample data from folder `data` to your database.
+
+  - Test data will have these sample users:
+
+    <details>
+    <summary>Sample users</summary>
+
+    ```
+    admin:
+        password: admin
+        private key: rsa_admin.txt
+    admin2:
+        password: admin
+        private key: rsa_admin2.txt
+    admin2:
+        password: admin
+        private key: rsa_admin3.txt
+    ```
+
+    </details>
 
 <!-- Run Locally -->
 
@@ -278,6 +302,10 @@ OR
 flask run
 ```
 
+Access local Swagger documentation
+
+http://127.0.0.1:5000/api/v1/
+
 <!-- Deployment -->
 
 <!-- ### :triangular_flag_on_post: Deployment
@@ -292,10 +320,84 @@ To deploy this project run
 
 ## :eyes: Usage
 
-Use this space to tell a little more about your project and how it can be used.
-Show additional screenshots, code samples, demos or link to other resources.
+First, you need to register an account.
 
-TODO
+To register account, you need to generate RSA key pair. You have to use function
+`generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to generate key
+pair.
+
+This will create two files:
+
+- `rsa.txt`: RSA private key (This file must be kept secretly).
+- `rsa_pub.txt`: RSA public key.
+
+OR:
+
+- Using `register` from `client/api.py`.
+- Using client console.
+
+Then you can login using your newly created account.
+
+After login, you will receive an `access_token`.
+
+<details>
+<summary>Screenshot</summary>
+
+![login response](https://user-images.githubusercontent.com/64480713/177004501-ea468252-6b12-47fa-9df7-c45824055cc9.png)
+
+</details>
+
+Use `access_token` to access protected endpoints:
+
+- **Swagger doc**: you MUST add your access token to access protected
+  endpoints. By clicking `Authorize` button:
+
+  <details>
+  <summary>Screenshot</summary>
+
+  ![authorize button](https://user-images.githubusercontent.com/64480713/177004457-8a6768f8-9119-40d5-a82e-6e58d5a78d99.png)
+
+  </details>
+
+  OR: clicking the **lock icon (:lock:)** on protected endpoints.
+
+  Then type your access token in the input field. E.g:
+
+  ```
+  Bearer eyJ0eXAiO...
+  ```
+
+  > NOTE: Must be in the format `Bearer {access_token}`.
+
+- **Hoppscotch**:
+
+  You have to paste your access token in the `Authorization` tab for each
+  requests. E.g:
+
+  <details>
+  <summary>Screenshot</summary>
+
+  ![hoppscotch token example](https://user-images.githubusercontent.com/64480713/177004894-18f9093d-5748-4b1c-a7cc-3508e0a7cf19.png)
+
+  </details>
+
+  > NOTE: You have to choose **Authorization Type**: `Bearer`
+
+- **File `client/api.py`**:
+
+  You have to call both function `login` and `getUserInformation`:
+
+  <details>
+  <summary>Example code</summary>
+
+  ```python
+  print(login(username="admin", password="admin"))
+  print(getUserInformation())
+  ```
+
+  </details>
+
+> NOTE: Access token will be expired after 1 hour.
 
 <!-- Roadmap -->
 
