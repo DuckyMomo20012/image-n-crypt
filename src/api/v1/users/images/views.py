@@ -23,16 +23,22 @@ from src.utils import flatten, getRandomFileName
 responseListImageModel = ns_users.model(
     "ResponseListImage",
     {
-        "img_name": fields.String(description="Image name"),
+        "img_name": fields.String(description="Image name", example="bicycle.png"),
     },
 )
 
 imageModel = ns_users.model(
     "Image",
     {
-        "img_content": fields.String(description="Image encrypted content"),
-        "img_name": fields.String(description="Image name"),
-        "quotient": fields.String(description="Quotient for encrypted content"),
+        "img_content": fields.String(
+            description="Image encrypted content",
+            example="PNG\r\n\u001a\n\u0000...",
+        ),
+        "img_name": fields.String(description="Image name", example="bicycle.png"),
+        "quotient": fields.String(
+            description="Quotient for encrypted content",
+            example="98 98 98 98 77 2 91 91...",
+        ),
     },
 )
 
@@ -40,8 +46,10 @@ imageModel = ns_users.model(
 permissionModel = ns_users.model(
     "Permission",
     {
-        "userId": fields.String(description="User id"),
-        "role": fields.String(description="User role for this image"),
+        "userId": fields.String(
+            description="User id", example="628387db1dc6fa1a0cd84c42"
+        ),
+        "role": fields.String(description="User role for this image", example="write"),
     },
 )
 
@@ -95,6 +103,19 @@ class ListAndUploadImage(Resource):
 
     @jwt_required()
     @ns_users.doc(description="Upload image")
+    @ns_users.param(
+        "imageFile",
+        ("Accept only PNG images. Image should have small size."),
+        _in="formData",
+    )
+    @ns_users.param(
+        "quotient",
+        (
+            "Generated quotient from function `encrypt` in"
+            " `helpers.crypto.crypto.py`.\nE.g: `98 98 98 98 77 2 91 91...`"
+        ),
+        _in="formData",
+    )
     @ns_users.response(200, "Successfully uploaded image")
     @ns_users.expect(uploadImageFormParser)
     def post(self, userId):

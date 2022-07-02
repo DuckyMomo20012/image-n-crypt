@@ -22,8 +22,13 @@ ns_auth: Namespace = Namespace("auth", description="Authentication related opera
 responseLoginModel = ns_auth.model(
     "ResponseLogin",
     {
-        "user_id": fields.String(description="User id"),
-        "access_token": fields.String(description="JWT access token"),
+        "user_id": fields.String(
+            description="User id", example="628385eb1dc6fa1a0cd84c38"
+        ),
+        "access_token": fields.String(
+            description="JWT access token",
+            example="eyJ0eXAiOiJKV1Q...",
+        ),
     },
 )
 
@@ -102,6 +107,14 @@ def invalid_token_handler(reason):
 
 
 @ns_auth.route("/register")
+@ns_auth.param(
+    "publicKey",
+    (
+        "Generated public key from function `generateAndWriteKeyToFile` in"
+        " `helpers.crypto.crypto.py`.\nE.g: `27977 9431`"
+    ),
+    _in="formData",
+)
 class Register(Resource):
     @ns_auth.doc(description="Register a new user")
     @ns_auth.response(201, "Successfully registered")
