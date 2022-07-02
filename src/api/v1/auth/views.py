@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from flask import abort, request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import jwt
@@ -18,28 +18,11 @@ from src.utils import flatten
 # You can name it like auth_api or auth_namespace
 ns_auth: Namespace = Namespace("auth", description="Authentication related operations")
 
-# This is for documentation only
-responseLoginModel = ns_auth.model(
-    "ResponseLogin",
-    {
-        "user_id": fields.String(
-            description="User id", example="628385eb1dc6fa1a0cd84c38"
-        ),
-        "access_token": fields.String(
-            description="JWT access token",
-            example="eyJ0eXAiOiJKV1Q...",
-        ),
-    },
+from src.api.v1.auth.doc import (  # noqa
+    loginFormParser,
+    registerFormParser,
+    responseLoginModel,
 )
-
-registerFormParser = ns_auth.parser()
-registerFormParser.add_argument("username", location="form", required=True)
-registerFormParser.add_argument("password", location="form", required=True)
-registerFormParser.add_argument("publicKey", location="form", required=True)
-
-loginFormParser = ns_auth.parser()
-loginFormParser.add_argument("username", location="form", required=True)
-loginFormParser.add_argument("password", location="form", required=True)
 
 
 @jwt.user_identity_loader

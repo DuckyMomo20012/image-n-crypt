@@ -3,11 +3,19 @@ from os import path
 
 from flask import abort, request
 from flask_jwt_extended import current_user, jwt_required
-from flask_restx import Resource, fields
-from werkzeug.datastructures import CombinedMultiDict, FileStorage
+from flask_restx import Resource
+from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
 
 from app import images as localImage
+from src.api.v1.users.images.doc import (
+    editPermissionFormParser,
+    imageModel,
+    permissionModel,
+    responseListImageModel,
+    shareImageFormParser,
+    uploadImageFormParser,
+)
 from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
 from src.api.v1.users.images.service import (
     deleteOneImagePermission,
@@ -18,59 +26,6 @@ from src.api.v1.users.images.service import (
 )
 from src.api.v1.users.views import ns_users
 from src.utils import flatten, getRandomFileName
-
-# This is for documentation only
-responseListImageModel = ns_users.model(
-    "ResponseListImage",
-    {
-        "img_name": fields.String(description="Image name", example="bicycle.png"),
-    },
-)
-
-imageModel = ns_users.model(
-    "Image",
-    {
-        "img_content": fields.String(
-            description=(
-                "Image encrypted content. Can be decrypted using"
-                " function `decrypt` in `helpers.crypto.crypto.py`, requires user's"
-                " private key. Private key MUST be generated from"
-                " `generateAndWriteKeyToFile` function."
-            ),
-            example="PNG\r\n\u001a\n\u0000...",
-        ),
-        "img_name": fields.String(description="Image name", example="bicycle.png"),
-        "quotient": fields.String(
-            description="Quotient for encrypted content",
-            example="98 98 98 98 77 2 91 91...",
-        ),
-    },
-)
-
-
-permissionModel = ns_users.model(
-    "Permission",
-    {
-        "userId": fields.String(
-            description="User id", example="628387db1dc6fa1a0cd84c42"
-        ),
-        "role": fields.String(description="User role for this image", example="write"),
-    },
-)
-
-uploadImageFormParser = ns_users.parser()
-uploadImageFormParser.add_argument(
-    "imageFile", location="files", type=FileStorage, required=True
-)
-uploadImageFormParser.add_argument("quotient", location="form", required=True)
-
-
-shareImageFormParser = ns_users.parser()
-shareImageFormParser.add_argument("user_id", location="form", required=True)
-shareImageFormParser.add_argument("role", location="form", required=True)
-
-editPermissionFormParser = shareImageFormParser.copy()
-editPermissionFormParser.remove_argument("user_id")
 
 
 @ns_users.route("/<string:userId>/images")

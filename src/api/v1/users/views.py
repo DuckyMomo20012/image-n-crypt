@@ -2,25 +2,14 @@ import json
 
 from flask import abort
 from flask_jwt_extended import jwt_required
-from flask_restx import Namespace, Resource, fields
+from flask_restx import Namespace, Resource
 
 from src.api.v1.users.service import getAllUsers, getUserById
 
 # You can name it like users_api or users_namespace
 ns_users: Namespace = Namespace("users", description="User related operations")
 
-userModel = ns_users.model(
-    "User",
-    {
-        "public_key": fields.String(
-            description="Public key of user", example="27977 9431"
-        ),
-        "user_id": fields.String(
-            description="User id", example="628385eb1dc6fa1a0cd84c38"
-        ),
-        "user_name": fields.String(description="User name", example="admin"),
-    },
-)
+from src.api.v1.users.doc import userModel  # noqa
 
 
 # NOTE: Can't use "make_response" with marshal_with
