@@ -320,6 +320,42 @@ To deploy this project on Heroku
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
+<details>
+<summary>Config deployment from scratch</summary>
+
+Requirement files:
+
+- **Procfile**: Procfile specifies the commands that are executed by the app
+  on startup:
+
+  E.g:
+
+  ```
+  web: gunicorn app:app
+  ```
+
+  > NOTE: "web" for a web process type.
+
+  > NOTE: first "app" refers to file `app.py` and second "app" refers to
+  > `app = Flask(__name__)` in file `app.py`.
+  > [Ref](https://stackoverflow.com/a/52005826/12512981).
+
+- **requirements.txt**:
+  You can use Poetry to generate this file:
+
+  ```bash
+  poetry export -f requirements.txt --output requirements.txt
+  ```
+
+  > NOTE: You have to install `gunicorn` dependency in your requirements.txt.
+
+- **app.json**: This file is required for deploying on Heroku using deploy
+  button.
+
+Read more in this tutorial: [Deploying a Flask Application to Heroku](https://stackabuse.com/deploying-a-flask-application-to-heroku/)
+
+</details>
+
 <!-- Usage -->
 
 ## :eyes: Usage
@@ -415,7 +451,7 @@ Using file `client/api.py`:
 - To handle this response, you can use the function `handleRes` in
   `client/helpers.py` (This function is used by the client console too).
 
-Encrypt and decrypt file manually:
+Encrypt and decrypt files manually:
 
 - You can use functions from file `src/helpers/crypto/crypto.py`:
 
@@ -551,6 +587,10 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
   - Because we implement the RSA algorithm from scratch, so it is unsafe and has
     slow performance. You should upload an image with a smaller size.
+
+- Deploy on Heroku error: `No web processes running`:
+
+  - You are missing file `Procfile` or `gunicorn` dependency.
 
 <!-- License -->
 
