@@ -245,7 +245,7 @@ cd image-n-crypt
   - **File `client/api.py`**: pre-defined functions to send requests to the
     server.
 
-  - **Client console (Not recommended)**: poorly crafted client.
+  - **Client console**: poorly crafted client.
 
     - You can run this client using the file `client/main.py`.
 
@@ -404,12 +404,73 @@ Use `access_token` to access protected endpoints:
 
   ```python
   login(username="admin", password="admin")
-  getUserInformation()
+  getUserInformation() # This will set global access_token and others global
+  variables
   ```
 
   </details>
 
 > NOTE: Access token will be expired after 1 hour.
+
+Using file `client/api.py`:
+
+- All functions ALWAYS return a tuple[message, status code] `(tuple[str, int])`.
+
+- This file contains some global variables, so you have to call both functions
+  `login` and `getUserInformation` to set these global variables before calling
+  other functions.
+
+- To handle this response, you can use the function `handleRes` in
+  `client/helpers.py` (This function is used by the client console too).
+
+Encrypt and decrypt file manually:
+
+- You can use functions from file `src/helpers/crypto/crypto.py`:
+
+  Examples below are extracted from file `client/api.py`:
+
+  <details>
+  <summary>Generate RSA key pair</summary>
+
+  ```python
+  def register(username, password)
+      # ...
+      e, d, n = generateAndWriteKeyToFile("", writeFile=True)
+  ```
+
+  </details>
+
+  <details>
+  <summary>Encrypt file</summary>
+
+  ```python
+  def uploadImage(fileName)
+      # ...
+      encrypt(
+          fileName,
+          n=n,
+          e=e,
+          imgEncryptedSaveDst=fileName_encrypt,
+          quotientSaveDst="quotient.txt",
+      )
+  ```
+
+  </details>
+
+  <details>
+  <summary>Decrypt file</summary>
+
+  ```python
+  def downloadImage(downloadFile, privateKeyPath)
+      # ...
+      decrypt(
+          imgEncryptedPath=downloadFile,
+          privateKeyPath=privateKeyPath,
+          imgDecryptedSaveDst=downloadFile_d,
+      )
+  ```
+
+  </details>
 
 <!-- REST API Documentation -->
 
@@ -421,7 +482,7 @@ OR:
 
 See it on [Wiki](https://github.com/DuckyMomo20012/image-n-crypt/wiki), [REST API
 endpoints](https://github.com/DuckyMomo20012/image-n-crypt/wiki/REST-API-endpoints)
-page.
+page, with details about implementation and explanation.
 
 <!-- RSA Encryption Algorithm -->
 
@@ -519,11 +580,11 @@ Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.c
 
 Here are useful resources and libraries that we have used in our projects.
 
-- [Flask](https://flask.palletsprojects.com/): a lightweight WSGI web
+- [Flask](https://flask.palletsprojects.com/): A lightweight WSGI web
   application framework.
-- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/): a Flask
+- [Flask-RESTX](https://flask-restx.readthedocs.io/en/latest/): A Flask
   extension that provides a consistent, simple, and powerful API framework.
 - [Flask-JWT-Extended](https://flask-jwt-extended.readthedocs.io/en/latest/):
-  adds support for using JSON Web Tokens (JWT) to Flask for protecting routes.
+  Adds support for using JSON Web Tokens (JWT) to Flask for protecting routes.
 - [Awesome Readme Template](https://github.com/Louis3797/awesome-readme-template):
   A detailed template to bootstrap your README file quickly.
