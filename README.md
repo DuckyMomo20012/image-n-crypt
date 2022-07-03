@@ -144,14 +144,8 @@ your .env file
 
 `SECRET_KEY`: Secret key for Flask application
 
-`SESSION_COOKIE_SECURE`: Controls whether the cookie should be set with the
-HTTPS protocol. Default: `False`.
-
 `UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded
 images.
-
-`WTF_CSRF_ENABLED`: Controls whether CSRF protection is enabled. Default:
-`False` (Recommend).
 
 `FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
 
