@@ -1,0 +1,31 @@
+{
+  "name": "Image-N-crypt",
+  "description": "Flask server for storing encrypted images",
+  "keywords": ["flask", "cryptography", "rest-api"],
+  "logo": "https://nodered.org/about/resources/media/node-red-icon.png",
+  "repository": "https://github.com/DuckyMomo20012/image-n-crypt",
+  "success_url": "/api/v1",
+  "website": "https://github.com/DuckyMomo20012/image-n-crypt",
+  "env": {
+    "SECRET_KEY": {
+      "description": "Secret key for Flask application"
+    },
+    "UPLOADED_IMAGES_DEST": {
+      "description": "Destination folder for server downloading uploaded images"
+    },
+    "FLASK_ENV": {
+      "description": "Enable hot reloading in development mode",
+      "value": "production"
+    },
+    "JWT_ACCESS_TOKEN_EXPIRES": {
+      "description": "Time in seconds for access token expiration",
+      "value": "3600"
+    },
+    "JWT_SECRET_KEY": {
+      "description": "Secret key for JWT"
+    },
+    "MONGODB_HOST": {
+      "description": "An URI to connect to your database"
+    }
+  }
+}

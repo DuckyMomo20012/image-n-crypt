@@ -55,7 +55,7 @@
   - [Installation](#gear-installation)
   - [Running Tests](#test_tube-running-tests)
   - [Run Locally](#running-run-locally)
-  <!-- - [Deployment](#triangular_flag_on_post-deployment) -->
+  - [Deployment](#triangular_flag_on_post-deployment)
 - [Usage](#eyes-usage)
 - [REST API Documentation](#book-rest-api-documentation)
 - [RSA Encryption Algorithm](#crystalball-rsa-encryption-algorithm)
@@ -314,13 +314,11 @@ http://127.0.0.1:5000/api/v1/
 
 <!-- Deployment -->
 
-<!-- ### :triangular_flag_on_post: Deployment
+### :triangular_flag_on_post: Deployment
 
-To deploy this project run
+To deploy this project on Heroku
 
-```bash
-  yarn deploy
-``` -->
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 <!-- Usage -->
 
