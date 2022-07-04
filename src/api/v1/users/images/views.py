@@ -7,6 +7,7 @@ from flask_restx import Resource
 from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
 
+from app import env
 from app import images as localImage
 from src.api.v1.users.images.doc import (
     editPermissionFormParser,
@@ -110,7 +111,8 @@ class ListAndUploadImage(Resource):
                 extImg=ext,
             )
             # Save locally
-            localImage.save(request.files["imageFile"])
+            if env.bool("DOWNLOAD_UPLOADED_IMAGES", default=False) is True:
+                localImage.save(request.files["imageFile"])
             # Save on Mongo
             image.save()
             return (

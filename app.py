@@ -14,7 +14,7 @@ app.config.update(
     # App configs
     SECRET_KEY=env.str("SECRET_KEY"),
     SESSION_COOKIE_SECURE=False,
-    UPLOADED_IMAGES_DEST=env.str("UPLOADED_IMAGES_DEST"),
+    UPLOADED_IMAGES_DEST=env.str("UPLOADED_IMAGES_DEST", default="src/assets"),
     WTF_CSRF_ENABLED=False,
     FLASK_ENV=env.str("FLASK_ENV", default="production"),
     # JWT configs
