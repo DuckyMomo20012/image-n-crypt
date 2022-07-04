@@ -7,6 +7,7 @@ from flask_restx import Resource
 from werkzeug.datastructures import CombinedMultiDict
 from werkzeug.utils import secure_filename
 
+from app import env
 from app import images as localImage
 from src.api.v1.users.images.doc import (
     editPermissionFormParser,
@@ -16,7 +17,12 @@ from src.api.v1.users.images.doc import (
     shareImageFormParser,
     uploadImageFormParser,
 )
-from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
+from src.api.v1.users.images.model import (
+    Image,
+    ImageForm,
+    ImagePermission,
+    ImagePermissionForm,
+)
 from src.api.v1.users.images.service import (
     deleteOneImagePermission,
     editOneImageRolePermission,
@@ -110,7 +116,8 @@ class ListAndUploadImage(Resource):
                 extImg=ext,
             )
             # Save locally
-            localImage.save(request.files["imageFile"])
+            if env.bool("DOWNLOAD_UPLOADED_IMAGES", default=False) is True:
+                localImage.save(request.files["imageFile"])
             # Save on Mongo
             image.save()
             return (
@@ -135,6 +142,9 @@ class DownloadAndDeleteImage(Resource):
     )
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
+
+        if userId != curUserId:
+            abort(401, description="User is not authorized")
 
         image = getOneImage(userId, fileName)
 
@@ -334,17 +344,25 @@ class ShareImage(Resource):
         if not image:
             abort(404, description="Image not found")
 
-        sharedUserId = request.form["user_id"]
-        sharedUserRole = request.form["role"]
-        imageOnePermit = getOneImagePermission(userId, fileName, sharedUserId)
-        # DB can find a permission has userId == curUserId
-        if imageOnePermit:
-            abort(409, description="Permission user id is already exists")
+        form = ImagePermissionForm()
 
-        newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
-        image.permissions.append(newPermission)
-        image.save()
-        return (
-            "",
-            201,
-        )
+        if form.validate_on_submit():
+
+            sharedUserId = request.form["user_id"]
+            sharedUserRole = request.form["role"]
+            imageOnePermit = getOneImagePermission(userId, fileName, sharedUserId)
+            # DB can find a permission has userId == curUserId
+            if imageOnePermit:
+                abort(409, description="Permission user id is already exists")
+
+            newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
+            image.permissions.append(newPermission)
+            image.save()
+            return (
+                "",
+                201,
+            )
+
+        if form.errors:
+            errorMessage = ", ".join(flatten(form.errors))
+            abort(422, description=errorMessage)

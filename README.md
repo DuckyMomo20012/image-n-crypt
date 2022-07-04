@@ -116,11 +116,11 @@
 
 ### :dart: Features
 
-- Registration.
-- Login.
-- Storing image: app client encrypts the image with RSA and sends the request to
-  the server to store the image.
-  - Image encrypted is required to be **openable** and can't be recognized by attackers.
+- Register and login user.
+- Storing image: app client encrypts the image with RSA algorithm and sends the
+  request to the server to store the image.
+  - Image encrypted is required to be **openable**, but the opener may or may
+    not understand the image.
 - View the image list.
 - Download image: client download encrypted images and decrypts it using the
   user's RSA private key.
@@ -130,7 +130,7 @@
 - After registration, an account is created with this information:
   - username.
   - ID.
-  - RSA public key (provided by the client app for the user after registration).
+  - RSA public key (provided by the user before registration).
 - Server connects with the client by using REST API.
 
 <!-- Env Variables -->
@@ -142,14 +142,20 @@ your .env file
 
 **App configs**
 
-`SECRET_KEY`: Secret key for Flask application
+`SECRET_KEY`: Secret key for Flask application.
 
 `UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded
-images.
+images. Default: `src/assets`.
+
+> NOTE: The application will automatically create a new `UPLOADED_IMAGE_DEST`
+> directory if it does not exist.
 
 `FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
 
 > NOTE: Change to "development" to enable hot reloading.
+
+`DOWNLOAD_UPLOADED_IMAGES`: Enable server downloading uploaded images. Default:
+`False`.
 
 **JWT configs**
 
@@ -167,11 +173,10 @@ E.g:
 ```
 # App configs
 SECRET_KEY="my secret key"
-SESSION_COOKIE_SECURE=False
 UPLOADED_IMAGES_DEST="src/assets"
-WTF_CSRF_ENABLED=False
 # Change to "development" to enable hot reloading
 FLASK_ENV="production"
+DOWNLOAD_UPLOADED_IMAGES=False
 
 # JWT configs
 JWT_ACCESS_TOKEN_EXPIRES=3600 # 1 hour
@@ -522,7 +527,7 @@ Upload images:
 
 - Currently, you can only upload images in PNG format.
 
-- Image should have small size.
+- Image should have a small size.
 
 <!-- REST API Documentation -->
 
@@ -551,8 +556,7 @@ This section has moved to
       Authentication~~
 - [x] Set the expiration time for the token. NOTE: It works!.
 - [x] Add validator for only .PNG image file.
-- [ ] Allow user to get back revoked token.
-- [ ] Handle expired token error.
+- [x] Handle expired token error.
 - [ ] Support more image extensions, and more file types.
 - [ ] Client support decrypt image service.
 - [ ] Handle file permissions (read/write)
@@ -591,7 +595,7 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
 - Client console error: `ModuleNotFoundError: No module named 'src'`:
 
-  - You are not exporting `PYTHONPATH` environment variable to the project
+  - You are not exporting the `PYTHONPATH` environment variable to the project
     directory.
 
   - Run this command:

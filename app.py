@@ -1,5 +1,5 @@
 from environs import Env
-from flask import Flask
+from flask import Flask, redirect
 from flask_jwt_extended import JWTManager
 from flask_mongoengine import MongoEngine
 from flask_uploads import UploadSet, configure_uploads
@@ -14,12 +14,13 @@ app.config.update(
     # App configs
     SECRET_KEY=env.str("SECRET_KEY"),
     SESSION_COOKIE_SECURE=False,
-    UPLOADED_IMAGES_DEST=env.str("UPLOADED_IMAGES_DEST"),
+    UPLOADED_IMAGES_DEST=env.str("UPLOADED_IMAGES_DEST", default="src/assets"),
     WTF_CSRF_ENABLED=False,
     FLASK_ENV=env.str("FLASK_ENV", default="production"),
     # JWT configs
     JWT_ACCESS_TOKEN_EXPIRES=env.int("JWT_ACCESS_TOKEN_EXPIRES", default=3600),
     JWT_SECRET_KEY=env.str("JWT_SECRET_KEY"),
+    JWT_ERROR_MESSAGE_KEY="message",
     # MongoDB configs
     MONGODB_HOST=env.str("MONGODB_HOST"),
 )
@@ -46,3 +47,8 @@ from src.api import (  # noqa
 )
 
 app.register_blueprint(v1_blueprint, url_prefix="/api/v1")
+
+
+@app.route("/")
+def index():
+    return redirect("/api/v1")

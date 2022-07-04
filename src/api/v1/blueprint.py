@@ -5,7 +5,7 @@ from src.api.v1.auth.views import ns_auth
 from src.api.v1.users.views import ns_users
 
 # JWT views need to be imported for app.py to work
-from .auth.views import (
+from .jwt.views import (
     check_if_token_is_revoked,
     revoked_token_handler,
     user_identity_lookup,
