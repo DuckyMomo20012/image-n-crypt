@@ -10,16 +10,10 @@
     "SECRET_KEY": {
       "description": "Secret key for Flask application"
     },
-    "UPLOADED_IMAGES_DEST": {
-      "description": "Destination folder for server downloading uploaded images"
-    },
-    "FLASK_ENV": {
-      "description": "Enable hot reloading in development mode",
-      "value": "production"
-    },
     "JWT_ACCESS_TOKEN_EXPIRES": {
       "description": "Time in seconds for access token expiration",
-      "value": "3600"
+      "value": "3600",
+      "required": false
     },
     "JWT_SECRET_KEY": {
       "description": "Secret key for JWT"
