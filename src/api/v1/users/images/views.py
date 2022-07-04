@@ -138,6 +138,9 @@ class DownloadAndDeleteImage(Resource):
     def get(self, userId, fileName):
         curUserId = str(current_user.id)
 
+        if userId != curUserId:
+            abort(401, description="User is not authorized")
+
         image = getOneImage(userId, fileName)
 
         if image:
