@@ -116,11 +116,11 @@
 
 ### :dart: Features
 
-- Registration.
-- Login.
-- Storing image: app client encrypts the image with RSA and sends the request to
-  the server to store the image.
-  - Image encrypted is required to be **openable** and can't be recognized by attackers.
+- Register and login user.
+- Storing image: app client encrypts the image with RSA algorithm and sends the
+  request to the server to store the image.
+  - Image encrypted is required to be **openable**, but the opener may or may
+    not understand the image.
 - View the image list.
 - Download image: client download encrypted images and decrypts it using the
   user's RSA private key.
@@ -130,7 +130,7 @@
 - After registration, an account is created with this information:
   - username.
   - ID.
-  - RSA public key (provided by the client app for the user after registration).
+  - RSA public key (provided by the user before registration).
 - Server connects with the client by using REST API.
 
 <!-- Env Variables -->
@@ -556,7 +556,6 @@ This section has moved to
       Authentication~~
 - [x] Set the expiration time for the token. NOTE: It works!.
 - [x] Add validator for only .PNG image file.
-- [ ] Allow user to get back revoked token.
 - [x] Handle expired token error.
 - [ ] Support more image extensions, and more file types.
 - [ ] Client support decrypt image service.
