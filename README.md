@@ -193,26 +193,44 @@ variables.
 
 ### :bangbang: Prerequisites
 
-This project uses [Poetry](https://python-poetry.org/) as package manager
+- Python: `>= 3.9`.
 
-Linux, macOS, Windows (WSL)
+- This project uses [Poetry](https://python-poetry.org/) as package manager
 
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
+  Linux, macOS, Windows (WSL)
 
-Read more about installation on
-[Poetry documentation](https://python-poetry.org/docs/master/#installation).
+  ```bash
+  curl -sSL https://install.python-poetry.org | python3 -
+  ```
+
+  Read more about installation on
+  [Poetry documentation](https://python-poetry.org/docs/master/#installation).
 
 <!-- Installation -->
 
 ### :gear: Installation
 
-Install image-n-crypt with Poetry
+Install file-crypto with Poetry
 
 ```bash
 poetry install
-cd image-n-crypt
+cd file-crypto
+```
+
+OR:
+
+Export Poetry dependencies to file `requirements.txt`
+
+```bash
+poetry export -f requirements.txt --output requirements.txt
+```
+
+> NOTE: You can add option: `--dev` to include development dependencies.
+
+Then install dependencies with `pip`
+
+```bash
+pip install -r requirements.txt
 ```
 
 <!-- Running Tests -->
@@ -500,6 +518,12 @@ Encrypt and decrypt files manually:
 
   </details>
 
+Upload images:
+
+- Currently, you can only upload images in PNG format.
+
+- Image should have small size.
+
 <!-- REST API Documentation -->
 
 ## :book: REST API Documentation
@@ -567,7 +591,8 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
 - Client console error: `ModuleNotFoundError: No module named 'src'`:
 
-  - You are not exporting PYTHONPATH to the project directory.
+  - You are not exporting `PYTHONPATH` environment variable to the project
+    directory.
 
   - Run this command:
 
