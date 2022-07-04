@@ -1,7 +1,7 @@
 import json
 
 from flask import abort
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import current_user, jwt_required
 from flask_restx import Namespace, Resource
 
 from src.api.v1.users.service import getAllUsers, getUserById
@@ -50,8 +50,14 @@ class GetUserInformation(Resource):
     @jwt_required()
     @ns_users.marshal_with(userModel, description="User information")
     def get(self, userId):
-        user = json.loads(getUserById(userId).to_json())
+        curUserId = str(current_user.id)
+
+        if userId != curUserId:
+            abort(401, description="User is not authorized")
+
+        user = getUserById(userId)
         if user:
+            user = json.loads(user.to_json())
             return (
                 {
                     "public_key": user["publicKey"],
