@@ -552,7 +552,7 @@ This section has moved to
 - [x] Set the expiration time for the token. NOTE: It works!.
 - [x] Add validator for only .PNG image file.
 - [ ] Allow user to get back revoked token.
-- [ ] Handle expired token error.
+- [x] Handle expired token error.
 - [ ] Support more image extensions, and more file types.
 - [ ] Client support decrypt image service.
 - [ ] Handle file permissions (read/write)

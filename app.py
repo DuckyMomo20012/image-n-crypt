@@ -20,6 +20,7 @@ app.config.update(
     # JWT configs
     JWT_ACCESS_TOKEN_EXPIRES=env.int("JWT_ACCESS_TOKEN_EXPIRES", default=3600),
     JWT_SECRET_KEY=env.str("JWT_SECRET_KEY"),
+    JWT_ERROR_MESSAGE_KEY="message",
     # MongoDB configs
     MONGODB_HOST=env.str("MONGODB_HOST"),
 )

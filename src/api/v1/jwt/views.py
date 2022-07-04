@@ -4,6 +4,11 @@ from app import jwt
 from src.api.v1.auth.service import getTokenBlocklistByJTI
 from src.api.v1.users.service import getUserById
 
+# NOTE: You can handle JWT errors here. For now, I just rename error message key
+# to "message" by setting JWT_ERROR_MESSAGE_KEY to match with other errors. You
+# can go to page "Configuring Flask-JWT-Extended" on the official docs to see
+# available function handlers.
+
 
 @jwt.user_identity_loader
 def user_identity_lookup(user):
