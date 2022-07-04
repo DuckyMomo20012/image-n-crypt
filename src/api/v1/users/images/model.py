@@ -1,5 +1,6 @@
 import mongoengine as me
 import wtforms as wf
+from bson.objectid import ObjectId
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from wtforms.validators import DataRequired
@@ -17,6 +18,26 @@ class ImageForm(FlaskForm):
     )
     quotient = wf.StringField(
         label="quotient", validators=[DataRequired("Quotient data is required")]
+    )
+
+
+def validateObjectId(form, field):
+    print(field.data)
+    if not ObjectId.is_valid(field.data):
+        raise wf.ValidationError(
+            "Not a valid ObjectId, it must be a 12-byte input or a"
+            " 24-character hex string"
+        )
+
+
+class ImagePermissionForm(FlaskForm):
+    user_id = wf.StringField(
+        label="userId",
+        validators=[DataRequired("User id data is required"), validateObjectId],
+    )
+    role = wf.StringField(
+        label="quotient",
+        validators=[DataRequired("Quotient data is required")],
     )
 
 

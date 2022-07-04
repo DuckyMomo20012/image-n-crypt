@@ -17,7 +17,12 @@ from src.api.v1.users.images.doc import (
     shareImageFormParser,
     uploadImageFormParser,
 )
-from src.api.v1.users.images.model import Image, ImageForm, ImagePermission
+from src.api.v1.users.images.model import (
+    Image,
+    ImageForm,
+    ImagePermission,
+    ImagePermissionForm,
+)
 from src.api.v1.users.images.service import (
     deleteOneImagePermission,
     editOneImageRolePermission,
@@ -339,17 +344,25 @@ class ShareImage(Resource):
         if not image:
             abort(404, description="Image not found")
 
-        sharedUserId = request.form["user_id"]
-        sharedUserRole = request.form["role"]
-        imageOnePermit = getOneImagePermission(userId, fileName, sharedUserId)
-        # DB can find a permission has userId == curUserId
-        if imageOnePermit:
-            abort(409, description="Permission user id is already exists")
+        form = ImagePermissionForm()
 
-        newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
-        image.permissions.append(newPermission)
-        image.save()
-        return (
-            "",
-            201,
-        )
+        if form.validate_on_submit():
+
+            sharedUserId = request.form["user_id"]
+            sharedUserRole = request.form["role"]
+            imageOnePermit = getOneImagePermission(userId, fileName, sharedUserId)
+            # DB can find a permission has userId == curUserId
+            if imageOnePermit:
+                abort(409, description="Permission user id is already exists")
+
+            newPermission = ImagePermission(userId=sharedUserId, role=sharedUserRole)
+            image.permissions.append(newPermission)
+            image.save()
+            return (
+                "",
+                201,
+            )
+
+        if form.errors:
+            errorMessage = ", ".join(flatten(form.errors))
+            abort(422, description=errorMessage)
