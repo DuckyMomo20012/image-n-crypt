@@ -1,5 +1,5 @@
 from environs import Env
-from flask import Flask
+from flask import Flask, redirect
 from flask_jwt_extended import JWTManager
 from flask_mongoengine import MongoEngine
 from flask_uploads import UploadSet, configure_uploads
@@ -46,3 +46,8 @@ from src.api import (  # noqa
 )
 
 app.register_blueprint(v1_blueprint, url_prefix="/api/v1")
+
+
+@app.route("/")
+def index():
+    return redirect("/api/v1")
