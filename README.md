@@ -57,6 +57,11 @@
   - [Run Locally](#running-run-locally)
   - [Deployment](#triangular_flag_on_post-deployment)
 - [Usage](#eyes-usage)
+  - [Register an account](#register-an-account)
+  - [Access protected endpoints](#access-protected-endpoints)
+  - [About file client/api.py](#about-file-clientapipy)
+  - [Encrypt and decrypt files manually](#encrypt-and-decrypt-files-manually)
+  - [Upload image notes](#upload-image-notes)
 - [REST API Documentation](#book-rest-api-documentation)
 - [RSA Encryption Algorithm](#crystalball-rsa-encryption-algorithm)
 - [Roadmap](#compass-roadmap)
@@ -383,13 +388,11 @@ Read more in this tutorial: [Deploying a Flask Application to Heroku](https://st
 
 ## :eyes: Usage
 
-First, you need to register an account.
+### Register an account
 
 To register an account, you need to generate RSA key pair. You have to use the
 function `generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to
-generate key pair.
-
-This will create two files:
+generate key pair. Running function will create two files:
 
 - `rsa.txt`: RSA private key (This file must be kept secretly).
 - `rsa_pub.txt`: RSA public key.
@@ -410,7 +413,9 @@ After login, you will receive an `access_token`.
 
 </details>
 
-Use `access_token` to access protected endpoints:
+### Access protected endpoints
+
+You have to use your `access_token` to access protected endpoints.
 
 - **Hoppscotch**:
 
@@ -436,7 +441,9 @@ Use `access_token` to access protected endpoints:
 
   </details>
 
-  OR: clicking the **lock icon (:lock:)** on protected endpoints.
+  OR:
+
+  Clicking the **lock icon (:lock:)** on protected endpoints.
 
   Then type your access token in the input field. E.g:
 
@@ -463,7 +470,7 @@ Use `access_token` to access protected endpoints:
 
 > NOTE: Access token will be expired after 1 hour.
 
-Using file `client/api.py`:
+### About file `client/api.py`:
 
 - All functions ALWAYS return a tuple[message, status code] `(tuple[str, int])`.
 
@@ -474,56 +481,56 @@ Using file `client/api.py`:
 - To handle this response, you can use the function `handleRes` in
   `client/helpers.py` (This function is used by the client console too).
 
-Encrypt and decrypt files manually:
+### Encrypt and decrypt files manually:
 
-- You can use functions from file `src/helpers/crypto/crypto.py`:
+You can use functions from file `src/helpers/crypto/crypto.py`.
 
-  Examples below are extracted from file `client/api.py`:
+Examples below are extracted from file `client/api.py`:
 
   <details>
   <summary>Generate RSA key pair</summary>
 
-  ```python
-  def register(username, password)
-      # ...
-      e, d, n = generateAndWriteKeyToFile("", writeFile=True)
-  ```
+```python
+def register(username, password)
+    # ...
+    e, d, n = generateAndWriteKeyToFile("", writeFile=True)
+```
 
   </details>
 
   <details>
   <summary>Encrypt file</summary>
 
-  ```python
-  def uploadImage(fileName)
-      # ...
-      encrypt(
-          fileName,
-          n=n,
-          e=e,
-          imgEncryptedSaveDst=fileName_encrypt,
-          quotientSaveDst="quotient.txt",
-      )
-  ```
+```python
+def uploadImage(fileName)
+    # ...
+    encrypt(
+        fileName,
+        n=n,
+        e=e,
+        imgEncryptedSaveDst=fileName_encrypt,
+        quotientSaveDst="quotient.txt",
+    )
+```
 
   </details>
 
   <details>
   <summary>Decrypt file</summary>
 
-  ```python
-  def downloadImage(downloadFile, privateKeyPath)
-      # ...
-      decrypt(
-          imgEncryptedPath=downloadFile,
-          privateKeyPath=privateKeyPath,
-          imgDecryptedSaveDst=downloadFile_d,
-      )
-  ```
+```python
+def downloadImage(downloadFile, privateKeyPath)
+    # ...
+    decrypt(
+        imgEncryptedPath=downloadFile,
+        privateKeyPath=privateKeyPath,
+        imgDecryptedSaveDst=downloadFile_d,
+    )
+```
 
   </details>
 
-Upload images:
+### Upload image notes
 
 - Currently, you can only upload images in PNG format.
 
