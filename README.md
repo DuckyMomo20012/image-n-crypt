@@ -52,9 +52,8 @@
   - [Environment Variables](#key-environment-variables)
 - [Getting Started](#toolbox-getting-started)
   - [Prerequisites](#bangbang-prerequisites)
-  - [Installation](#gear-installation)
-  - [Running Tests](#test_tube-running-tests)
   - [Run Locally](#running-run-locally)
+  - [Running Tests](#test_tube-running-tests)
   - [Deployment](#triangular_flag_on_post-deployment)
 - [Usage](#eyes-usage)
   - [Register an account](#register-an-account)
@@ -143,7 +142,7 @@
 ### :key: Environment Variables
 
 To run this project, you will need to add the following environment variables to
-your .env file
+your .env file.
 
 **App configs**
 
@@ -205,7 +204,7 @@ variables.
 
 - Python: `>= 3.9`.
 
-- This project uses [Poetry](https://python-poetry.org/) as package manager
+- This project uses [Poetry](https://python-poetry.org/) as package manager:
 
   Linux, macOS, Windows (WSL)
 
@@ -216,20 +215,31 @@ variables.
   Read more about installation on
   [Poetry documentation](https://python-poetry.org/docs/master/#installation).
 
-<!-- Installation -->
+<!-- Run Locally -->
 
-### :gear: Installation
+### :running: Run Locally
 
-Install file-crypto with Poetry
+Clone the project:
+
+```bash
+git clone https://github.com/DuckyMomo20012/image-n-crypt.git
+```
+
+Go to the project directory:
+
+```bash
+cd image-n-crypt
+```
+
+Install dependencies:
 
 ```bash
 poetry install
-cd file-crypto
 ```
 
 OR:
 
-Export Poetry dependencies to file `requirements.txt`
+Export Poetry dependencies to file `requirements.txt`:
 
 ```bash
 poetry export -f requirements.txt --output requirements.txt
@@ -237,11 +247,35 @@ poetry export -f requirements.txt --output requirements.txt
 
 > NOTE: You can add option: `--dev` to include development dependencies.
 
-Then install dependencies with `pip`
+Then install dependencies with `pip`:
 
 ```bash
 pip install -r requirements.txt
 ```
+
+---
+
+Activate virtual environment:
+
+```bash
+poetry shell
+```
+
+Start the program:
+
+```bash
+poe dev
+```
+
+OR
+
+```bash
+flask run
+```
+
+Access local Swagger documentation:
+
+http://127.0.0.1:5000/api/v1/
 
 <!-- Running Tests -->
 
@@ -295,50 +329,6 @@ pip install -r requirements.txt
     ```
 
     </details>
-
-<!-- Run Locally -->
-
-### :running: Run Locally
-
-Clone the project
-
-```bash
-git clone https://github.com/DuckyMomo20012/image-n-crypt.git
-```
-
-Go to the project directory
-
-```bash
-cd image-n-crypt
-```
-
-Install dependencies
-
-```bash
-poetry install
-```
-
-Activate virtual environment
-
-```bash
-poetry shell
-```
-
-Start the program
-
-```bash
-poe dev
-```
-
-OR
-
-```bash
-flask run
-```
-
-Access local Swagger documentation
-
-http://127.0.0.1:5000/api/v1/
 
 <!-- Deployment -->
 
@@ -582,7 +572,7 @@ Contributions are always welcome!
 
 ### :scroll: Code of Conduct
 
-Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/CODE_OF_CONDUCT.md)
+Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/CODE_OF_CONDUCT.md).
 
 <!-- FAQ -->
 
@@ -632,7 +622,9 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
 ## :warning: License
 
-Distributed under MIT license. See [LICENSE](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/LICENSE) for more information.
+Distributed under MIT license. See
+[LICENSE](https://github.com/DuckyMomo20012/image-n-crypt/blob/main/LICENSE) for
+more information.
 
 <!-- Contact -->
 
@@ -640,13 +632,13 @@ Distributed under MIT license. See [LICENSE](https://github.com/DuckyMomo20012/i
 
 Duong Vinh - [@duckymomo20012](https://twitter.com/duckymomo20012) - tienvinh.duong4@gmail.com
 
-Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.com/DuckyMomo20012/image-n-crypt)
+Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.com/DuckyMomo20012/image-n-crypt).
 
 <!-- Acknowledgments -->
 
 ## :gem: Acknowledgements
 
-Here are useful resources and libraries that we have used in our projects.
+Here are useful resources and libraries that we have used in our projects:
 
 - [Flask](https://flask.palletsprojects.com/): A lightweight WSGI web
   application framework.
