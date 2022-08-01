@@ -105,7 +105,7 @@ markupsafe==2.1.1; python_version >= "3.7" and python_version < "4" \
 marshmallow==3.17.0; python_version >= "3.7" \
     --hash=sha256:00040ab5ea0c608e8787137627a8efae97fabd60552a05dc889c888f814e75eb \
     --hash=sha256:635fb65a3285a31a30f276f30e958070f5214c7196202caa5c7ecf28f5274bc7
-mongoengine==0.24.1; python_version >= "3.6" \
+mongoengine==0.24.2; python_version >= "3.6" \
     --hash=sha256:68878b65bcb3751debcba4342180a180161cdb5f46525027e622ad081dd44fac \
     --hash=sha256:01baac85f408f5eefb6195c0afeae631e7fc6fab5cb221a7b46646f94227d6da
 numpy==1.23.0; python_version >= "3.10" and platform_system == "Linux" and platform_machine == "aarch64" or python_version >= "3.10" or python_version >= "3.9" and platform_system == "Darwin" and platform_machine == "arm64" \
