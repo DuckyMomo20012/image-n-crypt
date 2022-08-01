@@ -25,7 +25,7 @@ email-validator==1.2.1; python_version >= "3.7" and python_full_version < "3.0.0
 environs==9.5.0; python_version >= "3.6" \
     --hash=sha256:1e549569a3de49c05f856f40bce86979e7d5ffbbc4398e7f338574c220189124 \
     --hash=sha256:a76307b36fbe856bdca7ee9161e6c466fd7fcffc297109a118c59b54e27e30c9
-flask-jwt-extended==4.4.2; python_version >= "3.6" and python_version < "4" \
+flask-jwt-extended==4.4.3; python_version >= "3.6" and python_version < "4" \
     --hash=sha256:f582bba980fcf728ab7250dbb6fbdca8d4e074e24eb2915b01184376ffff98c7 \
     --hash=sha256:793f9e720d0e679cea8f99af6436819bfd1622fc345afeff48878c09f42548f6
 flask-mongoengine==1.0.0 \
