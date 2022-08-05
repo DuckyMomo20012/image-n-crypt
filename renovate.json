@@ -1,8 +1,17 @@
 {
-  "extends": [
-    "config:base"
+  "extends": ["config:base"],
+  "schedule": ["before 7am on the first day of the month"],
+  "groupName": "all dependencies",
+  "separateMajorMinor": false,
+  "groupSlug": "all",
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "groupName": "all dependencies",
+      "groupSlug": "all"
+    }
   ],
-  "schedule": [
-    "before 7am on the first day of the month"
-  ]
+  "lockFileMaintenance": {
+    "enabled": false
+  }
 }
