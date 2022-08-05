@@ -56,13 +56,13 @@
   - [Running Tests](#test_tube-running-tests)
   - [Deployment](#triangular_flag_on_post-deployment)
 - [Usage](#eyes-usage)
-  - [Register an account](#register-an-account)
-  - [Access protected endpoints](#access-protected-endpoints)
-  - [About file client/api.py](#about-file-clientapipy)
-  - [Encrypt and decrypt files manually](#encrypt-and-decrypt-files-manually)
-  - [Upload image notes](#upload-image-notes)
+  - [Register an account](#raising_hand-register-an-account)
+  - [Access protected endpoints](#no_pedestrians-access-protected-endpoints)
+  - [About file client/api.py](#information_source-about-file-clientapipy)
+  - [Encrypt and decrypt files manually](#asterisk-encrypt-and-decrypt-files-manually)
+  - [Upload image notes](#outbox_tray-upload-image-notes)
 - [REST API Documentation](#book-rest-api-documentation)
-- [RSA Encryption Algorithm](#crystalball-rsa-encryption-algorithm)
+- [RSA Encryption Algorithm](#crystal_ball-rsa-encryption-algorithm)
 - [Roadmap](#compass-roadmap)
 - [Contributing](#wave-contributing)
   - [Code of Conduct](#scroll-code-of-conduct)
@@ -142,35 +142,35 @@
 ### :key: Environment Variables
 
 To run this project, you will need to add the following environment variables to
-your .env file.
+your `.env` file:
 
-**App configs**
+- **App configs:**
 
-`SECRET_KEY`: Secret key for Flask application.
+  `SECRET_KEY`: Secret key for Flask application.
 
-`UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded
-images. Default: `src/assets`.
+  `UPLOADED_IMAGES_DEST`: Destination folder for server downloading uploaded
+  images. Default: `src/assets`.
 
-> NOTE: The application will automatically create a new `UPLOADED_IMAGE_DEST`
-> directory if it does not exist.
+  > **Note**: The application will automatically create a new `UPLOADED_IMAGE_DEST`
+  > directory if it does not exist and `DOWNLOAD_UPLOADED_IMAGES` is `True`.
 
-`FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
+  `FLASK_ENV`: Enable hot reloading in `development` mode. Default: `production`.
 
-> NOTE: Change to "development" to enable hot reloading.
+  > **Note**: Change to "development" mode to enable hot reloading.
 
-`DOWNLOAD_UPLOADED_IMAGES`: Enable server downloading uploaded images. Default:
-`False`.
+  `DOWNLOAD_UPLOADED_IMAGES`: Enable server downloading uploaded images. Default:
+  `False`.
 
-**JWT configs**
+- **JWT configs:**
 
-`JWT_ACCESS_TOKEN_EXPIRES`: Time in seconds for access token expiration.
-Default: `3600` (1 hour).
+  `JWT_ACCESS_TOKEN_EXPIRES`: Time in seconds for access token expiration.
+  Default: `3600` (1 hour).
 
-`JWT_SECRET_KEY`: Secret key for JWT.
+  `JWT_SECRET_KEY`: Secret key for JWT.
 
-**MongoDB configs**
+- **MongoDB configs:**
 
-`MONGODB_HOST`: An URI to connect to your database
+  `MONGODB_HOST`: An URI to connect to your database
 
 E.g:
 
@@ -245,7 +245,7 @@ Export Poetry dependencies to file `requirements.txt`:
 poetry export -f requirements.txt --output requirements.txt
 ```
 
-> NOTE: You can add option: `--dev` to include development dependencies.
+> **Note**: You can add option: `--dev` to include development dependencies.
 
 Then install dependencies with `pip`:
 
@@ -305,7 +305,7 @@ http://127.0.0.1:5000/api/v1/
 
     - You can run this client using the file `client/main.py`.
 
-    > NOTE: But you can use this client to **decrypt** downloaded images!.
+    > **Note**: But you can use this client to **decrypt** downloaded images!.
 
 - **Sample data**:
 
@@ -352,9 +352,9 @@ Requirement files:
   web: gunicorn app:app
   ```
 
-  > NOTE: "web" for a web process type.
+  > **Note**: "web" for a web process type.
 
-  > NOTE: first "app" refers to file `app.py` and second "app" refers to
+  > **Note**: first "app" refers to file `app.py` and second "app" refers to
   > `app = Flask(__name__)` in file `app.py`.
   > [Ref](https://stackoverflow.com/a/52005826/12512981).
 
@@ -365,7 +365,8 @@ Requirement files:
   poetry export -f requirements.txt --output requirements.txt
   ```
 
-  > NOTE: You have to install `gunicorn` dependency in your requirements.txt.
+  > **Note**: You have to install `gunicorn` dependency in your
+  > `requirements.txt`.
 
 - **app.json**: This file is required for deploying on Heroku using deploy
   button.
@@ -378,7 +379,7 @@ Read more in this tutorial: [Deploying a Flask Application to Heroku](https://st
 
 ## :eyes: Usage
 
-### Register an account
+### :raising_hand: Register an account
 
 To register an account, you need to generate RSA key pair. You have to use the
 function `generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to
@@ -403,7 +404,9 @@ After login, you will receive an `access_token`.
 
 </details>
 
-### Access protected endpoints
+> **Note**: Access token will be expired after **1 hour**.
+
+### :no_pedestrians: Access protected endpoints
 
 You have to use your `access_token` to access protected endpoints.
 
@@ -419,7 +422,7 @@ You have to use your `access_token` to access protected endpoints.
 
   </details>
 
-  > NOTE: You have to choose **Authorization Type**: `Bearer`
+  > **Note**: You have to choose **Authorization Type**: `Bearer`
 
 - **Swagger doc**: you MUST add your access token to access protected
   endpoints. By clicking the `Authorize` button:
@@ -441,7 +444,7 @@ You have to use your `access_token` to access protected endpoints.
   Bearer eyJ0eXAiO...
   ```
 
-  > NOTE: Must be in the format `Bearer {access_token}`.
+  > **Note**: Must be in the format `Bearer {access_token}`.
 
 - **File `client/api.py`**:
 
@@ -458,9 +461,7 @@ You have to use your `access_token` to access protected endpoints.
 
   </details>
 
-> NOTE: Access token will be expired after 1 hour.
-
-### About file `client/api.py`:
+### :information_source: About file `client/api.py`:
 
 - All functions ALWAYS return a tuple[message, status code] `(tuple[str, int])`.
 
@@ -471,7 +472,7 @@ You have to use your `access_token` to access protected endpoints.
 - To handle this response, you can use the function `handleRes` in
   `client/helpers.py` (This function is used by the client console too).
 
-### Encrypt and decrypt files manually:
+### :asterisk: Encrypt and decrypt files manually:
 
 You can use functions from file `src/helpers/crypto/crypto.py`.
 
@@ -520,7 +521,7 @@ def downloadImage(downloadFile, privateKeyPath)
 
   </details>
 
-### Upload image notes
+### :outbox_tray: Upload image notes
 
 - Currently, you can only upload images in PNG format.
 
@@ -550,13 +551,13 @@ This section has moved to
 ## :compass: Roadmap
 
 - [x] Important: Remove entirely CSRF protection. ~~Keeps CSRF for
-      Authentication~~
-- [x] Set the expiration time for the token. NOTE: It works!.
+      Authentication~~.
+- [x] Set the expiration time for the token.
 - [x] Add validator for only .PNG image file.
 - [x] Handle expired token error.
 - [ ] Support more image extensions, and more file types.
 - [ ] Client support decrypt image service.
-- [ ] Handle file permissions (read/write)
+- [ ] Handle file permissions (read/write).
 
 <!-- Contributing -->
 
@@ -597,13 +598,13 @@ Please read the [Code of Conduct](https://github.com/DuckyMomo20012/image-n-cryp
 
   - Run this command:
 
-    - Windows:
+    - **Windows:**
 
       ```console
       set PYTHONPATH=%cd%
       ```
 
-    - Linux:
+    - **Linux:**
 
       ```bash
       export PYTHONPATH=$(pwd)
