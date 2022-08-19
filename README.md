@@ -121,8 +121,8 @@
 ### :dart: Features
 
 - Register and login user.
-- Storing image: app client encrypts the image with RSA algorithm and sends the
-  request to the server to store the image.
+- Storing image: app client encrypts the image with the RSA algorithm and sends
+  the request to the server to store the image.
   - Image encrypted is required to be **openable**, but the opener may or may
     not understand the image.
 - View the image list.
@@ -175,6 +175,7 @@ your `.env` file:
 E.g:
 
 ```
+# .env
 # App configs
 SECRET_KEY="my secret key"
 UPLOADED_IMAGES_DEST="src/assets"
@@ -191,7 +192,7 @@ JWT_SECRET_KEY="my super secret key"
 MONGODB_HOST="mongodb+srv://{username}:{password}@crypto-image.u1r0p.mongodb.net/test"
 ```
 
-You can also checkout file `.env.example` to see all required environment
+You can also check out the file `.env.example` to see all required environment
 variables.
 
 <!-- Getting Started -->
@@ -255,7 +256,7 @@ pip install -r requirements.txt
 
 ---
 
-Activate virtual environment:
+Activate the virtual environment:
 
 ```bash
 poetry shell
@@ -305,7 +306,7 @@ http://127.0.0.1:5000/api/v1/
 
     - You can run this client using the file `client/main.py`.
 
-    > **Note**: But you can use this client to **decrypt** downloaded images!.
+    > **Note**: But you can use this client to **decrypt** downloaded images!
 
 - **Sample data**:
 
@@ -383,7 +384,7 @@ Read more in this tutorial: [Deploying a Flask Application to Heroku](https://st
 
 To register an account, you need to generate RSA key pair. You have to use the
 function `generateAndWriteKeyToFile` in `src.helpers.crypto.crypto.py` to
-generate key pair. Running function will create two files:
+generate key pair. This function will create two files:
 
 - `rsa.txt`: RSA private key (This file must be kept secretly).
 - `rsa_pub.txt`: RSA public key.
@@ -474,7 +475,7 @@ You have to use your `access_token` to access protected endpoints.
 
 ### :asterisk: Encrypt and decrypt files manually:
 
-You can use functions from file `src/helpers/crypto/crypto.py`.
+You can use functions from the file `src/helpers/crypto/crypto.py`.
 
 Examples below are extracted from file `client/api.py`:
 
@@ -631,7 +632,8 @@ more information.
 
 ## :handshake: Contact
 
-Duong Vinh - [@duckymomo20012](https://twitter.com/duckymomo20012) - tienvinh.duong4@gmail.com
+Duong Vinh - [@duckymomo20012](https://twitter.com/duckymomo20012) -
+tienvinh.duong4@gmail.com
 
 Project Link: [https://github.com/DuckyMomo20012/image-n-crypt](https://github.com/DuckyMomo20012/image-n-crypt).
 
